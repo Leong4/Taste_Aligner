@@ -7,12 +7,12 @@ mode:
   planner: remote
 
 services:
-  memory: "http://localhost:5001/read"
-  vision: "http://localhost:5002/describe"
-  ontology: "http://localhost:5003/normalize"
-  embedding: "http://localhost:5004/generate"
-  recommendation: "http://localhost:5005/score"
-  planner: "http://localhost:5006/compose"
+  vision: "http://localhost:5002"
+  ontology: "http://localhost:5003"
+  embedding: "http://localhost:5004"
+  memory: "http://localhost:5001"
+  recommendation: "http://localhost:5005"
+  planner: "http://localhost:5006"
 
 timeout:
   default: 3000

@@ -160,26 +160,39 @@ public class GatewayServer {
             if (segments.length < 3 || segments[2].isEmpty()) {
                 return ResponseData.badRequest("Missing tool name");
             }
-            String toolName = String.join(".", java.util.Arrays.copyOfRange(segments, 2, segments.length));
-            toolName = toolName.trim().toLowerCase();
+            String toolName = String.join(".", java.util.Arrays.copyOfRange(segments, 2, segments.length))
+                    .trim()
+                    .toLowerCase();
 
-            // Normalize naming: "ontology.normalize" → flatten to "ontology"
+            // Support both "module" and "module.action" tool names.
+            // Example: "/tool/planner.compose" -> toolName="planner.compose", module="planner"
+            String module = toolName;
+            String action = "";
+            int dot = toolName.indexOf('.');
+            if (dot > 0) {
+                module = toolName.substring(0, dot);
+                action = toolName.substring(dot + 1);
+            }
 
-            String mode = toolModes.get(toolName);
+            // Determine mode by module first (config.yaml uses module keys), fallback to full tool name.
+            String mode = toolModes.getOrDefault(module, toolModes.get(toolName));
             if (mode == null) {
                 return new ResponseData(
                         400,
-                        "{\"error\":\"unknown tool\"}",
+                        String.format("{\"error\":\"unknown tool\",\"tool\":\"%s\"}", escapeJson(toolName)),
                         "application/json"
                 );
             }
 
             if ("dummy".equalsIgnoreCase(mode)) {
-                // Special-case ontology.normalize dummy output
-                if ("ontology".equals(toolName)) {
+                // Keep dummy responses readable and stable. Special-case a few common tool families.
+                if ("memory".equals(module)) {
+                    // Stage-2 expects fixed P5 records. If memory service is not started, still return a stable dummy.
                     return new ResponseData(
                             200,
-                            "{ \"dummy\": true, \"tool\": \"ontology\", \"message\": \"dummy normalize\" }",
+                            "{\"results\":[{" +
+                                    "\"memory_id\":\"p5_tokyo_ramen\",\"user_id\":\"user_123\",\"type\":\"food\",\"city\":\"Tokyo\",\"timestamp\":\"2024-01-05T20:15:00Z\",\"title\":\"Late-night ramen in Shinjuku\",\"notes\":\"Creamy tonkotsu broth with extra chashu; walked from hotel.\",\"tags\":[\"ramen\",\"japan\",\"comfort\"],\"sentiment\":0.87}," +
+                                    "{\"memory_id\":\"p5_kyoto_temple\",\"user_id\":\"user_123\",\"type\":\"culture\",\"city\":\"Kyoto\",\"timestamp\":\"2023-11-12T09:30:00Z\",\"title\":\"Morning visit to Fushimi Inari\",\"notes\":\"Hiked through torii gates; quiet and cool.\",\"tags\":[\"culture\",\"walking\",\"japan\"],\"sentiment\":0.91}]}",
                             "application/json"
                     );
                 }
@@ -187,14 +200,26 @@ public class GatewayServer {
             }
 
             if ("remote".equalsIgnoreCase(mode)) {
-                String serviceUrl = getServiceUrl(toolName);
-                if (serviceUrl == null) {
+                String baseUrl = serviceUrls.get(module);
+                if (baseUrl == null || baseUrl.isBlank()) {
                     return new ResponseData(
                             500,
-                            "{\"error\":\"no configured backend for tool\"}",
+                            String.format("{\"error\":\"no configured backend for module\",\"module\":\"%s\"}", escapeJson(module)),
                             "application/json"
                     );
                 }
+
+                // Map tool -> service endpoint path
+                String endpointPath = resolveEndpointPath(module, action);
+                if (endpointPath == null) {
+                    return new ResponseData(
+                            400,
+                            String.format("{\"error\":\"unknown tool action\",\"tool\":\"%s\"}", escapeJson(toolName)),
+                            "application/json"
+                    );
+                }
+
+                String serviceUrl = joinUrl(baseUrl, endpointPath);
 
                 // Forward request body to remote microservice
                 byte[] incoming = exchange.getRequestBody().readAllBytes();
@@ -213,7 +238,10 @@ public class GatewayServer {
                         ? conn.getInputStream()
                         : conn.getErrorStream();
 
-                String body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+                String body = (is == null)
+                        ? "{\"error\":\"empty response\"}"
+                        : new String(is.readAllBytes(), StandardCharsets.UTF_8);
+
                 return new ResponseData(code, body, "application/json");
             }
 
@@ -223,10 +251,6 @@ public class GatewayServer {
                             escapeJson(mode), escapeJson(toolName)),
                     "application/json"
             );
-        }
-
-        private String getServiceUrl(String toolName) {
-            return serviceUrls.get(toolName);
         }
 
         private String buildDummyResponse(String toolName) {
@@ -255,6 +279,45 @@ public class GatewayServer {
 
         private String escapeJson(String value) {
             return Objects.toString(value, "").replace("\\", "\\\\").replace("\"", "\\\"");
+        }
+
+        private String resolveEndpointPath(String module, String action) {
+            // If action is empty, choose a sensible default.
+            String a = (action == null) ? "" : action.trim().toLowerCase();
+
+            switch (module) {
+                case "vision":
+                    // tool: vision.describe
+                    return "/describe";
+                case "ontology":
+                    // tool: ontology.normalize
+                    return "/normalize";
+                case "embedding":
+                    // tool: embedding.generate
+                    return "/generate";
+                case "recommendation":
+                    // tool: recommendation.score
+                    return "/score";
+                case "planner":
+                    // tool: planner.compose
+                    return "/compose";
+                case "memory":
+                    // tool: memory.write / memory.read / memory.search (MVP uses /write and /read)
+                    if (a.isEmpty()) return "/read";
+                    if (a.equals("write")) return "/write";
+                    if (a.equals("read") || a.equals("search")) return "/read";
+                    return null;
+                default:
+                    return null;
+            }
+        }
+
+        private String joinUrl(String base, String path) {
+            String b = Objects.toString(base, "").trim();
+            String p = Objects.toString(path, "").trim();
+            if (b.endsWith("/")) b = b.substring(0, b.length() - 1);
+            if (!p.startsWith("/")) p = "/" + p;
+            return b + p;
         }
     }
 

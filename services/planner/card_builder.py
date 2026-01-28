@@ -21,29 +21,35 @@ def compose_cards(payload: Any) -> Dict[str, Any]:
         "user_id": "u001"
     }
     """
-    data = ensure_dict(payload.data)
+    data: Dict[str, Any] = {}
+    if hasattr(payload, "data"):
+        data = ensure_dict(getattr(payload, "data"))
+    if not data and hasattr(payload, "dict"):
+        raw = ensure_dict(payload.dict(exclude_none=True))
+        data = {k: v for k, v in raw.items() if k != "data"}
 
-    city = data.get("city", "kyoto")
-    cz = data.get("cz", ["ramen_shop", "izakaya"])
-    ez = data.get("ez", ["temple", "park"])
+    city = data.get("city")
+    cz = data.get("cz", [])
+    ez = data.get("ez", [])
+    cz_list = cz if isinstance(cz, list) else []
+    ez_list = ez if isinstance(ez, list) else []
 
     # build card sequence, prefer CZ first then EZ
     steps: List[Dict[str, Any]] = []
     step_counter = 1
 
-    for place in cz:
+    for place in cz_list:
         steps.append({"step": step_counter, "place": place})
         step_counter += 1
 
-    for place in ez:
+    for place in ez_list:
         steps.append({"step": step_counter, "place": place})
         step_counter += 1
 
     return {
         "dummy": True,
         "city": city,
-        "cz_used": cz,
-        "ez_used": ez,
+        "cz_used": cz_list,
+        "ez_used": ez_list,
         "cards": steps,
     }
-

@@ -7,6 +7,10 @@ app = FastAPI()
 
 
 class Payload(BaseModel):
+    city: str | None = None
+    cz: list | None = None
+    ez: list | None = None
+    user_id: str | None = None
     data: dict | None = None
 
 
@@ -17,4 +21,3 @@ async def endpoint(payload: Payload):
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=5006)
-
