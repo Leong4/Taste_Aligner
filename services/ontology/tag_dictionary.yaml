@@ -1,0 +1,536 @@
+# Taste Aligner - Tag Ontology Dictionary
+# Production-grade tag taxonomy with multilingual support
+
+# ==================== FOOD ====================
+
+ramen:
+  category: food
+  subcategory: japanese
+  aliases:
+    - 拉面
+    - 拉麵
+    - 豚骨拉面
+    - ramen shop
+    - ramen_noodle
+    - noodles
+    - 日式拉面
+
+sushi:
+  category: food
+  subcategory: japanese
+  aliases:
+    - 寿司
+    - 壽司
+    - sushi bar
+    - sushi_restaurant
+    - 日本寿司
+    - nigiri
+    - sashimi
+
+izakaya:
+  category: food
+  subcategory: japanese
+  aliases:
+    - 居酒屋
+    - japanese pub
+    - japanese_bar
+    - sake bar
+    - 日式居酒屋
+
+cafe:
+  category: food
+  subcategory: cafe_dessert
+  aliases:
+    - 咖啡馆
+    - 咖啡廳
+    - coffee shop
+    - coffee_house
+    - café
+    - coffeeshop
+    - 咖啡店
+
+dessert:
+  category: food
+  subcategory: cafe_dessert
+  aliases:
+    - 甜点
+    - 甜品
+    - sweets
+    - pastry
+    - cake
+    - 蛋糕
+    - ice cream
+    - 冰淇淋
+
+street_food:
+  category: food
+  subcategory: casual
+  aliases:
+    - 街边小吃
+    - 小吃
+    - street eats
+    - food stall
+    - 路边摊
+    - snacks
+    - 夜市小吃
+
+local_cuisine:
+  category: food
+  subcategory: traditional
+  aliases:
+    - 当地美食
+    - 地方菜
+    - local food
+    - regional cuisine
+    - traditional food
+    - 传统美食
+
+fine_dining:
+  category: food
+  subcategory: upscale
+  aliases:
+    - 高档餐厅
+    - 精致餐饮
+    - upscale restaurant
+    - gourmet
+    - michelin
+    - 米其林
+
+breakfast:
+  category: food
+  subcategory: meal_type
+  aliases:
+    - 早餐
+    - morning food
+    - brunch
+    - 早午餐
+
+seafood:
+  category: food
+  subcategory: cuisine_type
+  aliases:
+    - 海鲜
+    - 海產
+    - fresh fish
+    - shellfish
+    - 海产
+
+# ==================== CULTURE ====================
+
+temple:
+  category: culture
+  subcategory: religious
+  aliases:
+    - 寺庙
+    - 寺廟
+    - buddhist temple
+    - 佛寺
+    - 古寺
+    - temple visit
+
+shrine:
+  category: culture
+  subcategory: religious
+  aliases:
+    - 神社
+    - shinto shrine
+    - 神宮
+    - shrine visit
+    - 参拜
+
+museum:
+  category: culture
+  subcategory: educational
+  aliases:
+    - 博物馆
+    - 博物館
+    - art museum
+    - history museum
+    - 美术馆
+    - gallery
+
+historic_site:
+  category: culture
+  subcategory: heritage
+  aliases:
+    - 历史遗迹
+    - 古迹
+    - historical site
+    - heritage site
+    - 文化遗产
+    - ruins
+    - 遗址
+
+art_gallery:
+  category: culture
+  subcategory: art
+  aliases:
+    - 画廊
+    - 艺术馆
+    - gallery
+    - art exhibition
+    - 美术展览
+    - contemporary art
+
+traditional_performance:
+  category: culture
+  subcategory: performance
+  aliases:
+    - 传统表演
+    - traditional show
+    - cultural performance
+    - theater
+    - 戏剧
+    - 剧场
+
+castle:
+  category: culture
+  subcategory: heritage
+  aliases:
+    - 城堡
+    - 古城
+    - fortress
+    - 城郭
+    - historic castle
+
+# ==================== URBAN ====================
+
+city_walk:
+  category: urban
+  subcategory: exploration
+  aliases:
+    - 城市漫步
+    - 市区散步
+    - urban walk
+    - city stroll
+    - walking tour
+    - 徒步游览
+    - walk
+    - walking
+
+shopping:
+  category: urban
+  subcategory: retail
+  aliases:
+    - 购物
+    - 逛街
+    - shopping district
+    - retail
+    - mall
+    - 商场
+    - boutique
+
+nightlife:
+  category: urban
+  subcategory: night
+  aliases:
+    - 夜生活
+    - night life
+    - evening entertainment
+    - 夜间活动
+    - nighttime
+    - after dark
+
+bar:
+  category: urban
+  subcategory: night
+  aliases:
+    - 酒吧
+    - pub
+    - cocktail bar
+    - 鸡尾酒吧
+    - drinks
+    - brewery
+    - 啤酒屋
+
+local_market:
+  category: urban
+  subcategory: market
+  aliases:
+    - 本地市场
+    - 当地市场
+    - local bazaar
+    - street market
+    - 集市
+    - farmers market
+    - 农贸市场
+
+architecture:
+  category: urban
+  subcategory: design
+  aliases:
+    - 建筑
+    - 建築
+    - buildings
+    - modern architecture
+    - 现代建筑
+    - cityscape
+    - 城市景观
+
+neighborhood:
+  category: urban
+  subcategory: exploration
+  aliases:
+    - 街区
+    - 社区
+    - district
+    - area
+    - 区域
+    - local area
+    - 居民区
+
+observation_deck:
+  category: urban
+  subcategory: viewpoint
+  aliases:
+    - 观景台
+    - 展望台
+    - viewing platform
+    - skyline view
+    - 城市全景
+    - tower view
+
+# ==================== NATURE ====================
+
+park:
+  category: nature
+  subcategory: green_space
+  aliases:
+    - 公园
+    - 公園
+    - garden
+    - 花园
+    - botanical garden
+    - 植物园
+    - green space
+
+hiking:
+  category: nature
+  subcategory: outdoor_activity
+  aliases:
+    - 徒步
+    - 登山
+    - trekking
+    - trail
+    - mountain trail
+    - 远足
+    - hike
+    - 爬山
+
+mountain:
+  category: nature
+  subcategory: landscape
+  aliases:
+    - 山
+    - 山峰
+    - peak
+    - summit
+    - mountain view
+    - 高山
+    - hills
+
+lake:
+  category: nature
+  subcategory: water
+  aliases:
+    - 湖
+    - 湖泊
+    - lakeside
+    - 湖边
+    - reservoir
+    - 水库
+
+seaside:
+  category: nature
+  subcategory: water
+  aliases:
+    - 海边
+    - 海滨
+    - beach
+    - coast
+    - 沙滩
+    - oceanfront
+    - 海岸
+    - coastal
+
+forest:
+  category: nature
+  subcategory: green_space
+  aliases:
+    - 森林
+    - woods
+    - woodland
+    - 树林
+    - nature reserve
+    - 自然保护区
+
+waterfall:
+  category: nature
+  subcategory: water
+  aliases:
+    - 瀑布
+    - falls
+    - cascade
+    - 水瀑
+
+hot_spring:
+  category: nature
+  subcategory: wellness
+  aliases:
+    - 温泉
+    - 溫泉
+    - onsen
+    - thermal bath
+    - spa
+    - 泡温泉
+
+scenic_view:
+  category: nature
+  subcategory: viewpoint
+  aliases:
+    - 风景
+    - 景观
+    - scenery
+    - landscape
+    - viewpoint
+    - 观景点
+    - vista
+    - panorama
+
+# ==================== EXPERIENCE ====================
+
+photography:
+  category: experience
+  subcategory: activity
+  aliases:
+    - 摄影
+    - 拍照
+    - photo spot
+    - instagram
+    - 打卡
+    - photo worthy
+    - scenic photo
+
+relaxation:
+  category: experience
+  subcategory: mood
+  aliases:
+    - 放松
+    - 休闲
+    - chill
+    - peaceful
+    - 宁静
+    - zen
+    - tranquil
+    - 安静
+
+family_friendly:
+  category: experience
+  subcategory: demographic
+  aliases:
+    - 亲子
+    - 家庭友好
+    - kids friendly
+    - family
+    - children
+    - 儿童友好
+    - 适合家庭
+
+solo_travel:
+  category: experience
+  subcategory: demographic
+  aliases:
+    - 独自旅行
+    - 一个人
+    - solo
+    - backpacker
+    - 背包客
+    - independent travel
+
+couple_trip:
+  category: experience
+  subcategory: demographic
+  aliases:
+    - 情侣
+    - 双人
+    - romantic
+    - couple
+    - 浪漫
+    - date
+    - honeymoon
+    - 蜜月
+
+adventure:
+  category: experience
+  subcategory: intensity
+  aliases:
+    - 冒险
+    - 探险
+    - adventurous
+    - exciting
+    - 刺激
+    - thrill
+    - extreme
+
+budget_friendly:
+  category: experience
+  subcategory: cost
+  aliases:
+    - 经济实惠
+    - 便宜
+    - cheap
+    - affordable
+    - budget
+    - 省钱
+    - low cost
+
+luxury:
+  category: experience
+  subcategory: cost
+  aliases:
+    - 奢华
+    - 豪华
+    - high end
+    - premium
+    - upscale
+    - 高端
+    - exclusive
+
+cultural_immersion:
+  category: experience
+  subcategory: learning
+  aliases:
+    - 文化体验
+    - 文化浸入
+    - local experience
+    - authentic
+    - 地道
+    - traditional experience
+    - 传统文化
+
+off_the_beaten_path:
+  category: experience
+  subcategory: discovery
+  aliases:
+    - 小众
+    - 冷门
+    - hidden gem
+    - secret spot
+    - 隐藏景点
+    - undiscovered
+    - 非主流
+
+seasonal:
+  category: experience
+  subcategory: timing
+  aliases:
+    - 季节性
+    - 时令
+    - cherry blossom
+    - 樱花
+    - autumn leaves
+    - 红叶
+    - snow
+    - 雪景
+    - festival
+    - 祭典

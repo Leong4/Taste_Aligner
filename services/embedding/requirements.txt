@@ -1,0 +1,7 @@
+# Embedding Service Dependencies (TES v1)
+# Hash-based deterministic embeddings, no ML models required
+
+fastapi>=0.104.0
+uvicorn>=0.24.0
+pydantic>=2.0.0
+numpy>=1.24.0

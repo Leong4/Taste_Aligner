@@ -1,0 +1,263 @@
+"""
+Database Module - SQLite Persistence for P5 Memories
+
+Handles all database operations for the Memory Service.
+"""
+
+import sqlite3
+import json
+import uuid
+from pathlib import Path
+from typing import Dict, Any, List, Optional
+from datetime import datetime
+import logging
+
+logger = logging.getLogger(__name__)
+
+# Database file path
+DB_PATH = Path(__file__).parent / "memory.db"
+
+
+def init_database():
+    """
+    Initialize SQLite database and create tables if they don't exist.
+    """
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS p5_memories (
+            memory_id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
+            timestamp TEXT NOT NULL,
+            city TEXT,
+            raw_tags TEXT,
+            normalized_tags TEXT,
+            taxonomy TEXT,
+            sentiment REAL,
+            embedding TEXT NOT NULL,
+            source TEXT,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    # Create index for user_id for faster queries
+    cursor.execute("""
+        CREATE INDEX IF NOT EXISTS idx_user_id ON p5_memories(user_id)
+    """)
+
+    conn.commit()
+    conn.close()
+
+    logger.info(f"Database initialized at {DB_PATH}")
+
+
+def write_memory(memory: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Write a P5 memory to the database.
+
+    Args:
+        memory: Memory data dict
+
+    Returns:
+        Written memory with memory_id
+    """
+    # Generate memory_id if not provided
+    if "memory_id" not in memory or not memory["memory_id"]:
+        memory["memory_id"] = str(uuid.uuid4())
+
+    # Convert lists/dicts to JSON strings
+    raw_tags_json = json.dumps(memory.get("raw_tags", []))
+    normalized_tags_json = json.dumps(memory.get("normalized_tags", []))
+    taxonomy_json = json.dumps(memory.get("taxonomy", {}))
+    embedding_json = json.dumps(memory.get("embedding", []))
+
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("""
+            INSERT INTO p5_memories (
+                memory_id, user_id, timestamp, city,
+                raw_tags, normalized_tags, taxonomy,
+                sentiment, embedding, source
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            memory["memory_id"],
+            memory.get("user_id", ""),
+            memory.get("timestamp", datetime.utcnow().isoformat() + "Z"),
+            memory.get("city", ""),
+            raw_tags_json,
+            normalized_tags_json,
+            taxonomy_json,
+            memory.get("sentiment", 0.0),
+            embedding_json,
+            memory.get("source", "unknown")
+        ))
+
+        conn.commit()
+        logger.info(f"Memory written: {memory['memory_id']}")
+
+        return {
+            "ok": True,
+            "memory_id": memory["memory_id"],
+            "written": memory
+        }
+
+    except sqlite3.IntegrityError as e:
+        logger.error(f"Memory already exists: {memory['memory_id']}")
+        raise ValueError(f"Memory with id {memory['memory_id']} already exists")
+    except Exception as e:
+        logger.error(f"Error writing memory: {e}")
+        raise
+    finally:
+        conn.close()
+
+
+def read_memory(memory_id: str) -> Optional[Dict[str, Any]]:
+    """
+    Read a single memory by ID.
+
+    Args:
+        memory_id: Memory ID
+
+    Returns:
+        Memory dict or None if not found
+    """
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("""
+            SELECT * FROM p5_memories WHERE memory_id = ?
+        """, (memory_id,))
+
+        row = cursor.fetchone()
+        if not row:
+            return None
+
+        memory = dict(row)
+
+        # Parse JSON fields
+        memory["raw_tags"] = json.loads(memory["raw_tags"]) if memory["raw_tags"] else []
+        memory["normalized_tags"] = json.loads(memory["normalized_tags"]) if memory["normalized_tags"] else []
+        memory["taxonomy"] = json.loads(memory["taxonomy"]) if memory["taxonomy"] else {}
+        memory["embedding"] = json.loads(memory["embedding"]) if memory["embedding"] else []
+
+        return memory
+
+    finally:
+        conn.close()
+
+
+def load_user_memories(user_id: str) -> List[Dict[str, Any]]:
+    """
+    Load all memories for a given user.
+
+    Args:
+        user_id: User ID
+
+    Returns:
+        List of memory dicts
+    """
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("""
+            SELECT * FROM p5_memories WHERE user_id = ? ORDER BY timestamp DESC
+        """, (user_id,))
+
+        rows = cursor.fetchall()
+        memories = []
+
+        for row in rows:
+            memory = dict(row)
+
+            # Parse JSON fields
+            memory["raw_tags"] = json.loads(memory["raw_tags"]) if memory["raw_tags"] else []
+            memory["normalized_tags"] = json.loads(memory["normalized_tags"]) if memory["normalized_tags"] else []
+            memory["taxonomy"] = json.loads(memory["taxonomy"]) if memory["taxonomy"] else {}
+            memory["embedding"] = json.loads(memory["embedding"]) if memory["embedding"] else []
+
+            memories.append(memory)
+
+        logger.info(f"Loaded {len(memories)} memories for user {user_id}")
+        return memories
+
+    finally:
+        conn.close()
+
+
+def get_database_stats() -> Dict[str, Any]:
+    """
+    Get database statistics.
+
+    Returns:
+        Stats dict
+    """
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("SELECT COUNT(*) FROM p5_memories")
+        total_memories = cursor.fetchone()[0]
+
+        cursor.execute("SELECT COUNT(DISTINCT user_id) FROM p5_memories")
+        total_users = cursor.fetchone()[0]
+
+        return {
+            "total_memories": total_memories,
+            "total_users": total_users,
+            "db_path": str(DB_PATH)
+        }
+
+    finally:
+        conn.close()
+
+
+def delete_all_memories() -> Dict[str, Any]:
+    """
+    DEVELOPMENT ONLY - Delete all memories from the database.
+
+    WARNING: This operation is irreversible and should ONLY be used
+    during testing and development. NEVER use in production.
+
+    Returns:
+        Dict with deletion stats
+    """
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    try:
+        # Count memories before deletion
+        cursor.execute("SELECT COUNT(*) FROM p5_memories")
+        count_before = cursor.fetchone()[0]
+
+        # Delete all memories
+        cursor.execute("DELETE FROM p5_memories")
+        conn.commit()
+
+        # Count after (should be 0)
+        cursor.execute("SELECT COUNT(*) FROM p5_memories")
+        count_after = cursor.fetchone()[0]
+
+        deleted_count = count_before - count_after
+
+        logger.warning(
+            f"🔥 DEV ONLY: Deleted {deleted_count} memories from database"
+        )
+
+        return {
+            "ok": True,
+            "deleted_count": deleted_count,
+            "remaining_count": count_after
+        }
+
+    except Exception as e:
+        logger.error(f"Error deleting memories: {e}")
+        raise
+    finally:
+        conn.close()

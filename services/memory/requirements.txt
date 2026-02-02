@@ -1,0 +1,6 @@
+# Memory Service Dependencies (v1)
+# SQLite persistence + cosine similarity search
+
+fastapi>=0.104.0
+uvicorn>=0.24.0
+pydantic>=2.0.0

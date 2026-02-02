@@ -14,10 +14,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -32,18 +36,26 @@ public class GatewayServer {
     private static final int TIMEOUT_MS = 3000;
     private final Map<String, String> toolModes;
     private final Map<String, String> serviceUrls;
+    private final Map<String, ToolRoute> toolRoutes;
+    private final Map<String, RateLimiter> rateLimiters;
+    private final Map<String, CircuitState> circuitStates;
     private final ExecutorService taskExecutor;
     private HttpServer server;
 
     public GatewayServer(Path configPath) {
         this.toolModes = loadToolModes(configPath);
         this.serviceUrls = loadServiceUrls(configPath);
+        this.toolRoutes = initToolRoutes();
+        this.rateLimiters = new ConcurrentHashMap<>();
+        this.circuitStates = new ConcurrentHashMap<>();
         this.taskExecutor = Executors.newCachedThreadPool();
     }
 
     public void start() throws IOException {
         server = HttpServer.create(new InetSocketAddress(PORT), 0);
         server.createContext("/tool", new ToolHandler());
+        server.createContext("/health", new HealthHandler());
+        server.createContext("/status", new StatusHandler());
         server.setExecutor(Executors.newCachedThreadPool());
         Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
         server.start();
@@ -126,53 +138,74 @@ public class GatewayServer {
         }
     }
 
+    private Map<String, ToolRoute> initToolRoutes() {
+        Map<String, ToolRoute> routes = new HashMap<>();
+        routes.put("planner.compose", new ToolRoute("planner.compose", "planner", "/compose", 3000, false, true, 10));
+        routes.put("ontology.normalize", new ToolRoute("ontology.normalize", "ontology", "/normalize", 3000, true, false, 20));
+        routes.put("embedding.generate", new ToolRoute("embedding.generate", "embedding", "/generate", 3000, true, false, 20));
+        routes.put("vision.describe", new ToolRoute("vision.describe", "vision", "/describe", 5000, true, false, 10));
+        routes.put("recommendation.score", new ToolRoute("recommendation.score", "recommendation", "/score", 3000, true, false, 20));
+        routes.put("memory.read", new ToolRoute("memory.read", "memory", "/read", 2000, true, true, 30));
+        return routes;
+    }
+
     private final class ToolHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) {
             long start = System.currentTimeMillis();
             String path = exchange.getRequestURI().getPath();
-            LOGGER.info(() -> String.format("Incoming request %s %s at %s", exchange.getRequestMethod(), path, Instant.now()));
+            String toolName = extractToolName(path);
+            String traceId = newTraceId();
+            logInfo(traceId, toolName, "incoming", String.format("method=%s path=%s", exchange.getRequestMethod(), path));
 
-            Future<ResponseData> future = taskExecutor.submit(() -> processRequest(exchange));
+            ToolRoute route = (toolName == null) ? null : toolRoutes.get(toolName);
+            int timeoutMs = (route != null && route.timeoutMs > 0) ? route.timeoutMs : TIMEOUT_MS;
+            // TODO: apply per-tool timeout across all stages more precisely
+
+            Future<ResponseData> future = taskExecutor.submit(() -> processRequest(exchange, toolName, route, traceId));
             ResponseData response;
             try {
-                response = future.get(TIMEOUT_MS, TimeUnit.MILLISECONDS);
+                response = future.get(timeoutMs, TimeUnit.MILLISECONDS);
             } catch (TimeoutException e) {
                 future.cancel(true);
-                LOGGER.log(Level.WARNING, "Request timed out");
+                logWarn(traceId, toolName, "timeout", "request timed out");
                 response = ResponseData.timeout();
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Error processing request", e);
+                logError(traceId, toolName, "error", "error processing request", e);
                 response = ResponseData.error();
             }
 
-            writeResponse(exchange, response);
+            writeResponse(exchange, response, traceId);
             long duration = System.currentTimeMillis() - start;
-            LOGGER.info(String.format("Responded with %d in %d ms", response.statusCode, duration));
+            logInfo(traceId, toolName, "respond", String.format("latency=%dms status=%d", duration, response.statusCode));
         }
 
-        private ResponseData processRequest(HttpExchange exchange) throws IOException {
+        private ResponseData processRequest(HttpExchange exchange, String toolName, ToolRoute route, String traceId) throws IOException {
             if (!"POST".equalsIgnoreCase(exchange.getRequestMethod())) {
                 return ResponseData.methodNotAllowed();
             }
 
-            String[] segments = exchange.getRequestURI().getPath().split("/");
-            if (segments.length < 3 || segments[2].isEmpty()) {
+            if (toolName == null || toolName.isBlank()) {
                 return ResponseData.badRequest("Missing tool name");
             }
-            String toolName = String.join(".", java.util.Arrays.copyOfRange(segments, 2, segments.length))
-                    .trim()
-                    .toLowerCase();
 
-            // Support both "module" and "module.action" tool names.
-            // Example: "/tool/planner.compose" -> toolName="planner.compose", module="planner"
-            String module = toolName;
-            String action = "";
-            int dot = toolName.indexOf('.');
-            if (dot > 0) {
-                module = toolName.substring(0, dot);
-                action = toolName.substring(dot + 1);
+            if (route == null) {
+                return new ResponseData(
+                        400,
+                        String.format("{\"error\":\"unknown tool\",\"tool\":\"%s\"}", escapeJson(toolName)),
+                        "application/json"
+                );
             }
+
+            if (!allowByRateLimit(route, traceId)) {
+                return new ResponseData(
+                        429,
+                        String.format("{\"error\":\"rate limit exceeded\",\"tool\":\"%s\"}", escapeJson(toolName)),
+                        "application/json"
+                );
+            }
+
+            String module = route.serviceKey;
 
             // Determine mode by module first (config.yaml uses module keys), fallback to full tool name.
             String mode = toolModes.getOrDefault(module, toolModes.get(toolName));
@@ -188,6 +221,7 @@ public class GatewayServer {
                 // Keep dummy responses readable and stable. Special-case a few common tool families.
                 if ("memory".equals(module)) {
                     // Stage-2 expects fixed P5 records. If memory service is not started, still return a stable dummy.
+                    logInfo(traceId, toolName, "dummy", "returning memory dummy response");
                     return new ResponseData(
                             200,
                             "{\"results\":[{" +
@@ -196,10 +230,19 @@ public class GatewayServer {
                             "application/json"
                     );
                 }
+                logInfo(traceId, toolName, "dummy", "returning generic dummy response");
                 return new ResponseData(200, buildDummyResponse(toolName), "application/json");
             }
 
             if ("remote".equalsIgnoreCase(mode)) {
+                if (isCircuitOpen(route.serviceKey, traceId)) {
+                    return new ResponseData(
+                            503,
+                            String.format("{\"error\":\"circuit open\",\"service\":\"%s\"}", escapeJson(route.serviceKey)),
+                            "application/json"
+                    );
+                }
+
                 String baseUrl = serviceUrls.get(module);
                 if (baseUrl == null || baseUrl.isBlank()) {
                     return new ResponseData(
@@ -209,40 +252,65 @@ public class GatewayServer {
                     );
                 }
 
-                // Map tool -> service endpoint path
-                String endpointPath = resolveEndpointPath(module, action);
-                if (endpointPath == null) {
-                    return new ResponseData(
-                            400,
-                            String.format("{\"error\":\"unknown tool action\",\"tool\":\"%s\"}", escapeJson(toolName)),
-                            "application/json"
-                    );
-                }
-
-                String serviceUrl = joinUrl(baseUrl, endpointPath);
+                String serviceUrl = joinUrl(baseUrl, route.path);
 
                 // Forward request body to remote microservice
                 byte[] incoming = exchange.getRequestBody().readAllBytes();
-                java.net.URL url = new java.net.URL(serviceUrl);
-                java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("POST");
-                conn.setDoOutput(true);
-                conn.setRequestProperty("Content-Type", "application/json");
+                int attempts = route.retryable ? 3 : 1;
+                ResponseData lastResponse = null;
 
-                try (OutputStream os = conn.getOutputStream()) {
-                    os.write(incoming);
+                for (int attempt = 1; attempt <= attempts; attempt++) {
+                    boolean lastAttempt = (attempt == attempts);
+                    try {
+                        java.net.URL url = new java.net.URL(serviceUrl);
+                        java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
+                        conn.setRequestMethod("POST");
+                        conn.setDoOutput(true);
+                        conn.setRequestProperty("Content-Type", "application/json");
+                        conn.setRequestProperty("X-Trace-Id", traceId);
+
+                        try (OutputStream os = conn.getOutputStream()) {
+                            os.write(incoming);
+                        }
+
+                        int code = conn.getResponseCode();
+                        InputStream is = (code >= 200 && code < 300)
+                                ? conn.getInputStream()
+                                : conn.getErrorStream();
+
+                        String body = (is == null)
+                                ? "{\"error\":\"empty response\"}"
+                                : new String(is.readAllBytes(), StandardCharsets.UTF_8);
+
+                        lastResponse = new ResponseData(code, body, "application/json");
+                        logInfo(traceId, toolName, "forward", String.format("attempt=%d status=%d", attempt, code));
+
+                        if (code >= 200 && code < 300) {
+                            recordCircuitSuccess(route.serviceKey, traceId);
+                            return lastResponse;
+                        }
+
+                        recordCircuitFailure(route.serviceKey, traceId);
+                        if (!route.retryable || lastAttempt || code < 500) {
+                            return lastResponse;
+                        }
+                    } catch (IOException e) {
+                        logWarn(traceId, toolName, "forward", String.format("attempt=%d network_error=%s", attempt, e.getMessage()));
+                        recordCircuitFailure(route.serviceKey, traceId);
+                        if (!route.retryable || lastAttempt) {
+                            return new ResponseData(
+                                    502,
+                                    String.format("{\"error\":\"network error\",\"tool\":\"%s\"}", escapeJson(toolName)),
+                                    "application/json"
+                            );
+                        }
+                    }
                 }
 
-                int code = conn.getResponseCode();
-                InputStream is = (code >= 200 && code < 300)
-                        ? conn.getInputStream()
-                        : conn.getErrorStream();
-
-                String body = (is == null)
-                        ? "{\"error\":\"empty response\"}"
-                        : new String(is.readAllBytes(), StandardCharsets.UTF_8);
-
-                return new ResponseData(code, body, "application/json");
+                if (lastResponse != null) {
+                    return lastResponse;
+                }
+                return new ResponseData(502, "{\"error\":\"bad gateway\"}", "application/json");
             }
 
             return new ResponseData(
@@ -261,10 +329,11 @@ public class GatewayServer {
                     "}";
         }
 
-        private void writeResponse(HttpExchange exchange, ResponseData response) {
+        private void writeResponse(HttpExchange exchange, ResponseData response, String traceId) {
             try {
                 Headers headers = exchange.getResponseHeaders();
                 headers.set("Content-Type", response.contentType);
+                headers.set("X-Trace-Id", traceId);
                 byte[] bytes = response.body.getBytes(StandardCharsets.UTF_8);
                 exchange.sendResponseHeaders(response.statusCode, bytes.length);
                 try (OutputStream os = exchange.getResponseBody()) {
@@ -279,45 +348,6 @@ public class GatewayServer {
 
         private String escapeJson(String value) {
             return Objects.toString(value, "").replace("\\", "\\\\").replace("\"", "\\\"");
-        }
-
-        private String resolveEndpointPath(String module, String action) {
-            // If action is empty, choose a sensible default.
-            String a = (action == null) ? "" : action.trim().toLowerCase();
-
-            switch (module) {
-                case "vision":
-                    // tool: vision.describe
-                    return "/describe";
-                case "ontology":
-                    // tool: ontology.normalize
-                    return "/normalize";
-                case "embedding":
-                    // tool: embedding.generate
-                    return "/generate";
-                case "recommendation":
-                    // tool: recommendation.score
-                    return "/score";
-                case "planner":
-                    // tool: planner.compose
-                    return "/compose";
-                case "memory":
-                    // tool: memory.write / memory.read / memory.search (MVP uses /write and /read)
-                    if (a.isEmpty()) return "/read";
-                    if (a.equals("write")) return "/write";
-                    if (a.equals("read") || a.equals("search")) return "/read";
-                    return null;
-                default:
-                    return null;
-            }
-        }
-
-        private String joinUrl(String base, String path) {
-            String b = Objects.toString(base, "").trim();
-            String p = Objects.toString(path, "").trim();
-            if (b.endsWith("/")) b = b.substring(0, b.length() - 1);
-            if (!p.startsWith("/")) p = "/" + p;
-            return b + p;
         }
     }
 
@@ -352,6 +382,204 @@ public class GatewayServer {
         private static String escape(String value) {
             return Objects.toString(value, "").replace("\\", "\\\\").replace("\"", "\\\"");
         }
+    }
+
+    private static final class ToolRoute {
+        private final String toolName;
+        private final String serviceKey;
+        private final String path;
+        private final int timeoutMs;
+        private final boolean retryable;
+        private final boolean allowFallback;
+        private final int rateLimitQps;
+
+        private ToolRoute(
+                String toolName,
+                String serviceKey,
+                String path,
+                int timeoutMs,
+                boolean retryable,
+                boolean allowFallback,
+                int rateLimitQps
+        ) {
+            this.toolName = toolName;
+            this.serviceKey = serviceKey;
+            this.path = path;
+            this.timeoutMs = timeoutMs;
+            this.retryable = retryable;
+            this.allowFallback = allowFallback;
+            this.rateLimitQps = rateLimitQps;
+        }
+    }
+
+    private static final class RateLimiter {
+        private long windowStartMs;
+        private int count;
+
+        private synchronized boolean allow(int qps) {
+            if (qps <= 0) return true;
+            long now = System.currentTimeMillis();
+            if (now - windowStartMs >= 1000) {
+                windowStartMs = now;
+                count = 0;
+            }
+            if (count >= qps) {
+                return false;
+            }
+            count++;
+            return true;
+        }
+    }
+
+    private static final class CircuitState {
+        private int failureCount;
+        private long openUntilMs;
+
+        private synchronized boolean isOpen() {
+            return System.currentTimeMillis() < openUntilMs;
+        }
+
+        private synchronized void recordSuccess() {
+            failureCount = 0;
+            openUntilMs = 0;
+        }
+
+        private synchronized void recordFailure() {
+            failureCount++;
+            if (failureCount >= 5) {
+                openUntilMs = System.currentTimeMillis() + 30_000;
+            }
+        }
+
+        private synchronized String status() {
+            return isOpen() ? "open" : "closed";
+        }
+    }
+
+    private final class HealthHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) {
+            String traceId = newTraceId();
+            logInfo(traceId, "health", "health", "status ok");
+            ResponseData response = new ResponseData(200, "{\"status\":\"ok\"}", "application/json");
+            writeResponse(exchange, response, traceId);
+        }
+    }
+
+    private final class StatusHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) {
+            String traceId = newTraceId();
+            List<String> serviceStatuses = new ArrayList<>();
+            for (Map.Entry<String, CircuitState> entry : circuitStates.entrySet()) {
+                String service = entry.getKey();
+                String status = entry.getValue().status();
+                serviceStatuses.add(String.format("\"%s\":\"%s\"", escapeJson(service), escapeJson(status)));
+            }
+            String statusBody = "{"
+                    + "\"tool_count\":" + toolRoutes.size() + ","
+                    + "\"services\":{" + String.join(",", serviceStatuses) + "},"
+                    + "\"time\":\"" + Instant.now() + "\""
+                    + "}";
+            logInfo(traceId, "status", "status", "reporting status");
+            ResponseData response = new ResponseData(200, statusBody, "application/json");
+            writeResponse(exchange, response, traceId);
+        }
+    }
+
+    private boolean allowByRateLimit(ToolRoute route, String traceId) {
+        if (route.rateLimitQps <= 0) {
+            return true;
+        }
+        RateLimiter limiter = rateLimiters.computeIfAbsent(route.toolName, k -> new RateLimiter());
+        boolean allowed = limiter.allow(route.rateLimitQps);
+        if (!allowed) {
+            logWarn(traceId, route.toolName, "rate_limit", "rate limit exceeded");
+        }
+        return allowed;
+    }
+
+    private boolean isCircuitOpen(String serviceKey, String traceId) {
+        CircuitState state = circuitStates.computeIfAbsent(serviceKey, k -> new CircuitState());
+        boolean open = state.isOpen();
+        if (open) {
+            logWarn(traceId, serviceKey, "circuit", "circuit open");
+        }
+        return open;
+    }
+
+    private void recordCircuitSuccess(String serviceKey, String traceId) {
+        CircuitState state = circuitStates.computeIfAbsent(serviceKey, k -> new CircuitState());
+        state.recordSuccess();
+        logInfo(traceId, serviceKey, "circuit", "circuit closed");
+    }
+
+    private void recordCircuitFailure(String serviceKey, String traceId) {
+        CircuitState state = circuitStates.computeIfAbsent(serviceKey, k -> new CircuitState());
+        state.recordFailure();
+        logWarn(traceId, serviceKey, "circuit", "circuit failure recorded");
+    }
+
+    private void writeResponse(HttpExchange exchange, ResponseData response, String traceId) {
+        try {
+            Headers headers = exchange.getResponseHeaders();
+            headers.set("Content-Type", response.contentType);
+            headers.set("X-Trace-Id", traceId);
+            byte[] bytes = response.body.getBytes(StandardCharsets.UTF_8);
+            exchange.sendResponseHeaders(response.statusCode, bytes.length);
+            try (OutputStream os = exchange.getResponseBody()) {
+                os.write(bytes);
+            }
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Failed to write response", e);
+        } finally {
+            exchange.close();
+        }
+    }
+
+    private String joinUrl(String base, String path) {
+        String b = Objects.toString(base, "").trim();
+        String p = Objects.toString(path, "").trim();
+        if (b.endsWith("/")) b = b.substring(0, b.length() - 1);
+        if (!p.startsWith("/")) p = "/" + p;
+        return b + p;
+    }
+
+    private String extractToolName(String path) {
+        if (path == null) return null;
+        if (!path.startsWith("/tool")) return null;
+        String[] segments = path.split("/");
+        if (segments.length < 3 || segments[2].isEmpty()) {
+            return null;
+        }
+        return String.join(".", java.util.Arrays.copyOfRange(segments, 2, segments.length))
+                .trim()
+                .toLowerCase();
+    }
+
+    private String newTraceId() {
+        return UUID.randomUUID().toString();
+    }
+
+    private void logInfo(String traceId, String tool, String stage, String message) {
+        LOGGER.info(() -> formatLog(traceId, tool, stage, message));
+    }
+
+    private void logWarn(String traceId, String tool, String stage, String message) {
+        LOGGER.warning(() -> formatLog(traceId, tool, stage, message));
+    }
+
+    private void logError(String traceId, String tool, String stage, String message, Exception e) {
+        LOGGER.log(Level.SEVERE, formatLog(traceId, tool, stage, message), e);
+    }
+
+    private String formatLog(String traceId, String tool, String stage, String message) {
+        String safeTool = Objects.toString(tool, "unknown");
+        return String.format("[trace_id=%s] [tool=%s] [stage=%s] %s", traceId, safeTool, stage, message);
+    }
+
+    private String escapeJson(String value) {
+        return Objects.toString(value, "").replace("\\", "\\\\").replace("\"", "\\\"");
     }
 
     public static void main(String[] args) throws IOException {
