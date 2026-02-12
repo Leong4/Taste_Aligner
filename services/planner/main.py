@@ -59,6 +59,16 @@ def _build_memory_anchor(result: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _merge_trace_dict(base: Dict[str, Any], extra: Dict[str, Any]) -> Dict[str, Any]:
+    merged = dict(base or {})
+    for key, value in (extra or {}).items():
+        if isinstance(value, dict) and isinstance(merged.get(key), dict):
+            merged[key] = _merge_trace_dict(merged[key], value)
+        else:
+            merged[key] = value
+    return merged
+
+
 @app.get("/health")
 async def health():
     return {"ok": True, "service": "planner", "version": PLANNER_VERSION}
@@ -183,6 +193,21 @@ async def compose(payload: ComposeRequest):
         controls
     )
 
+    planner_trace = selection_debug.get("planner_trace", {})
+    planner_trace = _merge_trace_dict(
+        planner_trace,
+        {
+            "compose": {
+                "rule_id": "planner_compose_v1",
+                "cards_count": len(cards),
+                "cz_count": len(selected_cz),
+                "ez_count": len(selected_ez)
+            }
+        }
+    )
+    reco_trace = reco_payload.get("decision_trace", {})
+    decision_trace = _merge_trace_dict(reco_trace, {"planner": planner_trace})
+
     response = {
         "ok": True,
         "service": "planner",
@@ -191,6 +216,7 @@ async def compose(payload: ComposeRequest):
         "input_echo": normalized,
         "mix_policy": reco_payload.get("mix_policy"),
         "cards": cards,
+        "decision_trace": decision_trace,
         "debug": {
             "services": {
                 "recommendation": {

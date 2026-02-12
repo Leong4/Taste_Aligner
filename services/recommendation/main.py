@@ -278,6 +278,7 @@ async def score_endpoint(request: ScoreRequest):
 
         cz_ranked = rerank_results["cz_ranked"]
         ez_ranked = rerank_results["ez_ranked"]
+        rerank_trace = rerank_results.get("decision_trace", {})
 
         logger.info(
             f"[{trace_id}] Rerank: {len(cz_ranked)} CZ, {len(ez_ranked)} EZ"
@@ -293,10 +294,32 @@ async def score_endpoint(request: ScoreRequest):
             intent=intent,
             memory_confidence=memory_confidence
         )
+        mix_policy_trace = mix_policy.get("decision_trace")
+        mix_policy_output = {k: v for k, v in mix_policy.items() if k != "decision_trace"}
+
+        recall_trace = (
+            (recall_results.get("decision_trace") or {}).get("recall")
+            if isinstance(recall_results.get("decision_trace"), dict)
+            else None
+        )
+        if not recall_trace:
+            recall_trace = {
+                "rule_id": "recall_v1_city_strict",
+                "candidate_counts": {
+                    "cz": len(recall_results["cz_candidates"]),
+                    "ez": len(recall_results["ez_candidates"]),
+                    "total": recall_results["total_candidates"]
+                },
+                "thresholds": {
+                    "recall_ez_excellence_threshold": RECALL_EZ_EXCELLENCE_THRESHOLD
+                },
+                "rules_used": recall_results.get("recall_rules", []),
+                "filter_stats": recall_results.get("stats", {})
+            }
 
         logger.info(
-            f"[{trace_id}] Mix policy: {mix_policy['rule']} "
-            f"(ratio={mix_policy['ratio']}, conf={mix_policy['confidence']:.2f})"
+            f"[{trace_id}] Mix policy: {mix_policy_output['rule']} "
+            f"(ratio={mix_policy_output['ratio']}, conf={mix_policy_output['confidence']:.2f})"
         )
 
         # ========================================
@@ -325,7 +348,13 @@ async def score_endpoint(request: ScoreRequest):
                 "stats": recall_results["stats"]
             },
 
-            "mix_policy": mix_policy,
+            "mix_policy": mix_policy_output,
+
+            "decision_trace": {
+                "recall": recall_trace,
+                "rerank": rerank_trace,
+                "mix_policy": mix_policy_trace
+            },
 
             "cz_ranked": cz_ranked,
             "ez_ranked": ez_ranked,

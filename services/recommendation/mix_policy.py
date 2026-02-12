@@ -33,6 +33,109 @@ def parse_ratio(ratio_str: str) -> tuple:
     return (int(parts[0]), int(parts[1]))
 
 
+def decide_mix_policy(
+    intent: Dict[str, Any],
+    memory_signals: Dict[str, Any],
+    context: Dict[str, Any]
+) -> Dict[str, Any]:
+    """
+    Skill-like decision interface for CZ/EZ mix policy.
+
+    Returns structured decision trace for reuse/debug.
+    """
+    intent_type = intent.get("intent")
+    if intent_type not in ["comfort", "explore", "balanced"]:
+        intent_type = "balanced"
+
+    memory_confidence = memory_signals.get("memory_confidence")
+    if memory_confidence is None:
+        memory_confidence = 0.5
+    memory_confidence = max(0.0, min(1.0, float(memory_confidence)))
+
+    cz_ranked = context.get("cz_ranked") or []
+    ez_ranked = context.get("ez_ranked") or []
+    top_cz_score = float(cz_ranked[0]["score_CZ"]) if cz_ranked else 0.0
+    top_ez_score = float(ez_ranked[0]["score_EZ"]) if ez_ranked else 0.0
+    delta = top_cz_score - top_ez_score if (cz_ranked and ez_ranked) else 0.0
+
+    if not cz_ranked and not ez_ranked:
+        return {
+            "ratio": {"label": "1:1", "cz": 0, "ez": 0},
+            "rule_id": "no_candidates",
+            "confidence": 0.0,
+            "reasons": ["no CZ/EZ candidates available"],
+            "components": {
+                "intent": intent_type,
+                "memory_confidence": round(memory_confidence, 4),
+                "delta": 0.0,
+                "top_cz_score": 0.0,
+                "top_ez_score": 0.0,
+                "thresholds": {"t_high": T_HIGH, "t_mid": T_MID}
+            }
+        }
+
+    if not cz_ranked:
+        ez_count = min(3, len(ez_ranked))
+        return {
+            "ratio": {"label": "0:3", "cz": 0, "ez": ez_count},
+            "rule_id": "only_ez_available",
+            "confidence": 1.0,
+            "reasons": ["CZ empty, fallback to EZ only"],
+            "components": {
+                "intent": intent_type,
+                "memory_confidence": round(memory_confidence, 4),
+                "delta": float("-inf"),
+                "top_cz_score": 0.0,
+                "top_ez_score": round(top_ez_score, 4),
+                "thresholds": {"t_high": T_HIGH, "t_mid": T_MID}
+            }
+        }
+
+    if not ez_ranked:
+        cz_count = min(3, len(cz_ranked))
+        return {
+            "ratio": {"label": "3:0", "cz": cz_count, "ez": 0},
+            "rule_id": "only_cz_available",
+            "confidence": 1.0,
+            "reasons": ["EZ empty, fallback to CZ only"],
+            "components": {
+                "intent": intent_type,
+                "memory_confidence": round(memory_confidence, 4),
+                "delta": float("inf"),
+                "top_cz_score": round(top_cz_score, 4),
+                "top_ez_score": 0.0,
+                "thresholds": {"t_high": T_HIGH, "t_mid": T_MID}
+            }
+        }
+
+    ratio_str, rule_id, confidence = _decide_ratio(delta, intent_type, memory_confidence)
+    cz_count, ez_count = parse_ratio(ratio_str)
+    cz_count = min(cz_count, len(cz_ranked))
+    ez_count = min(ez_count, len(ez_ranked))
+
+    reasons = [
+        f"intent={intent_type}",
+        f"memory_confidence={memory_confidence:.2f}",
+        f"delta={delta:.4f}",
+        f"rule={rule_id}"
+    ]
+
+    return {
+        "ratio": {"label": ratio_str, "cz": cz_count, "ez": ez_count},
+        "rule_id": rule_id,
+        "confidence": round(confidence, 4),
+        "reasons": reasons,
+        "components": {
+            "intent": intent_type,
+            "memory_confidence": round(memory_confidence, 4),
+            "delta": round(delta, 4),
+            "top_cz_score": round(top_cz_score, 4),
+            "top_ez_score": round(top_ez_score, 4),
+            "thresholds": {"t_high": T_HIGH, "t_mid": T_MID}
+        }
+    }
+
+
 def compute_mix_policy(
     cz_ranked: List[Dict[str, Any]],
     ez_ranked: List[Dict[str, Any]],
@@ -67,84 +170,23 @@ def compute_mix_policy(
             "top_ez_score": float
         }
     """
-    # Default values
-    if intent not in ["comfort", "explore", "balanced"]:
-        intent = "balanced"  # Default
-
-    if memory_confidence is None:
-        memory_confidence = 0.5  # Neutral default
-
-    # Clamp memory_confidence to [0, 1]
-    memory_confidence = max(0.0, min(1.0, memory_confidence))
-
-    # Handle empty cases
-    if not cz_ranked and not ez_ranked:
-        return {
-            "ratio": "1:1",
-            "cz": 0,
-            "ez": 0,
-            "rule": "no_candidates",
-            "confidence": 0.0,
-            "inputs_used": {"intent": intent, "memory_confidence": memory_confidence},
-            "delta": 0.0,
-            "top_cz_score": 0.0,
-            "top_ez_score": 0.0
-        }
-
-    if not cz_ranked:
-        # Only EZ available
-        return {
-            "ratio": "0:3",  # Note: not in VALID_RATIOS, but special case
-            "cz": 0,
-            "ez": min(3, len(ez_ranked)),
-            "rule": "only_ez_available",
-            "confidence": 1.0,
-            "inputs_used": {"intent": intent, "memory_confidence": memory_confidence},
-            "delta": float('-inf'),
-            "top_cz_score": 0.0,
-            "top_ez_score": ez_ranked[0]["score_EZ"] if ez_ranked else 0.0
-        }
-
-    if not ez_ranked:
-        # Only CZ available
-        return {
-            "ratio": "3:0",
-            "cz": min(3, len(cz_ranked)),
-            "ez": 0,
-            "rule": "only_cz_available",
-            "confidence": 1.0,
-            "inputs_used": {"intent": intent, "memory_confidence": memory_confidence},
-            "delta": float('inf'),
-            "top_cz_score": cz_ranked[0]["score_CZ"],
-            "top_ez_score": 0.0
-        }
-
-    # Get top scores
-    top_cz_score = cz_ranked[0]["score_CZ"]
-    top_ez_score = ez_ranked[0]["score_EZ"]
-
-    # Compute delta
-    delta = top_cz_score - top_ez_score
-
-    # ========================================
-    # v1.1 Decision Logic
-    # ========================================
-
-    ratio_str, rule, confidence = _decide_ratio(
-        delta, intent, memory_confidence
+    decision = decide_mix_policy(
+        intent={"intent": intent},
+        memory_signals={"memory_confidence": memory_confidence},
+        context={"cz_ranked": cz_ranked, "ez_ranked": ez_ranked}
     )
-
-    # Parse ratio to counts
-    cz_count, ez_count = parse_ratio(ratio_str)
-
-    # Adjust counts if insufficient candidates
-    cz_count = min(cz_count, len(cz_ranked))
-    ez_count = min(ez_count, len(ez_ranked))
+    ratio_info = decision["ratio"]
+    ratio_str = ratio_info["label"]
+    cz_count = ratio_info["cz"]
+    ez_count = ratio_info["ez"]
+    rule = decision["rule_id"]
+    confidence = decision["confidence"]
+    components = decision.get("components", {})
 
     logger.info(
         f"Mix policy: {cz_count} CZ + {ez_count} EZ "
-        f"(ratio={ratio_str}, rule={rule}, delta={delta:.4f}, "
-        f"intent={intent}, mem_conf={memory_confidence:.2f})"
+        f"(ratio={ratio_str}, rule={rule}, delta={components.get('delta', 0.0):.4f}, "
+        f"intent={components.get('intent')}, mem_conf={components.get('memory_confidence', 0.0):.2f})"
     )
 
     return {
@@ -152,15 +194,16 @@ def compute_mix_policy(
         "cz": cz_count,
         "ez": ez_count,
         "rule": rule,
-        "confidence": round(confidence, 4),
+        "confidence": confidence,
         "inputs_used": {
-            "intent": intent,
-            "memory_confidence": memory_confidence,
-            "delta": round(delta, 4)
+            "intent": components.get("intent"),
+            "memory_confidence": components.get("memory_confidence"),
+            "delta": components.get("delta")
         },
-        "delta": round(delta, 4),
-        "top_cz_score": round(top_cz_score, 4),
-        "top_ez_score": round(top_ez_score, 4)
+        "delta": components.get("delta"),
+        "top_cz_score": components.get("top_cz_score"),
+        "top_ez_score": components.get("top_ez_score"),
+        "decision_trace": decision
     }
 
 

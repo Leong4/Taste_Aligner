@@ -1,23 +1,28 @@
+/**
+ * HTTP server for the Taste Aligner agent runtime.
+ *
+ * Exposes a single POST /run endpoint that accepts user text and
+ * returns recommendation cards with full decision_trace.
+ *
+ * Architecture: Uses SkillRegistry + Graph + Orchestrator instead
+ * of the previous ReActRuntime + IntentAgent pattern.
+ */
+
 import http from "node:http";
-import { IntentAgent } from "./agents/intentAgent";
-import { ReActRuntime } from "./runtime/reactRuntime";
-import { ToolClient } from "./tools/toolClient";
+import { createOrchestrator } from "./core/bootstrap";
 
 const PORT = Number(process.env.AGENT_SERVER_PORT ?? 8787);
 
-const agent = new IntentAgent();
 const gatewayBaseUrl = process.env.GATEWAY_BASE_URL ?? "http://localhost:8080";
 const timeoutMs = process.env.GATEWAY_TIMEOUT_MS
     ? Number(process.env.GATEWAY_TIMEOUT_MS)
     : 3000;
 
-const toolClient = new ToolClient({
+const orchestrator = createOrchestrator({
     gatewayBaseUrl,
     timeoutMs,
     logPayload: true,
 });
-
-const runtime = new ReActRuntime(agent, toolClient, { maxTurns: 3 });
 
 function sendJson(res: http.ServerResponse, status: number, body: unknown) {
     const payload = JSON.stringify(body);
@@ -76,20 +81,46 @@ const server = http.createServer(async (req, res) => {
             return;
         }
 
-        const history = await runtime.run(text);
-        const last = history[history.length - 1];
-        const state = last?.thought?.state ?? {};
-        const observation = last?.observation;
-        const output = observation?.output ?? null;
+        const orchInput: { text: string; user_id?: string } = { text };
+        if (typeof body.user_id === "string") {
+            orchInput.user_id = body.user_id;
+        }
+        const result = await orchestrator.run(orchInput);
 
+        // Build response maintaining backward compatibility with the
+        // existing frontend contract. The old response shape:
+        //   { ok, city, type, tool, observation, output, history }
+        //
+        // The new response preserves these fields and adds
+        // decision_trace, timing, and errors at the top level.
         sendJson(res, 200, {
-            ok: observation?.ok ?? false,
-            city: state.city ?? null,
-            type: state.type ?? "unknown",
-            tool: observation?.tool ?? null,
-            observation: observation ?? null,
-            output,
-            history,
+            ok: result.ok,
+            city: result.city,
+            type: result.type,
+            tool: result.ok ? "planner.compose" : null,
+            observation: result.ok
+                ? {
+                    ok: true,
+                    tool: "planner.compose",
+                    output: {
+                        ok: true,
+                        cards: result.cards,
+                        mix_policy: result.mix_policy,
+                        decision_trace: result.decision_trace,
+                    },
+                }
+                : null,
+            output: result.ok
+                ? {
+                    ok: true,
+                    cards: result.cards,
+                    mix_policy: result.mix_policy,
+                    decision_trace: result.decision_trace,
+                }
+                : null,
+            decision_trace: result.decision_trace,
+            timing: result.timing,
+            errors: result.errors,
         });
     } catch (err: any) {
         sendJson(res, 500, { error: "server_error", message: err?.message ?? "unknown" });

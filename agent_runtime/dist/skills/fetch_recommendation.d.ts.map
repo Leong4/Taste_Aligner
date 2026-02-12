@@ -1,0 +1,1 @@
+{"version":3,"file":"fetch_recommendation.d.ts","sourceRoot":"","sources":["../../src/skills/fetch_recommendation.ts"],"names":[],"mappings":"AAAA;;;;;;;;;;;;;GAaG;AAEH,OAAO,EAAE,KAAK,EAAiC,wBAAwB,EAAE,MAAM,eAAe,CAAC;AAC/F,OAAO,EAAE,UAAU,EAAE,MAAM,qBAAqB,CAAC;AAEjD,wBAAgB,8BAA8B,CAC1C,UAAU,EAAE,UAAU,GACvB,KAAK,CAAC,wBAAwB,EAAE,OAAO,CAAC,CAiE1C"}

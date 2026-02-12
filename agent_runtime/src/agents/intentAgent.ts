@@ -4,6 +4,11 @@ import { Action, Thought } from "../types/react";
 export type Intent = {
     city: string | null;
     type: "food" | "culture" | "mixed" | "unknown";
+    tags: string[];
+    cz_seed: string[];
+    ez_seed: string[];
+    raw_text: string;
+    confidence: number;
 };
 
 const CITY_RULES: Array<{ name: string; patterns: RegExp[] }> = [
@@ -60,6 +65,30 @@ function detectType(text: string): Intent["type"] {
     return "unknown";
 }
 
+function extractMatchedTags(text: string): string[] {
+    const tags: string[] = [];
+    for (const keyword of FOOD_KEYWORDS) {
+        if (text.includes(keyword)) tags.push(keyword);
+    }
+    for (const keyword of CULTURE_KEYWORDS) {
+        if (text.includes(keyword)) tags.push(keyword);
+    }
+    return Array.from(new Set(tags));
+}
+
+function buildZoneSeed(type: Intent["type"]): { cz_seed: string[]; ez_seed: string[] } {
+    if (type === "food") {
+        return { cz_seed: ["ramen_shop", "izakaya"], ez_seed: [] };
+    }
+    if (type === "culture") {
+        return { cz_seed: [], ez_seed: ["temple", "park"] };
+    }
+    if (type === "mixed") {
+        return { cz_seed: ["ramen_shop", "izakaya"], ez_seed: ["temple", "park"] };
+    }
+    return { cz_seed: ["ramen_shop"], ez_seed: ["park"] };
+}
+
 export class IntentAgent implements Agent {
     name = "intent-agent";
 
@@ -67,41 +96,92 @@ export class IntentAgent implements Agent {
         const text = ctx.userInput.toLowerCase();
         const city = detectCity(text);
         const type = detectType(text);
+        const tags = extractMatchedTags(text);
+        const seed = buildZoneSeed(type);
         const done = city === null;
+        const structuredIntent: Intent = {
+            city,
+            type,
+            tags,
+            cz_seed: seed.cz_seed,
+            ez_seed: seed.ez_seed,
+            raw_text: ctx.userInput,
+            confidence: city ? 0.8 : 0.2,
+        };
+        const intentTrace = city
+            ? {
+                rule_id: "intent_v1_keywords",
+                city_detected: true,
+                city,
+                type,
+                cz_seed: seed.cz_seed,
+                ez_seed: seed.ez_seed,
+                tags,
+                text: ctx.userInput,
+            }
+            : {
+                rule_id: "intent_v1_keywords",
+                city_detected: false,
+                abort_reason: "no_city_detected",
+                type,
+                tags,
+                text: ctx.userInput,
+            };
 
         return {
             text: done ? "city not found" : `I should call planner.compose for city=${city} type=${type}`,
             done,
-            state: { city, type },
+            state: {
+                city,
+                type,
+                intent: structuredIntent,
+                decision_trace: {
+                    intent_agent: intentTrace,
+                },
+            },
         };
     }
 
     async act(thought: Thought): Promise<Action | null> {
         const city = thought.state?.city ?? null;
         const type = thought.state?.type ?? "unknown";
+        const intent: Intent | undefined = thought.state?.intent;
 
         if (!city) {
             return null;
         }
 
-        let cz: string[] = [];
-        let ez: string[] = [];
-
-        if (type === "food") {
-            cz = ["ramen_shop", "izakaya"];
-        } else if (type === "culture") {
-            ez = ["temple", "park"];
-        } else if (type === "mixed") {
-            cz = ["ramen_shop", "izakaya"];
-            ez = ["temple", "park"];
-        } else {
-            cz = ["ramen_shop"];
-            ez = ["park"];
-        }
+        const seed = buildZoneSeed(type);
+        const cz = intent?.cz_seed ?? seed.cz_seed;
+        const ez = intent?.ez_seed ?? seed.ez_seed;
+        const tags = intent?.tags ?? [];
+        const intentTrace = thought.state?.decision_trace?.intent_agent ?? {
+            rule_id: "intent_v1_keywords",
+            city_detected: true,
+            city,
+            type,
+            cz_seed: cz,
+            ez_seed: ez,
+            tags,
+            text: intent?.raw_text ?? "",
+        };
 
         return {
             tool: "planner.compose",
-            input: { city, cz, ez, user_id: "u001" },
+            input: {
+                city,
+                cz,
+                ez,
+                tags,
+                user_id: "u001",
+                intent,
+                meta: {
+                    intent,
+                    decision_trace: {
+                        intent_agent: intentTrace,
+                    },
+                },
+            },
         };
     }
 }

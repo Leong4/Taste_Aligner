@@ -149,6 +149,15 @@ def select_items_for_cards(
     selected_ez = ez_items[:requested_topk_ez]
 
     ez_fill_method_used = "none"
+    ez_fill_triggered = False
+    ez_fill_reason = "sufficient_ez_candidates"
+    ez_fill_source = "ez_pool"
+    pool_size_before_fill = {
+        "ez_pool": len(ez_items),
+        "cz_pool": len(cz_items)
+    }
+    fill_item_ids: List[str] = []
+    fill_steps: List[Dict[str, Any]] = []
     selected_ids = {_item_key(item) for item in selected_cz + selected_ez}
 
     if len(selected_ez) < requested_topk_ez:
@@ -162,29 +171,65 @@ def select_items_for_cards(
         needed = requested_topk_ez - len(selected_ez)
         fill = pool[:needed]
         if fill:
+            ez_fill_triggered = True
             ez_fill_method_used = "same_city_excellence_fallback"
+            ez_fill_reason = "insufficient_ez_candidates"
+            ez_fill_source = "excellence_fallback"
             for item in fill:
+                item_id = _item_key(item)
                 _mark_fill_reason(item, "ez_fill_same_city_excellence_fallback")
                 selected_ez.append(item)
-                selected_ids.add(_item_key(item))
+                selected_ids.add(item_id)
+                fill_item_ids.append(item_id)
+                fill_steps.append({
+                    "source": "excellence_fallback",
+                    "item_id": item_id,
+                    "reason": "insufficient_ez_candidates"
+                })
 
     if len(selected_ez) < requested_topk_ez:
         remaining_cz = [item for item in cz_items if _item_key(item) not in selected_ids]
         needed = requested_topk_ez - len(selected_ez)
         fill = remaining_cz[:needed]
         if fill:
+            ez_fill_triggered = True
             ez_fill_method_used = "from_cz_due_to_insufficient_ez"
+            ez_fill_reason = "insufficient_ez_after_excellence_fallback"
+            ez_fill_source = "cz_pool"
             for item in fill:
+                item_id = _item_key(item)
                 _mark_fill_reason(item, "ez_fill_from_cz_due_to_insufficient_ez")
                 selected_ez.append(item)
-                selected_ids.add(_item_key(item))
+                selected_ids.add(item_id)
+                fill_item_ids.append(item_id)
+                fill_steps.append({
+                    "source": "cz_pool",
+                    "item_id": item_id,
+                    "reason": "insufficient_ez_after_excellence_fallback"
+                })
+
+    if len(selected_ez) < requested_topk_ez and not ez_fill_triggered:
+        ez_fill_reason = "insufficient_candidates_after_fallback"
+
+    planner_trace = {
+        "rule_id": "planner_select_v1",
+        "selected_cz_ids": [_item_key(item) for item in selected_cz],
+        "selected_ez_ids": [_item_key(item) for item in selected_ez],
+        "ez_fill_triggered": ez_fill_triggered,
+        "ez_fill_reason": ez_fill_reason,
+        "ez_fill_source": ez_fill_source,
+        "pool_size_before_fill": pool_size_before_fill,
+        "fill_item_ids": fill_item_ids,
+        "fill_steps": fill_steps
+    }
 
     return selected_cz, selected_ez, {
         "requested_topk_cz": requested_topk_cz,
         "requested_topk_ez": requested_topk_ez,
         "actual_cz_count": len(selected_cz),
         "actual_ez_count": len(selected_ez),
-        "ez_fill_method_used": ez_fill_method_used
+        "ez_fill_method_used": ez_fill_method_used,
+        "planner_trace": planner_trace
     }
 
 

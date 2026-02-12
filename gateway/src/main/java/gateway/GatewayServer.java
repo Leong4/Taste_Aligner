@@ -205,6 +205,12 @@ public class GatewayServer {
                 );
             }
 
+            byte[] incoming = exchange.getRequestBody().readAllBytes();
+            ResponseData validationError = validateToolInput(toolName, incoming);
+            if (validationError != null) {
+                return validationError;
+            }
+
             String module = route.serviceKey;
 
             // Determine mode by module first (config.yaml uses module keys), fallback to full tool name.
@@ -255,7 +261,6 @@ public class GatewayServer {
                 String serviceUrl = joinUrl(baseUrl, route.path);
 
                 // Forward request body to remote microservice
-                byte[] incoming = exchange.getRequestBody().readAllBytes();
                 int attempts = route.retryable ? 3 : 1;
                 ResponseData lastResponse = null;
 
@@ -319,6 +324,135 @@ public class GatewayServer {
                             escapeJson(mode), escapeJson(toolName)),
                     "application/json"
             );
+        }
+
+        private ResponseData validateToolInput(String toolName, byte[] incoming) {
+            Map<String, Object> payload = parsePayloadMap(incoming);
+            if (payload == null) {
+                return invalidToolInput(
+                        toolName,
+                        List.of("json_object"),
+                        "Request body must be a JSON object"
+                );
+            }
+
+            List<String> missing = new ArrayList<>();
+            switch (toolName) {
+                case "planner.compose":
+                    if (!hasAnyPath(payload, List.of("city", "data.city"))) {
+                        missing.add("city|data.city");
+                    }
+                    break;
+                case "ontology.normalize":
+                    if (!hasAnyPath(payload, List.of("data", "tags", "data.tags"))) {
+                        missing.add("data|tags");
+                    }
+                    break;
+                case "embedding.generate":
+                    if (!hasPath(payload, "data")) {
+                        missing.add("data");
+                    }
+                    break;
+                case "vision.describe":
+                    if (!hasAnyPath(payload, List.of("data.image_url", "image_url", "data.image_base64", "image_base64"))) {
+                        missing.add("data.image_url|data.image_base64");
+                    }
+                    break;
+                case "recommendation.score":
+                    if (!hasAnyPath(payload, List.of("data.user_id", "user_id"))) {
+                        missing.add("data.user_id|user_id");
+                    }
+                    if (!hasAnyPath(payload, List.of("data.city", "city"))) {
+                        missing.add("data.city|city");
+                    }
+                    break;
+                case "memory.read":
+                    if (!hasAnyPath(payload, List.of("memory_id", "data.memory_id"))) {
+                        missing.add("memory_id|data.memory_id");
+                    }
+                    break;
+                default:
+                    return null;
+            }
+
+            if (missing.isEmpty()) {
+                return null;
+            }
+
+            return invalidToolInput(
+                    toolName,
+                    missing,
+                    "Provide required fields in tool input payload"
+            );
+        }
+
+        private Map<String, Object> parsePayloadMap(byte[] incoming) {
+            String raw = new String(incoming == null ? new byte[0] : incoming, StandardCharsets.UTF_8).trim();
+            if (raw.isEmpty()) {
+                return new HashMap<>();
+            }
+            try {
+                Yaml yaml = new Yaml();
+                Object parsed = yaml.load(raw);
+                if (parsed instanceof Map<?, ?>) {
+                    Map<String, Object> result = new HashMap<>();
+                    ((Map<?, ?>) parsed).forEach((k, v) -> {
+                        if (k != null) {
+                            result.put(k.toString(), v);
+                        }
+                    });
+                    return result;
+                }
+                return null;
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
+        private boolean hasAnyPath(Map<String, Object> payload, List<String> paths) {
+            for (String path : paths) {
+                if (hasPath(payload, path)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @SuppressWarnings("unchecked")
+        private boolean hasPath(Map<String, Object> payload, String path) {
+            if (payload == null || path == null || path.isBlank()) return false;
+            String[] parts = path.split("\\.");
+            Object cursor = payload;
+            for (String part : parts) {
+                if (!(cursor instanceof Map<?, ?>)) return false;
+                Map<String, Object> map = (Map<String, Object>) cursor;
+                if (!map.containsKey(part)) return false;
+                cursor = map.get(part);
+            }
+
+            if (cursor == null) return false;
+            if (cursor instanceof String) return !((String) cursor).trim().isEmpty();
+            if (cursor instanceof List<?>) return !((List<?>) cursor).isEmpty();
+            return true;
+        }
+
+        private ResponseData invalidToolInput(String toolName, List<String> missing, String hint) {
+            String body = String.format(
+                    "{\"error\":\"INVALID_TOOL_INPUT\",\"tool\":\"%s\",\"missing\":%s,\"hint\":\"%s\"}",
+                    escapeJson(toolName),
+                    toJsonStringArray(missing),
+                    escapeJson(hint)
+            );
+            return new ResponseData(400, body, "application/json");
+        }
+
+        private String toJsonStringArray(List<String> values) {
+            if (values == null || values.isEmpty()) return "[]";
+            List<String> escaped = new ArrayList<>();
+            for (String value : values) {
+                escaped.add("\"" + escapeJson(value) + "\"");
+            }
+            return "[" + String.join(",", escaped) + "]";
         }
 
         private String buildDummyResponse(String toolName) {

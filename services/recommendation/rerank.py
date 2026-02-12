@@ -55,6 +55,7 @@ except ImportError:
     from db import get_item_embedding, upsert_item_embedding
 
 logger = logging.getLogger(__name__)
+TRACE_REJECT_SAMPLE_LIMIT = 50
 
 
 def cosine_similarity(vec1: List[float], vec2: List[float]) -> float:
@@ -252,7 +253,59 @@ def compute_location_relevance(item_city: str, user_city: str) -> float:
     return 0.5
 
 
-def compute_cz_score(
+def score_alignment_components(user_ctx: Dict[str, Any], item: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Skill-like pure component builder for CZ alignment scoring.
+    """
+    user_city = user_ctx.get("user_city", "")
+    user_tags = user_ctx.get("user_tags", [])
+    user_id = user_ctx.get("user_id", "")
+    item_id = item.get("id")
+    item_tags = item.get("tags", [])
+    item_city = item.get("city", "")
+    item_title = item.get("title", "")
+
+    tag_sim = compute_tag_similarity(item_tags, user_tags)
+    memory_inf_data = compute_memory_influence(
+        item_id, item_title, item_tags, user_id, user_city, user_tags
+    )
+    memory_inf = memory_inf_data["score"]
+    memory_sim = memory_inf_data.get("memory_similarity", 0.0)
+    location_rel = compute_location_relevance(item_city, user_city)
+
+    return {
+        "rule_id": "cz_alignment_components_v1",
+        "tag_similarity": tag_sim,
+        "memory_influence": memory_inf,
+        "memory_similarity": memory_sim,
+        "memory_method": memory_inf_data.get("method", "none"),
+        "location_relevance": location_rel,
+        "memory_influence_detail": memory_inf_data
+    }
+
+
+def compute_cz_score(components: Dict[str, Any], config_summary: Optional[Dict[str, Any]] = None) -> float:
+    """
+    Skill-like pure scorer for CZ.
+    """
+    return (
+        CZ_ALPHA * float(components.get("tag_similarity", 0.0)) +
+        CZ_BETA * float(components.get("memory_influence", 0.0)) +
+        CZ_GAMMA * float(components.get("location_relevance", 0.0))
+    )
+
+
+def compute_ez_score(components: Dict[str, Any], config_summary: Optional[Dict[str, Any]] = None) -> float:
+    """
+    Skill-like pure scorer for EZ.
+    """
+    return (
+        EZ_MU * float(components.get("global_excellence", 0.0)) +
+        EZ_NU * float(components.get("taste_distance", 0.0))
+    )
+
+
+def score_cz_item(
     item: Dict[str, Any],
     user_city: str,
     user_tags: List[str],
@@ -290,23 +343,16 @@ def compute_cz_score(
     item_tags = item.get("tags", [])
     item_city = item.get("city", "")
 
-    # Compute components
-    tag_sim = compute_tag_similarity(item_tags, user_tags)
-
-    memory_inf_data = compute_memory_influence(
-        item_id, item.get("title", ""), item_tags, user_id, user_city, user_tags
+    components = score_alignment_components(
+        {"user_city": user_city, "user_tags": user_tags, "user_id": user_id},
+        item
     )
-    memory_inf = memory_inf_data["score"]
-    memory_sim = memory_inf_data.get("memory_similarity", 0.0)  # v1.2
-
-    location_rel = compute_location_relevance(item_city, user_city)
-
-    # Final CZ score
-    score_cz = (
-        CZ_ALPHA * tag_sim +
-        CZ_BETA * memory_inf +
-        CZ_GAMMA * location_rel
-    )
+    score_cz = compute_cz_score(components)
+    tag_sim = components["tag_similarity"]
+    memory_inf = components["memory_influence"]
+    memory_sim = components["memory_similarity"]
+    location_rel = components["location_relevance"]
+    memory_inf_data = components["memory_influence_detail"]
 
     # Generate reason string
     reason = _generate_cz_reason(tag_sim, memory_inf, location_rel)
@@ -336,12 +382,12 @@ def compute_cz_score(
     }
 
 
-def compute_ez_score(
+def score_ez_item(
     item: Dict[str, Any],
     user_city: str,
     user_tags: List[str],
     user_id: str
-) -> Optional[Dict[str, Any]]:
+) -> Tuple[Optional[Dict[str, Any]], Optional[str]]:
     """
     Compute Exploration Zone (EZ) score with explainability.
 
@@ -400,12 +446,14 @@ def compute_ez_score(
 
         # Filter: taste_distance must be reasonable (skip if tags empty)
         if taste_distance > EZ_TASTE_DISTANCE_MAX:
-            return None  # Too far, discard
+            return None, "taste_distance_too_high"
 
         # Final EZ score (v1.1: increased ν weight)
-        score_ez = (
-            EZ_MU * excellence +
-            EZ_NU * taste_distance
+        score_ez = compute_ez_score(
+            {
+                "global_excellence": excellence,
+                "taste_distance": taste_distance
+            }
         )
 
     # Generate reason
@@ -444,7 +492,7 @@ def compute_ez_score(
         "sim_cap": SIM_CAP,
         "why_explore": reason,
         "rerank_stage": rerank_stage
-    }
+    }, None
 
 
 def _generate_cz_reason(tag_sim: float, memory_inf: float, location_rel: float) -> str:
@@ -493,11 +541,11 @@ def _item_similarity(a: Dict[str, Any], b: Dict[str, Any]) -> float:
     return min(1.0, jaccard + kind_bonus)
 
 
-def rerank_ez_with_diversity(
+def apply_mmr_diversity(
     ez_items: List[Dict[str, Any]],
     top_k: int,
     lambda_diversity: float
-) -> List[Dict[str, Any]]:
+) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
     """
     MMR-style diversity rerank for EZ when tags=[].
 
@@ -538,7 +586,53 @@ def rerank_ez_with_diversity(
         selected.append(best_item)
         remaining.remove(best_item)
 
+    summary = {
+        "rule_id": "ez_diversity_mmr_v1",
+        "method": "mmr",
+        "lambda": round(lambda_diversity, 4),
+        "selected_ids": [item.get("id") for item in selected],
+        "selected_count": len(selected)
+    }
+    return selected, summary
+
+
+def rerank_ez_with_diversity(
+    ez_items: List[Dict[str, Any]],
+    top_k: int,
+    lambda_diversity: float
+) -> List[Dict[str, Any]]:
+    selected, _ = apply_mmr_diversity(ez_items, top_k, lambda_diversity)
     return selected
+
+
+def _trace_top_item(item: Dict[str, Any], zone: str) -> Dict[str, Any]:
+    if zone == "cz":
+        return {
+            "id": item.get("id"),
+            "zone": "cz",
+            "score": item.get("score_CZ"),
+            "components": {
+                "tag_similarity": item.get("components", {}).get("tag_similarity"),
+                "memory_influence": item.get("components", {}).get("memory_influence"),
+                "memory_similarity": item.get("components", {}).get("memory_similarity"),
+                "location_relevance": item.get("components", {}).get("location_relevance")
+            },
+            "rule_id": "cz_score_v1",
+            "filter_reason": None
+        }
+    return {
+        "id": item.get("id"),
+        "zone": "ez",
+        "score": item.get("score_EZ"),
+        "components": {
+            "global_excellence": item.get("components", {}).get("global_excellence"),
+            "taste_similarity_raw": item.get("components", {}).get("taste_similarity_raw"),
+            "taste_similarity_capped": item.get("components", {}).get("taste_similarity_capped"),
+            "taste_distance": item.get("components", {}).get("taste_distance")
+        },
+        "rule_id": "ez_score_v1",
+        "filter_reason": item.get("filter_reason")
+    }
 
 
 def rerank_candidates(
@@ -570,6 +664,10 @@ def rerank_candidates(
 
     cz_scored = []
     ez_scored = []
+    ez_filter_reasons: Dict[str, int] = {
+        "taste_distance_too_high": 0,
+        "other": 0
+    }
 
     tags_empty = not user_tags or all(not tag.strip() for tag in user_tags)
     diversity_enabled = (
@@ -586,6 +684,7 @@ def rerank_candidates(
     user_city_lower = user_city.lower().strip() if user_city else ""
     cz_filtered = []
     cross_city_rejected = 0
+    cross_city_rejected_records: List[Dict[str, Any]] = []
 
     for item in cz_candidates:
         item_city = item.get("city", "").lower().strip()
@@ -593,6 +692,14 @@ def rerank_candidates(
             cz_filtered.append(item)
         else:
             cross_city_rejected += 1
+            rejected_id = item.get("id")
+            rejected_city = item.get("city")
+            cross_city_rejected_records.append(
+                {
+                    "id": str(rejected_id) if rejected_id is not None else "",
+                    "city": rejected_city
+                }
+            )
             logger.warning(
                 f"CZ LEAK PREVENTED: Rejected {item.get('id')} "
                 f"(city={item.get('city')}) from CZ for user_city={user_city}"
@@ -600,13 +707,14 @@ def rerank_candidates(
 
     if cross_city_rejected > 0:
         logger.error(
-            f"CZ CONTAMINATION: Rejected {cross_city_rejected} cross-city items "
-            f"from CZ candidates. This should not happen - check recall stage!"
+            "cross_city_contamination_detected: "
+            f"rejected={cross_city_rejected}; "
+            "upstream candidates contain cross-city items; filtered by rerank guard"
         )
 
     # Rerank CZ candidates (using filtered list)
     for item in cz_filtered:
-        cz_result = compute_cz_score(item, user_city, user_tags, user_id)
+        cz_result = score_cz_item(item, user_city, user_tags, user_id)
         mem_detail = cz_result.get("memory_influence_detail", {})
         if mem_detail.get("method") == "embedding_cosine":
             embedding_ok_count += 1
@@ -618,17 +726,29 @@ def rerank_candidates(
 
     # Rerank EZ candidates
     for item in ez_candidates:
-        ez_result = compute_ez_score(item, user_city, user_tags, user_id)
+        ez_result, filter_reason = score_ez_item(item, user_city, user_tags, user_id)
         if ez_result is not None:  # May be filtered by taste_distance
             ez_scored.append(ez_result)
+        else:
+            if filter_reason in ez_filter_reasons:
+                ez_filter_reasons[filter_reason] += 1
+            else:
+                ez_filter_reasons["other"] += 1
 
     # Sort CZ by score_CZ DESC
     cz_ranked = sorted(cz_scored, key=lambda x: x["score_CZ"], reverse=True)
     cz_ranked = cz_ranked[:TOP_K_CZ]
 
     # Sort EZ by score_EZ DESC or apply diversity rerank when tags=[]
+    diversity_trace = {
+        "rule_id": "ez_diversity_disabled",
+        "method": None,
+        "lambda": None,
+        "selected_ids": [],
+        "selected_count": 0
+    }
     if diversity_enabled:
-        ez_ranked = rerank_ez_with_diversity(ez_scored, TOP_K_EZ, EZ_LAMBDA_DIVERSITY)
+        ez_ranked, diversity_trace = apply_mmr_diversity(ez_scored, TOP_K_EZ, EZ_LAMBDA_DIVERSITY)
     else:
         ez_ranked = sorted(ez_scored, key=lambda x: x["score_EZ"], reverse=True)
         ez_ranked = ez_ranked[:TOP_K_EZ]
@@ -648,6 +768,25 @@ def rerank_candidates(
         taste_distances = [item["components"]["taste_distance"] for item in ez_ranked[:5]]
         logger.info(f"Top 5 EZ taste_distance: {taste_distances}")
 
+    top_items_trace = (
+        [_trace_top_item(item, "cz") for item in cz_ranked[:5]] +
+        [_trace_top_item(item, "ez") for item in ez_ranked[:5]]
+    )
+    cross_city_sample = cross_city_rejected_records[:TRACE_REJECT_SAMPLE_LIMIT]
+    cross_city_truncated = len(cross_city_rejected_records) > TRACE_REJECT_SAMPLE_LIMIT
+    cross_city_rejected_ids = [entry["id"] for entry in cross_city_sample]
+    cross_city_rejected_cities = {
+        entry["id"]: entry.get("city")
+        for entry in cross_city_sample
+    }
+    cross_city_guard_trace = {
+        "rule_id": "cross_city_guard_v1",
+        "rejected_count": cross_city_rejected,
+        "rejected_ids": cross_city_rejected_ids,
+        "rejected_cities": cross_city_rejected_cities,
+        "truncated": cross_city_truncated
+    }
+
     return {
         "cz_ranked": cz_ranked,
         "ez_ranked": ez_ranked,
@@ -661,8 +800,29 @@ def rerank_candidates(
             "ez_diversity_enabled": diversity_enabled,
             "ez_diversity_method": EZ_DIVERSITY_METHOD if diversity_enabled else None,
             "ez_lambda_diversity": EZ_LAMBDA_DIVERSITY if diversity_enabled else None,
+            "ez_filter_reasons": ez_filter_reasons,
             "embedding_ok_count": embedding_ok_count,
             "embedding_fail_count": embedding_fail_count,
             "embedding_last_error": embedding_last_error
+        },
+        "decision_trace": {
+            "rule_id": "rerank_v1_3",
+            "top_items": top_items_trace,
+            "filters": {
+                "cz_cross_city_rejected": cross_city_rejected,
+                "cross_city_guard": cross_city_guard_trace,
+                "ez_filter_reasons": ez_filter_reasons
+            },
+            "diversity": diversity_trace,
+            "weights": {
+                "cz": {"alpha": CZ_ALPHA, "beta": CZ_BETA, "gamma": CZ_GAMMA},
+                "ez": {"mu": EZ_MU, "nu": EZ_NU}
+            },
+            "thresholds": {
+                "sim_cap": SIM_CAP,
+                "ez_taste_distance_max": EZ_TASTE_DISTANCE_MAX,
+                "top_k_cz": TOP_K_CZ,
+                "top_k_ez": TOP_K_EZ
+            }
         }
     }

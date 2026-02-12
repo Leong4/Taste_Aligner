@@ -1,0 +1,1371 @@
+•	City: guangzhou
+•		•	[food] Taotaoju | tags: cantonese, dim_sum, traditional, breakfast, casual | excellence: 0.90
+•		•	[food] Liufuji | tags: cantonese, roast_meat, classic, lunch, local | excellence: 0.85
+•		•	[food] Bingsheng Seafood Restaurant | tags: seafood, chinese, fresh, dinner, group | excellence: 0.87
+•		•	[food] Bingsheng | tags: modern_cantonese, seafood, upscale, fine_dining, dinner | excellence: 0.88
+•		•	[food] Tiger Prawn Vietnamese Restaurant | tags: vietnamese, seafood, spicy, casual, fusion | excellence: 0.82
+•		•	[food] Mercato | tags: italian, western, pizza, wine, social | excellence: 0.84
+•		•	[food] Bosphorus Turkish Restaurant | tags: turkish, mediterranean, grill, dinner, international | excellence: 0.80
+•		•	[food] Morgan’s | tags: brunch, western, casual, coffee, friends | excellence: 0.81
+•		•	[food] Xinji Seafood Restaurant | tags: seafood, local, family, dinner, classic | excellence: 0.83
+•		•	[food] Yayuan Restaurant | tags: cantonese, local, lunch, everyday, affordable | excellence: 0.79
+•		•	[food] Jinyuexuan Vietnamese Cuisine | tags: southeast_asian, vietnamese, casual, lunch, flavourful | excellence: 0.80
+•		•	[food] Guangzhou Old Town Street Eats | tags: street_food, snacks, cantonese, casual, budget | excellence: 0.78
+•		•	[food] Traditional Claypot Rice Spot | tags: claypot, local, dinner, classic, casual | excellence: 0.76
+•		•	[food] Rice Noodle Roll Stall | tags: street_food, dim_sum, quick_bite, local, budget | excellence: 0.75
+•		•	[food] Roast Goose Specialist | tags: roast_goose, cantonese, meat, dinner, local | excellence: 0.82
+•		•	[food] Double Skin Milk Dessert Shop | tags: dessert, sweet, local, casual, snack | excellence: 0.77
+•		•	[food] Shrimp Dumpling Stand | tags: dim_sum, seafood, traditional, snack, lunchtime | excellence: 0.76
+•		•	[food] Congee & Side Dishes Shop | tags: congee, traditional, breakfast, budget, local | excellence: 0.74
+•		•	[food] Cantonese BBQ Skewer Stall | tags: barbecue, street_food, night_market, casual, local | excellence: 0.73
+•		•	[food] Cold Noodle Bar | tags: noodles, chilled, summer, budget, casual | excellence: 0.72
+•		•	[food] China Town BBQ Bistro | tags: asian_fusion, dinner, casual, grill, social | excellence: 0.79
+•		•	[food] Night Market Skewer Alley | tags: night_food, street_food, casual, fun, local | excellence: 0.74
+•		•	[culture] Cantong tower | tags: landmark, skyline, photo_spot, modern, observation | excellence: 0.95
+•		•	[culture] Guangzhou Chimelong Safari Park （Main Gate） | tags: wildlife, park, family, outdoor, adventure | excellence: 0.90
+•		•	[culture] Chen Clan Ancestral Hall | tags: heritage, architecture, museum, traditional, culture | excellence: 0.92
+•		•	[culture] Huacheng Square | tags: city_square, modern, landscape, public, sightseeing | excellence: 0.88
+•		•	[culture] Yuexiu Park | tags: park, history, nature, local, relax | excellence: 0.87
+•		•	[culture] Shangxiajiu Commercial Pedestrian Street | tags: shopping, heritage, street_culture, local, experience | excellence: 0.86
+•		•	[culture] Temple of the Six Banyan Trees | tags: temple, buddhist, heritage, calm, traditional | excellence: 0.89
+•		•	[culture] Guangzhou Sculpture Park | tags: park, art, outdoor, creative, family | excellence: 0.80
+•		•	[culture] Baomo Garden | tags: garden, heritage, quiet, classical, design | excellence: 0.81
+•		•	[culture] Guangzhou Liwanhu Park | tags: lake, park, relax, local, scenery | excellence: 0.78
+•		•	[culture] The Site of Nanyue Kingdom Palace | tags: history, archaeology, museum, ancient, culture | excellence: 0.85
+•		•	[culture] Pearl River Night Cruise | tags: river, night, scenic, experience, romantic | excellence: 0.88
+•		•	[culture] Guangdong Museum Visit | tags: museum, modern, exhibits, culture, education | excellence: 0.82
+•		•	[culture] Cantonese Opera Museum | tags: opera, performance, culture, history, art | excellence: 0.80
+•		•	[culture] Guangzhou Art District | tags: contemporary_art, gallery, creative, urban, cultural | excellence: 0.79
+•		•	[culture] Historic Liwan Streets | tags: heritage, alley, local_life, traditional, walking | excellence: 0.83
+•		•	[culture] Sun Yat-sen Memorial Hall | tags: history, architecture, memorial, culture, educational | excellence: 0.84
+•		•	[culture] Guangdong Folk Culture Museum | tags: folk, culture, history, local, exhibits | excellence: 0.81
+•		•	[walk] Pearl River Riverside Walk | tags: walk, river, sunset, scenic, leisure | excellence: 0.82
+•		•	[walk] Beijing Road Historic Walk | tags: walk, history, urban, shopping, daytime | excellence: 0.85
+•		•	[walk] Shamian Island Stroll | tags: walk, colonial_architecture, river, calm, daytime | excellence: 0.83
+•		•	[walk] Huacheng Square to Opera Loop | tags: walk, modern, skyline, day_night, urban | excellence: 0.84
+•		•	[walk] Night Lights on Canton Tower | tags: walk, night, lights, skyline, photo | excellence: 0.88
+•		•	[walk] Yuexiu Park Trails | tags: walk, nature, hill, exercise, daytime | excellence: 0.80
+•		•	[walk] Tianhe Central District Urban Trek | tags: walk, city_life, modern, shopping, daytime | excellence: 0.81
+•		•	[walk] Local Night Market Circuit | tags: walk, night_food, street, local, lively | excellence: 0.79
+•		•	[walk] Liwan Old Streets Walk | tags: walk, historic, local_life, alley, cultural | excellence: 0.83
+•		•	[walk] Haizhu Bridge Sunset Route | tags: walk, river, sunset, locals, relaxed | excellence: 0.78
+
+
+City: chengdu
+•	[food] Fu Rong Huang | tags: sichuan, traditional_chinese, spicy, dinner, classic | excellence: 0.92
+•	[food] Shuyanfu | tags: sichuan, fine_dining, local_flavours, dinner, refined | excellence: 0.90
+•	[food] Lixuan Chinese Restaurant | tags: sichuan, upscale, chinese_cuisine, elegant, dinner | excellence: 0.89
+•	[food] Ponti’s Ristorante | tags: italian, pizza, western, casual, social | excellence: 0.85
+•	[food] Ma Wang Zi | tags: modern_sichuan, contemporary, lunch, dinner, creative | excellence: 0.83
+•	[food] Long Sen Yuan Hotpot | tags: hot_pot, spice, communal, local, dinner | excellence: 0.87
+•	[food] Chen Mapo Tofu | tags: sichuan, tofu, spicy, quick_bite, local | excellence: 0.81
+•	[food] Houtang Hot Pot | tags: hot_pot, classic, spice, hearty, local | excellence: 0.84
+•	[food] Ma’s Kitchen | tags: chinese, comfort_food, local, lunch, dinner | excellence: 0.82
+•	[food] Heming Chashe | tags: tea_house, snacks, casual, local, traditional | excellence: 0.80
+•	[food] Yushaoxia Street Grill | tags: grill, street_food, spicy, casual, local | excellence: 0.78
+•	[food] Chengdu Chi Ke | tags: sichuan, local_diner, breakfast, lunch, authentic | excellence: 0.77
+•	[food] Bobo Chicken Caotang North Rd | tags: sichuan, street_food, chicken, spicy, snack | excellence: 0.75
+•	[food] Cold Noodles Stand | tags: street_food, noodles, quick_bite, refreshing, casual | excellence: 0.74
+•	[food] Lai Tang Yuan Stall | tags: dessert, traditional, sweet, local, snack | excellence: 0.76
+•	[food] Dan Dan Noodles Shop | tags: noodles, sichuan, spicy, breakfast, local | excellence: 0.79
+•	[food] Dumpling House | tags: dumplings, chinese, casual, lunch, local | excellence: 0.76
+•	[food] Sichuan Snack Alley | tags: street_food, snacks, local, casual, lively | excellence: 0.73
+•	[food] Tea House & Dim Sum | tags: tea, dim_sum, traditional, relax, morning | excellence: 0.78
+•	[food] Western Bistro Bar | tags: western, bar, casual, dinner, drinks | excellence: 0.75
+•	[food] Café on Taikoo Li | tags: cafe, coffee, casual, modern, daytime | excellence: 0.80
+•	[food] Noodle & Dumpling Corner | tags: local, noodles, dumplings, lunch, budget | excellence: 0.72
+•	[culture] Chengdu Research Base of Giant Panda Breeding | tags: wildlife, pandas, conservation, family, outdoor | excellence: 0.96
+•	[culture] Wenshu Monastery | tags: temple, buddhist, heritage, calm, historical | excellence: 0.91
+•	[culture] Jinli Ancient Street | tags: historic_street, culture, local_life, heritage, shopping | excellence: 0.90
+•	[culture] People’s Park | tags: park, tea_culture, local_life, relax, nature | excellence: 0.88
+•	[culture] Wuhou Shrine | tags: history, shrine, three_kingdoms, heritage, culture | excellence: 0.89
+•	[culture] KuanZhai Alleys | tags: heritage, alley, culture, cafes, traditional | excellence: 0.87
+•	[culture] Sichuan Opera Performance | tags: opera, performing_arts, cultural, evening, traditional | excellence: 0.86
+•	[culture] Du Fu Thatched Cottage | tags: museum, literature, history, heritage, garden | excellence: 0.85
+•	[culture] Qingyang Palace | tags: taoist_temple, spiritual, heritage, architecture, calm | excellence: 0.84
+•	[culture] Taikoo Li District | tags: urban_district, shopping, modern, lifestyle, culture | excellence: 0.83
+•	[culture] Sichuan Museum | tags: museum, artifacts, history, education, exhibits | excellence: 0.82
+•	[culture] Sichuan Cuisine Museum | tags: museum, food_culture, local, interactive, culture | excellence: 0.81
+•	[culture] Teahouse Culture Spot | tags: teahouse, tradition, local_life, tea, social | excellence: 0.80
+•	[culture] Leshan Giant Buddha (half-day) | tags: unesco, heritage, statue, historic, pilgrimage | excellence: 0.88
+•	[culture] Mount Qingcheng | tags: unesco, taoism, nature, hiking, heritage | excellence: 0.89
+•	[culture] Dujiangyan Irrigation System | tags: unesco, engineering, heritage, outdoor, history | excellence: 0.88
+•	[culture] Chengdu City Walls Park | tags: history, park, ruins, heritage, outdoor | excellence: 0.78
+•	[culture] Contemporary Art Gallery | tags: art, modern, exhibits, creative, urban | excellence: 0.79
+•	[walk] Taikoo Li Shopping Loop | tags: walk, urban, shopping, daytime, modern | excellence: 0.85
+•	[walk] Wide & Narrow Alley Walk | tags: walk, heritage, alleys, daytime, photography | excellence: 0.87
+•	[walk] Jinli Ancient Street Stroll | tags: walk, historic, local_life, street, daytime | excellence: 0.88
+•	[walk] People’s Park Tea Walk | tags: walk, park, tea, local, relaxed | excellence: 0.80
+•	[walk] Night Food Street Circuit | tags: walk, night, street_food, lively, casual | excellence: 0.82
+•	[walk] Riverside Promenade | tags: walk, scenic, sunset, leisure, calm | excellence: 0.79
+•	[walk] Temple & Garden Loop | tags: walk, heritage, temples, garden, reflective | excellence: 0.81
+•	[walk] Chunxi Road Urban Trek | tags: walk, city_life, shopping, urban, daytime | excellence: 0.83
+•	[walk] Tea House Row Amble | tags: walk, tea_culture, local, casual, relaxed | excellence: 0.78
+•	[walk] Night Market & Bar District | tags: walk, night, bars, nightlife, social | excellence: 0.84
+•	[walk] Local Alley Explorations | tags: walk, alleys, local_life, discovery, daytime | excellence: 0.82
+
+
+City: shanghai
+•	[food] Jia Jia Tang Bao | tags: soup_dumplings, shanghainese, street_food, quick_bite, local | excellence: 0.87  
+•	[food] Lost Heaven | tags: yunnan, chinese, fusion, lunch, dinner | excellence: 0.85  
+•	[food] The Fellas Terrace | tags: italian, mediterranean, terrace, cafe, casual | excellence: 0.83  
+•	[food] Ren He Guan | tags: shanghainese, traditional, fine_dining, classic, dinner | excellence: 0.90  
+•	[food] M on the Bund | tags: western, river_view, fine_dining, upscale, dinner | excellence: 0.88  
+•	[food] Mr & Mrs Bund | tags: french, western, modern, dinner, creative | excellence: 0.87  
+•	[food] Ultraviolet | tags: multi_sensory, avant_garde, experimental, tasting, exclusive | excellence: 0.96  
+•	[food] Crab Meat Noodle House | tags: seafood, noodles, shanghainese, casual, local | excellence: 0.82  
+•	[food] Tandoor Indian Restaurant | tags: indian, spicy, grill, casual, international | excellence: 0.80  
+•	[food] Efes Turkish & Mediterranean | tags: mediterranean, grill, casual, social, dinner | excellence: 0.79  
+•	[food] YICAFE at Pudong | tags: seafood, buffet, international, lunch, social | excellence: 0.81  
+•	[food] Goodfellas | tags: italian, pizza, social, casual, lunch | excellence: 0.80  
+•	[food] Shanghai Grandmother | tags: chinese, homestyle, lunch, local, traditional | excellence: 0.78  
+•	[food] Chinese Hotpot Spot | tags: hotpot, communal, spicy, local, lunch | excellence: 0.75
+•	[food] Tea House & Dim Sum Corner | tags: tea, dim_sum, morning, traditional, local | excellence: 0.76
+•	[food] Western Bistro & Bar | tags: western, bar, casual, drinks, night | excellence: 0.77
+•	[food] Street Skewer Alley | tags: street_food, barbecue, night, local, casual | excellence: 0.74
+•	[food] Quick Noodle Stand | tags: noodles, quick_bite, budget, local, lunch | excellence: 0.72
+•	[food] Dessert & Pastry Shop | tags: sweets, bakery, casual, local, snack | excellence: 0.73
+•	[food] Coffee & Snacks Cafe | tags: cafe, coffee, daytime, casual, social | excellence: 0.79
+•	[culture] The Bund | tags: waterfront, skyline, photo_spot, history, iconic | excellence: 0.95  
+•	[culture] Yu Garden | tags: classical_garden, heritage, chinese_architecture, tranquility, photo_spot | excellence: 0.89  
+•	[culture] Shanghai Tower Observation Deck | tags: skyscraper, skyline, modern, view, photo | excellence: 0.94  
+•	[culture] Jade Buddha Temple | tags: temple, buddhist, heritage, serene, spiritual | excellence: 0.88  
+•	[culture] Shanghai Museum | tags: museum, history, art, culture, exhibits | excellence: 0.90  
+•	[culture] Century Park | tags: park, nature, relax, outdoor, family | excellence: 0.83  
+•	[culture] Former French Concession | tags: heritage, shikumen, culture, cafes, architecture | excellence: 0.91 ure] Tianzifang | tags: arts_district, boutique, alley, culture, local | excellence: 0.88 ure] Xintiandi District | tags: nightlife, shopping, heritage, lifestyle, dining | excellence: 0.87 ure] Qibao Old Street | tags: old_town, heritage, markets, local, food_spots | excellence: 0.85 ure] Longhua Temple | tags: temple, history, calm, heritage, architecture | excellence: 0.84
+•	[culture] Shanghai Urban Planning Exhibition | tags: modern, city_development, exhibits, learning, architecture | excellence: 0.82
+•	[culture] Art Museum District | tags: contemporary_art, galleries, creative, culture, exhibits | excellence: 0.80
+•	[culture] Huangpu River Cruise | tags: scenic, river, sunset, urban, experience | excellence: 0.88 ure] Shanghai Jewish Refugees Museum | tags: history, heritage, education, culture, museum | excellence: 0.81
+•	[culture] Propaganda Poster Art Centre | tags: museum, cold_war, art, history, rare | excellence: 0.79
+•	[culture] Urban Photography Spots | tags: photospots, skyline, urban, creative, iconic | excellence: 0.82
+•	[walk] Bund Riverside Promenade | tags: walk, river, skyline, sunset, photo | excellence: 0.90 k] Former French Concession Stroll | tags: walk, heritage, trees, cafes, daytime | excellence: 0.88 ] Tianzifang Alley Walk | tags: walk, arts, alleys, boutique, local | excellence: 0.86 ] Xintiandi Night Circuit | tags: walk, night, nightlife, lights, social | excellence: 0.87 ] Nanjing Road Urban Trek | tags: walk, shopping, urban, lights, daytime | excellence: 0.89
+•	[walk] People’s Square Loop | tags: walk, park, urban, culture, day_night | excellence: 0.83 k] Wukang Road Tree Lined Stroll | tags: walk, heritage, trees, calm, daytime | excellence: 0.84 ] Huangpu River Sunset Path | tags: walk, river, sunset, locals, relax | excellence: 0.85
+•	[walk] Old Town & Market Walk | tags: walk, local_life, markets, heritage, daytime | excellence: 0.82
+•	[walk] Bund After Dark | tags: walk, night, lights, skyline, photo | excellence: 0.91 cite
+
+
+City: tokyo
+•	[food] Jiro Ramen Ginza | tags: ramen, noodles, bkyu_gurume, casual, local | excellence: 0.88
+•	[food] Tsukiji Sushi Counter | tags: sushi, seafood, breakfast, local, traditional | excellence: 0.91
+•	[food] Monja Street Tsukishima | tags: monjayaki, teppan, street_food, casual, fun | excellence: 0.85  
+•	[food] Tempura Specialist | tags: tempura, japanese, deepfried, traditional, lunch | excellence: 0.87
+•	[food] Udon & Tempura Bar | tags: udon, noodles, comfort, local, quick_bite | excellence: 0.84
+•	[food] Yakitori Alley Spot | tags: yakitori, grill, izakaya, evening, casual | excellence: 0.83
+•	[food] Tokyo Soba House | tags: soba, buckwheat, traditional, lunch, relaxed | excellence: 0.81
+•	[food] Okonomiyaki Stand | tags: okonomiyaki, savory_pancake, street_food, casual, local | excellence: 0.80  
+•	[food] Crepe Street Harajuku | tags: crepes, sweets, street_food, youth, casual | excellence: 0.79
+•	[food] Coffee Kissaten | tags: kissaten, retro_cafe, coffee, dessert, relaxed | excellence: 0.78  
+•	[food] Tonkatsu Bistro | tags: tonkatsu, fried, lunch, local, hearty | excellence: 0.83
+•	[food] Izakaya & Sake Bar | tags: izakaya, drinks, grill, evening, social | excellence: 0.82
+•	[food] Japanese Curry House | tags: curry, rice, comfort, casual, local | excellence: 0.79
+•	[food] Wagyu BBQ Restaurant | tags: wagyu, bbq, japanese, premium, dinner | excellence: 0.89
+•	[food] French-Japanese Fusion | tags: fusion, fine_dining, modern, dinner, creative | excellence: 0.90
+•	[food] Sushi Omakase Spot | tags: omakase, sushi, premium, chef’s_choice, elegant | excellence: 0.94
+•	[food] Izakaya Alley Bites | tags: izakaya, small_plates, local, casual, night | excellence: 0.81
+•	[food] Yakisoba Stall | tags: yakisoba, noodles, street_food, casual, quick | excellence: 0.76
+•	[food] Matcha Dessert Cafe | tags: dessert, matcha, sweets, casual, modern | excellence: 0.80
+•	[food] Teppanyaki Grill | tags: teppanyaki, steak, show, dinner, modern | excellence: 0.88
+•	[food] Korean BBQ Town | tags: korean, bbq, international, social, dinner | excellence: 0.82
+•	[food] Italian Trattoria | tags: italian, pasta, western, casual, lunch | excellence: 0.81
+•	[culture] Senso-ji Temple | tags: temple, historic, edo_period, spiritual, traditional | excellence: 0.94  
+•	[culture] Meiji Shrine | tags: shrine, shinto, forest, heritage, serene | excellence: 0.92  
+•	[culture] Tokyo Skytree | tags: skyscraper, skyline, modern, observation, landmark | excellence: 0.93  
+•	[culture] Imperial Palace Grounds | tags: palace, history, gardens, heritage, walk | excellence: 0.91  
+•	[culture] Tokyo National Museum | tags: museum, history, art, culture, exhibits | excellence: 0.89  
+•	[culture] teamLab Planets | tags: digital_art, immersive, contemporary, creative, interactive | excellence: 0.90 ure] Akihabara Pop Culture | tags: anime, electronics, subculture, shopping, modern | excellence: 0.88  
+•	[culture] Ueno Park & Zoo | tags: park, nature, zoo, family, relax | excellence: 0.87  
+•	[culture] National Art Center | tags: art, exhibits, contemporary, culture, learning | excellence: 0.85 ure] Edo-Tokyo Museum | tags: history, edo_culture, exhibits, educational, local | excellence: 0.86 ure] Kabuki-za Theatre | tags: theatre, kabuki, performance, traditional, art | excellence: 0.88 ure] Nezu Museum & Garden | tags: museum, garden, art, tranquil, heritage | excellence: 0.87 ure] Shibuya Crossing Viewpoint | tags: intersection, city_life, iconic, modern, photo | excellence: 0.89  
+•	[culture] Asakusa Culture Streets | tags: market, heritage, shopping, local, traditional | excellence: 0.88  
+•	[culture] Studio Ghibli Museum | tags: museum, animation, whimsical, family, culture | excellence: 0.90 ure] Odaiba Seaside Park | tags: seaside, park, modern, view, family | excellence: 0.84 ture] Sumida River Cruise | tags: river, cruise, evening, scenery, experience | excellence: 0.87  
+•	[walk] Shibuya Crossing Walk | tags: walk, urban, iconic, lights, modern | excellence: 0.92  
+•	[walk] Asakusa Old Town Stroll | tags: walk, heritage, market, traditional, daytime | excellence: 0.89  
+•	[walk] Ueno Park Circuit | tags: walk, park, nature, museum_row, family | excellence: 0.88 ] Harajuku Takeshita Street | tags: walk, youth_culture, shopping, colorful, daytime | excellence: 0.87  
+•	[walk] Ginza Luxury Lane | tags: walk, shopping, urban, upscale, daytime | excellence: 0.90  
+•	[walk] Odaiba Bay Promenade | tags: walk, seaside, modern, sunset, leisure | excellence: 0.86  
+•	[walk] Yanaka Retro Lanes | tags: walk, retro, local_life, alleys, charming | excellence: 0.85 ] Sumida Riverside Path | tags: walk, river, scenic, sunset, calm | excellence: 0.84  
+•	[walk] Night Lights Tokyo Tower Loop | tags: walk, night, lights, skyline, photo | excellence: 0.93  
+•	[walk] Shimokitazawa Alley Trek | tags: walk, indie_shops, youth, local, daytime | excellence: 0.86 cite
+
+
+City: hokkaido
+•	[food] Soup Curry GARAKU | tags: soup_curry, spicy, local, casual, hearty | excellence: 0.89
+•	[food] Sapporo Ramen Shingen | tags: ramen, miso, noodles, comfort, local | excellence: 0.87
+•	[food] Ebisoba Ichigen | tags: ramen, shrimp_broth, rich, casual, modern | excellence: 0.88
+•	[food] Nemuro Hanamaru | tags: sushi, seafood, conveyor, casual, fresh | excellence: 0.90
+•	[food] Kantaro Sushi | tags: sushi, seafood, local, family, lunch | excellence: 0.86
+•	[food] Daruma Honten | tags: jingisukan, lamb, grill, traditional, dinner | excellence: 0.91
+•	[food] Sapporo Beer Garden | tags: barbecue, beer, social, dinner, lively | excellence: 0.85
+•	[food] Hakodate Uni Murakami | tags: sea_urchin, seafood, premium, local, dinner | excellence: 0.92
+•	[food] Nijo Market Donburi | tags: donburi, seafood, market, fresh, casual | excellence: 0.84
+•	[food] Otaru Masazushi | tags: sushi, refined, seafood, elegant, dinner | excellence: 0.91
+•	[food] Milk Kobo | tags: dairy, dessert, sweets, local, casual | excellence: 0.82
+•	[food] LeTAO Pathos | tags: cheesecake, dessert, cafe, sweets, modern | excellence: 0.83
+•	[food] Rokkatei Cafe | tags: confectionery, sweets, cafe, local, relaxed | excellence: 0.81
+•	[food] Asahikawa Aoba | tags: ramen, soy_sauce, classic, local, lunch | excellence: 0.85
+•	[food] Hakodate Asaichi Shokudo | tags: seafood, breakfast, market, local, authentic | excellence: 0.88
+•	[food] Susukino Izakaya Hachikyo | tags: izakaya, seafood, energetic, dinner, local | excellence: 0.87
+•	[food] Kamimura | tags: french, fine_dining, fusion, elegant, dinner | excellence: 0.94
+•	[food] Niseko Green Farm Cafe | tags: farm_to_table, vegetables, healthy, casual, scenic | excellence: 0.80
+•	[food] Otaru Canal Cafe | tags: cafe, canal_view, dessert, relaxed, daytime | excellence: 0.78
+•	[food] Sapporo Craft Beer Works | tags: brewery, beer, casual, nightlife, modern | excellence: 0.82
+•	[food] Kushiro Robata | tags: robatayaki, seafood, grill, traditional, dinner | excellence: 0.88
+•	[food] Teshikaga Ramen | tags: ramen, rich_broth, hearty, local, casual | excellence: 0.84
+•	[culture] Sapporo Snow Festival | tags: winter_festival, snow_sculpture, seasonal, iconic, outdoor | excellence: 0.96
+•	[culture] Asahiyama Zoo | tags: wildlife, zoo, family, interactive, outdoor | excellence: 0.92
+•	[culture] Shiretoko National Park | tags: national_park, unesco, wilderness, hiking, nature | excellence: 0.93
+•	[culture] Lake Toya | tags: caldera_lake, scenic, nature, relax, outdoor | excellence: 0.90
+•	[culture] Otaru Canal | tags: canal, historic, scenic, architecture, heritage | excellence: 0.91
+•	[culture] Goryokaku Fort | tags: star_fort, history, architecture, landmark, heritage | excellence: 0.89
+•	[culture] Upopoy National Ainu Museum | tags: ainu, indigenous, museum, culture, education | excellence: 0.90
+•	[culture] Sapporo Beer Museum | tags: beer_history, industrial_heritage, tasting, cultural, exhibits | excellence: 0.86
+•	[culture] Hokkaido Shrine | tags: shrine, shinto, forest, spiritual, traditional | excellence: 0.88
+•	[culture] Mount Hakodate Observatory | tags: night_view, cityscape, scenic, romantic, landmark | excellence: 0.92
+•	[culture] Furano Lavender Fields | tags: flowers, seasonal, countryside, scenic, photography | excellence: 0.91
+•	[culture] Blue Pond Biei | tags: natural_wonder, water, scenic, photography, tranquil | excellence: 0.90
+•	[culture] Noboribetsu Jigokudani | tags: geothermal, volcanic, landscape, dramatic, outdoor | excellence: 0.89
+•	[culture] Sapporo Clock Tower | tags: landmark, history, architecture, heritage, urban | excellence: 0.84
+•	[culture] Hakodate Red Brick Warehouses | tags: heritage, waterfront, shopping, architecture, historic | excellence: 0.87
+•	[culture] Moerenuma Park | tags: sculpture_park, modern_design, landscape, art, outdoor | excellence: 0.88
+•	[culture] Niseko Ski Resort | tags: skiing, powder_snow, winter_sports, mountain, adventure | excellence: 0.94
+•	[culture] Abashiri Drift Ice Museum | tags: arctic_theme, interactive, winter, educational, unique | excellence: 0.85
+•	[walk] Odori Park Promenade | tags: walk, urban_park, seasonal, daytime, leisure | excellence: 0.86
+•	[walk] Susukino Night Walk | tags: walk, nightlife, neon, social, night | excellence: 0.88
+•	[walk] Otaru Canal Evening Stroll | tags: walk, canal, romantic, night, scenic | excellence: 0.89
+•	[walk] Biei Patchwork Road | tags: walk, countryside, rolling_hills, scenic, daytime | excellence: 0.87
+•	[walk] Hakodate Bay Area Walk | tags: walk, waterfront, historic, relaxed, sunset | excellence: 0.85
+•	[walk] Lake Toya Lakeside Path | tags: walk, lake, calm, nature, leisure | excellence: 0.84
+•	[walk] Noboribetsu Onsen Town Walk | tags: walk, onsen, steam, traditional, atmospheric | excellence: 0.83
+•	[walk] Furano Flower Road | tags: walk, flowers, seasonal, countryside, photography | excellence: 0.88
+•	[walk] Sapporo Underground Walkway | tags: walk, indoor, modern, urban, winter | excellence: 0.82
+•	[walk] Shiretoko Coastal Trail | tags: walk, coast, wilderness, scenic, outdoor | excellence: 0.90
+
+
+City: osaka
+•	[food] Mizuno | tags: okonomiyaki, teppan, local_specialty, casual, dinner | excellence: 0.90
+•	[food] Kani Doraku Dotonbori | tags: crab, seafood, iconic, dinner, traditional | excellence: 0.91
+•	[food] Kushikatsu Daruma | tags: kushikatsu, deep_fried, street_food, casual, lively | excellence: 0.88
+•	[food] Endo Sushi | tags: sushi, seafood, market_style, breakfast, authentic | excellence: 0.89
+•	[food] Hanamaruken Ramen | tags: ramen, pork_broth, comfort, casual, local | excellence: 0.86
+•	[food] Jibundoki Umeda | tags: izakaya, small_plates, social, evening, modern | excellence: 0.82
+•	[food] Matsusakagyu Yakiniku | tags: yakiniku, wagyu, grill, premium, dinner | excellence: 0.93
+•	[food] Tsurutontan Soemoncho | tags: udon, noodles, late_night, casual, comfort | excellence: 0.85
+•	[food] Ajinoya | tags: okonomiyaki, traditional, hearty, lunch, local | excellence: 0.89
+•	[food] Honke Owariya | tags: soba, buckwheat, classic, lunch, refined | excellence: 0.83
+•	[food] Chibo | tags: teppanyaki, okonomiyaki, lively, casual, group | excellence: 0.87
+•	[food] Takoyaki Wanaka | tags: takoyaki, street_food, snack, casual, local | excellence: 0.88
+•	[food] Ichiran Ramen Namba | tags: ramen, tonkotsu, solo_dining, casual, modern | excellence: 0.84
+•	[food] La Cime | tags: french, fine_dining, tasting_menu, creative, elegant | excellence: 0.95
+•	[food] Pizzeria da Tigre | tags: italian, pizza, wood_fired, casual, lunch | excellence: 0.82
+•	[food] Ali’s Kitchen | tags: indian, spicy, curry, casual, international | excellence: 0.81
+•	[food] Halal Ramen Naniwaya | tags: halal, ramen, inclusive, casual, noodles | excellence: 0.80
+•	[food] Rikuro Cheesecake | tags: cheesecake, dessert, bakery, sweet, takeaway | excellence: 0.83
+•	[food] Pablo Tart Shop | tags: tart, dessert, cafe, modern, sweets | excellence: 0.79
+•	[food] Kuromon Market Donburi | tags: seafood_bowl, market, fresh, lunch, local | excellence: 0.87
+•	[food] Gyozaoh | tags: gyoza, dumplings, casual, evening, local | excellence: 0.78
+•	[food] Beer Belly Tenma | tags: craft_beer, pub, social, casual, nightlife | excellence: 0.81
+•	[culture] Osaka Castle | tags: castle, samurai_history, landmark, heritage, park | excellence: 0.94
+•	[culture] Shitennoji Temple | tags: buddhist_temple, ancient, spiritual, traditional, heritage | excellence: 0.90
+•	[culture] Sumiyoshi Taisha | tags: shrine, shinto, architecture, sacred, historic | excellence: 0.89
+•	[culture] National Museum of Art | tags: modern_art, underground_architecture, exhibits, contemporary, culture | excellence: 0.87
+•	[culture] Osaka Museum of History | tags: museum, urban_history, interactive, educational, heritage | excellence: 0.85
+•	[culture] Universal Studios Japan | tags: theme_park, entertainment, family, immersive, modern | excellence: 0.93
+•	[culture] Kuromon Market | tags: food_culture, market, local_life, vibrant, traditional | excellence: 0.88
+•	[culture] Nakanoshima Park | tags: riverside_park, urban, seasonal, relax, public_space | excellence: 0.84
+•	[culture] Umeda Sky Building | tags: skyscraper, observation_deck, skyline, modern, landmark | excellence: 0.91
+•	[culture] Tempozan Giant Ferris Wheel | tags: ferris_wheel, waterfront, view, leisure, modern | excellence: 0.86
+•	[culture] Osaka Aquarium Kaiyukan | tags: aquarium, marine_life, family, educational, immersive | excellence: 0.92
+•	[culture] Hozenji Yokocho | tags: stone_paved_alley, lanterns, traditional, atmosphere, heritage | excellence: 0.87
+•	[culture] Tennoji Zoo | tags: zoo, wildlife, family, outdoor, recreation | excellence: 0.83
+•	[culture] Minoo Park | tags: waterfall, nature, hiking, seasonal, scenic | excellence: 0.88
+•	[culture] Bunraku National Theatre | tags: puppetry, performing_arts, traditional, cultural, heritage | excellence: 0.89
+•	[culture] Abeno Harukas Art Museum | tags: art_museum, skyline_view, contemporary, exhibits, modern | excellence: 0.86
+•	[culture] America Mura | tags: youth_culture, street_art, fashion, subculture, urban | excellence: 0.84
+•	[culture] Shinsekai District | tags: retro, neon, local_life, nostalgic, entertainment | excellence: 0.88
+•	[walk] Dotonbori Canal Walk | tags: walk, canal, neon, nightlife, lively | excellence: 0.91
+•	[walk] Namba Yasaka Loop | tags: walk, shrine, urban, cultural, daytime | excellence: 0.82
+•	[walk] Osaka Castle Park Path | tags: walk, park, seasonal, cherry_blossom, daytime | excellence: 0.89
+•	[walk] Kuromon Market Stroll | tags: walk, market, street_food, lively, daytime | excellence: 0.86
+•	[walk] Tenjinbashisuji Arcade Walk | tags: walk, shopping_street, covered_arcade, local, daytime | excellence: 0.87
+•	[walk] Umeda Night Skyline Walk | tags: walk, skyline, lights, modern, night | excellence: 0.90
+•	[walk] Nakanoshima Riverside Path | tags: walk, river, calm, urban, sunset | excellence: 0.85
+•	[walk] Shinsekai Evening Walk | tags: walk, retro, neon, nostalgic, night | excellence: 0.88
+•	[walk] Sumiyoshi Taisha Bridge Walk | tags: walk, shrine_bridge, traditional, tranquil, daytime | excellence: 0.84
+•	[walk] America Mura Street Loop | tags: walk, youth, street_art, fashion, urban | excellence: 0.83
+
+
+City: seoul
+•	[food] Gwangjang Market Bindaetteok | tags: korean, street_food, pancake, market, casual | excellence: 0.88
+•	[food] Tosokchon Samgyetang | tags: korean, chicken_soup, traditional, comfort, lunch | excellence: 0.90
+•	[food] Jin Ok Hwa Dakhanmari | tags: chicken_hotpot, local_specialty, communal, casual, dinner | excellence: 0.89
+•	[food] Maple Tree House Itaewon | tags: korean_bbq, grill, social, dinner, modern | excellence: 0.91
+•	[food] Mingles | tags: korean_fusion, fine_dining, tasting_menu, creative, elegant | excellence: 0.95
+•	[food] Jungsik | tags: contemporary_korean, michelin, modern, refined, dinner | excellence: 0.96
+•	[food] Woo Lae Oak | tags: naengmyeon, noodles, traditional, local, classic | excellence: 0.88
+•	[food] Hanilkwan | tags: korean_cuisine, heritage, refined, lunch, dinner | excellence: 0.87
+•	[food] Kyochon Chicken Hongdae | tags: fried_chicken, casual, nightlife, popular, local | excellence: 0.84
+•	[food] Gusto Taco | tags: mexican, tacos, international, casual, social | excellence: 0.82
+•	[food] Vatos Urban Tacos | tags: fusion, mexican_korean, lively, dinner, modern | excellence: 0.83
+•	[food] Brera | tags: italian, pasta, wine, cozy, dinner | excellence: 0.81
+•	[food] Linus BBQ | tags: american_bbq, smoked_meat, casual, hearty, international | excellence: 0.80
+•	[food] Paris Baguette Flagship | tags: bakery, cafe, dessert, casual, modern | excellence: 0.78
+•	[food] Cafe Onion Anguk | tags: cafe, coffee, hanok_style, trendy, brunch | excellence: 0.85
+•	[food] Oreno Ramen | tags: ramen, japanese, noodles, casual, popular | excellence: 0.82
+•	[food] Bukchon Son Mandu | tags: dumplings, traditional, local, snack, casual | excellence: 0.79
+•	[food] Gopchang Story | tags: offal_bbq, korean, grill, nightlife, bold_flavor | excellence: 0.83
+•	[food] Pro Soy Crab | tags: soy_marinated_crab, seafood, premium, dinner, specialty | excellence: 0.92
+•	[food] BHC Chicken | tags: fried_chicken, franchise, casual, takeaway, local | excellence: 0.77
+•	[food] Noryangjin Fish Market Stalls | tags: seafood, market, fresh, experiential, dinner | excellence: 0.86
+•	[food] O’sulloc Tea House | tags: tea, dessert, matcha, cafe, relaxed | excellence: 0.80
+•	[culture] Gyeongbokgung Palace | tags: palace, joseon_dynasty, heritage, landmark, traditional | excellence: 0.95
+•	[culture] Changdeokgung Secret Garden | tags: unesco, royal_garden, heritage, tranquil, historic | excellence: 0.94
+•	[culture] Bukchon Hanok Village | tags: hanok, heritage, traditional_architecture, cultural, scenic | excellence: 0.92
+•	[culture] N Seoul Tower | tags: observation_tower, skyline, landmark, romantic, modern | excellence: 0.90
+•	[culture] War Memorial of Korea | tags: museum, military_history, educational, large_scale, cultural | excellence: 0.88
+•	[culture] Leeum Samsung Museum of Art | tags: contemporary_art, museum, architecture, exhibits, modern | excellence: 0.89
+•	[culture] Dongdaemun Design Plaza | tags: futuristic_architecture, design, exhibitions, urban, modern | excellence: 0.90
+•	[culture] Jogyesa Temple | tags: buddhist_temple, spiritual, colorful_lanterns, traditional, heritage | excellence: 0.87
+•	[culture] National Museum of Korea | tags: museum, history, artifacts, educational, grand_scale | excellence: 0.91
+•	[culture] Hongdae Street Culture | tags: youth_culture, indie_music, street_performance, creative, urban | excellence: 0.86
+•	[culture] Itaewon District | tags: multicultural, nightlife, dining_scene, urban, diverse | excellence: 0.85
+•	[culture] COEX Starfield Library | tags: library, modern_design, photo_spot, indoor, iconic | excellence: 0.84
+•	[culture] Lotte World Tower | tags: skyscraper, skyline, observation_deck, modern, landmark | excellence: 0.89
+•	[culture] Deoksugung Palace | tags: palace, stone_wall_road, heritage, historic, urban | excellence: 0.88
+•	[culture] Seodaemun Prison History Hall | tags: colonial_history, museum, educational, solemn, heritage | excellence: 0.86
+•	[culture] Namsan Hanok Village | tags: traditional_houses, cultural_experience, heritage, outdoor, historic | excellence: 0.87
+•	[culture] Gwanghwamun Square | tags: public_square, monuments, civic_space, urban, landmark | excellence: 0.85
+•	[culture] Banpo Rainbow Bridge | tags: bridge, night_view, fountain_show, romantic, modern | excellence: 0.88
+•	[walk] Cheonggyecheon Stream Walk | tags: walk, urban_stream, daytime, relaxed, scenic | excellence: 0.90
+•	[walk] Bukchon Alley Stroll | tags: walk, hanok, heritage, photography, daytime | excellence: 0.89
+•	[walk] Namsan Park Trail | tags: walk, forest, hilltop_view, nature, outdoor | excellence: 0.88
+•	[walk] Han River Park Path | tags: walk, riverside, sunset, leisure, urban | excellence: 0.87
+•	[walk] Ikseon-dong Night Walk | tags: walk, hanok, nightlife, trendy, intimate | excellence: 0.86
+•	[walk] Dongdaemun Night Loop | tags: walk, lights, shopping, modern, night | excellence: 0.88
+•	[walk] Hongdae Evening Walk | tags: walk, youth, street_art, lively, night | excellence: 0.85
+•	[walk] Deoksugung Stone Wall Road | tags: walk, heritage, tree_lined, romantic, daytime | excellence: 0.87
+•	[walk] Itaewon Hill Stroll | tags: walk, multicultural, urban_view, casual, daytime | excellence: 0.83
+•	[walk] Seongsu Cafe Street Walk | tags: walk, industrial_chic, cafes, trendy, daytime | excellence: 0.84
+
+
+City: ho chi minh city
+•	[food] Pho Hoa Pasteur | tags: vietnamese, pho, noodles, broth, local | excellence: 0.90
+•	[food] Banh Mi Huynh Hoa | tags: banh_mi, sandwich, street_food, quick_bite, local | excellence: 0.89
+•	[food] Com Tam Ba Ghien | tags: com_tam, broken_rice, pork, local, casual | excellence: 0.88
+•	[food] Quan Ut Ut | tags: vietnamese, bun_thit_nuong, noodles, grill, lunch | excellence: 0.87
+•	[food] Ben Thanh Market Food Stalls | tags: market, street_food, variety, local, budget | excellence: 0.91  
+•	[food] Hoa Tuc Restaurant | tags: vietnamese_fusion, refined, lunch, dinner, modern | excellence: 0.92
+•	[food] Hoa Ma Chicken Rice | tags: grilled_chicken, rice, local, hearty, casual | excellence: 0.85
+•	[food] Secret Garden Rooftop | tags: rooftop, vietnamese, relaxed, dinner, scenic | excellence: 0.86
+•	[food] Bún Bò Huế Corner | tags: spicy, noodle_soup, viet_central, local, lunch | excellence: 0.84
+•	[food] Bánh Xèo 46A | tags: banh_xeo, crepe, seafood, street_food, local | excellence: 0.87
+•	[food] Quan An Ngon | tags: vietnamese, traditional_dishes, casual, local, group | excellence: 0.90
+•	[food] Bun Thit Nuong Kieu Bao | tags: vermicelli, grill, local, lunch, flavorful | excellence: 0.86
+•	[food] Ca Phe Trung (Egg Coffee) | tags: coffee, egg_coffee, cafe, dessert, local | excellence: 0.83
+•	[food] Pasteur Street Brewing Co. | tags: craft_beer, brewery, casual, social, night | excellence: 0.82
+•	[food] Saigon Vegan Kitchen | tags: vegan, healthy, modern, lunch, casual | excellence: 0.80
+•	[food] Nam Giao Restaurant | tags: vietnamese, regional_cuisine, elegant, dinner, local | excellence: 0.91
+•	[food] Vinh Khanh Street Stalls | tags: street_food, seafood, local, lively, casual | excellence: 0.87
+•	[food] Dak Lak Coffee Spot | tags: coffee, ethiopian_beans, cafe, aroma, relaxed | excellence: 0.81
+•	[food] Asian Kitchen Saigon | tags: pan_asian, casual, dinner, fusion, international | excellence: 0.79
+•	[food] Sushi Bar District 1 | tags: sushi, japanese, dinner, refined, modern | excellence: 0.82
+•	[food] BBQ & Beer Alley | tags: barbecue, drinks, casual, night, social | excellence: 0.81
+•	[food] Sweet Dessert Stand | tags: street_food, dessert, local, sweet, quick_bite | excellence: 0.78
+•	[culture] Ben Thanh Market | tags: market, landmark, historic, local_life, busy | excellence: 0.92  
+•	[culture] Notre Dame Cathedral of Saigon | tags: cathedral, colonial_architecture, heritage, landmark, photo | excellence: 0.90  
+•	[culture] Saigon Central Post Office | tags: colonial_architecture, heritage, historic, photo_spot, urban | excellence: 0.89  
+•	[culture] Independence Palace | tags: history, presidential_palace, heritage, museum, iconic | excellence: 0.91  
+•	[culture] War Remnants Museum | tags: museum, war_history, vietnam_war, educational, impactful | excellence: 0.90  
+•	[culture] Nguyen Hue Walking Street | tags: pedestrian_street, urban, social_space, evening, lively | excellence: 0.88  
+•	[culture] Jade Emperor Pagoda | tags: pagoda, spiritual, ornate, traditional, cultural | excellence: 0.87  
+•	[culture] Saigon Opera House | tags: opera_house, architecture, performance, culture, elegant | excellence: 0.89  
+•	[culture] Ho Chi Minh City Museum | tags: museum, history, artifacts, education, city_story | excellence: 0.85  
+•	[culture] Fine Arts Museum | tags: art, vietnamese_art, heritage, exhibits, creative | excellence: 0.86  
+•	[culture] Saigon Skydeck Bitexco | tags: skyscraper, observation, skyline, modern, view | excellence: 0.89  
+•	[culture] Cao Dai Temple | tags: temple, vibrant_colors, religious, architecture, cultural | excellence: 0.88  
+•	[culture] Thien Hau Temple | tags: chinese_temple, spiritual, heritage, incense, calm | excellence: 0.84  
+•	[culture] Fine Arts Museum Garden | tags: sculpture_garden, art, peaceful, culture, outdoor | excellence: 0.83
+•	[culture] Mekong Delta Day Trip | tags: river_life, delta, scenic, villages, nature | excellence: 0.87
+•	[culture] Saigon River Sunset Cruise | tags: river, sunset, scenic, experience, relaxed | excellence: 0.88
+•	[culture] Opera House Performance | tags: live_show, performing_arts, cultural, evening, creative | excellence: 0.86
+•	[walk] Nguyen Hue Street Walk | tags: walk, urban, pedestrian, evening, social | excellence: 0.89  
+•	[walk] Dong Khoi Boutique Lane | tags: walk, shopping, fashion, urban, daytime | excellence: 0.88  
+•	[walk] Ben Thanh Market Circuit | tags: walk, market, street_food, lively, daytime | excellence: 0.90  
+•	[walk] Saigon River Promenade | tags: walk, river, sunset, scenic, relaxed | excellence: 0.87  
+•	[walk] Bui Vien Backpacker Street | tags: walk, nightlife, neon, social, lively | excellence: 0.88  
+•	[walk] Pham Ngu Lao Night Loop | tags: walk, backpacker_area, night, casual, energetic | excellence: 0.86  
+•	[walk] Old Quarter Alley Walk | tags: walk, heritage, narrow_streets, exploration, daytime | excellence: 0.85
+•	[walk] Cafe Apartment Stroll | tags: walk, cafe_hopping, architecture, relaxed, urban | excellence: 0.84  
+•	[walk] Saigon Opera House Square | tags: walk, architecture, plaza, urban, photo | excellence: 0.83  
+•	[walk] Thien Hau Temple Lane | tags: walk, cultural_path, spiritual, narrow, daytime | excellence: 0.82  
+•	[walk] Mekong Riverside Walk | tags: walk, river, delta_influence, scenic, outdoor | excellence: 0.86
+
+
+City: bangkok
+•	[food] Jay Fai | tags: thai, seafood, street_food, spicy, casual | excellence: 0.93
+•	[food] Thipsamai Pad Thai | tags: thai, pad_thai, noodles, classic, casual | excellence: 0.91
+•	[food] Here Hai | tags: thai, crab_fried_rice, seafood, signature, casual | excellence: 0.90
+•	[food] Rung Rueang Pork Noodles | tags: thai, noodle_soup, pork, street_food, local | excellence: 0.89
+•	[food] Go-Ang Pratunam Boat Noodles | tags: thai, boat_noodles, broth, local, casual | excellence: 0.88
+•	[food] Sook Siam Food Court | tags: thai, street_food_court, variety, casual, social | excellence: 0.87
+•	[food] Baan Khanitha | tags: thai, fine_dining, classic, elegant, dinner | excellence: 0.92
+•	[food] Blue Elephant | tags: thai, royal_cuisine, refined, dinner, elegant | excellence: 0.91
+•	[food] Cabbages & Condoms | tags: thai, local_cuisine, social_enterprise, casual, lunch | excellence: 0.85
+•	[food] Soul Food Mahanakorn | tags: thai, eastern_thai, creative, modern, dinner | excellence: 0.87
+•	[food] Bo.Lan | tags: thai, traditional, tasting_menu, upscale, local | excellence: 0.93
+•	[food] Err Urban Rustic Thai | tags: thai, casual, modern, snacks, local | excellence: 0.86
+•	[food] Som Tam Nua | tags: thai, papaya_salad, spicy, street_food, casual | excellence: 0.88
+•	[food] Khao Man Gai Pratunam | tags: thai, chicken_rice, street_food, local, lunch | excellence: 0.87
+•	[food] Thanee Khao Moo Daeng | tags: thai, roast_pork_rice, casual, local, quick_bite | excellence: 0.88
+•	[food] Wallflowers Upstairs | tags: bar_food, cocktails, modern, chic, social | excellence: 0.84
+•	[food] Eat Me Restaurant | tags: international, modern, dinner, creative, elegant | excellence: 0.90
+•	[food] Espresso Gallery | tags: cafe, coffee, brunch, relaxed, modern | excellence: 0.82
+•	[food] Charcoal Tandoor Grill | tags: indian, grill, international, dinner, social | excellence: 0.80
+•	[food] Sukhumvit Soi 38 Stalls | tags: thai, street_food, night, local, casual | excellence: 0.86
+•	[food] Chinatown Seafood Alley | tags: seafood, street_food, night, lively, local | excellence: 0.87
+•	[culture] Grand Palace | tags: palace, royal_architecture, heritage, landmark, historic | excellence: 0.96
+•	[culture] Wat Pho | tags: temple, reclining_buddha, thai_culture, spiritual, historic | excellence: 0.94
+•	[culture] Wat Arun | tags: temple, riverside, iconic, architecture, cultural | excellence: 0.93
+•	[culture] Jim Thompson House | tags: museum, traditional_house, history, culture, art | excellence: 0.89
+•	[culture] Chatuchak Weekend Market | tags: market, massive, shopping, local, vibrant | excellence: 0.91
+•	[culture] Chinatown Yaowarat Road | tags: heritage, street_food, market, chinese_influence, urban | excellence: 0.92
+•	[culture] Erawan Shrine | tags: shrine, spiritual, urban, colorful, local | excellence: 0.88
+•	[culture] Bangkok Art and Culture Centre | tags: art, contemporary, exhibits, creative, culture | excellence: 0.87
+•	[culture] Vimanmek Mansion | tags: historic_mansion, teak_wood, heritage, architecture, museum | excellence: 0.85
+•	[culture] Museum of Siam | tags: museum, interactive, thai_history, culture, educational | excellence: 0.88
+•	[culture] Lumphini Park | tags: park, nature, outdoor, relax, urban | excellence: 0.90
+•	[culture] Asiatique The Riverfront | tags: market, riverfront, shopping, night, cultural | excellence: 0.89
+•	[culture] Bangkok Folk Museum | tags: history, exhibits, traditional, learning, cultural | excellence: 0.83
+•	[culture] Sea Life Bangkok Ocean World | tags: aquarium, marine_life, family, educational, indoor | excellence: 0.88
+•	[culture] Rattanakosin Exhibition Hall | tags: history, culture, interactive, learning, royal | excellence: 0.87
+•	[culture] Museum of Contemporary Art | tags: modern_art, exhibits, creative, culture, urban | excellence: 0.89
+•	[culture] Bangkok Flower Market | tags: market, flowers, colorful, local, sensory | excellence: 0.90
+•	[culture] Traditional Thai Puppet Show | tags: performing_arts, heritage, traditional, culture, stage | excellence: 0.86
+•	[culture] Floating Market Samut Songkhram | tags: market, canal_boats, traditional_trade, scenic, local | excellence: 0.92
+•	[walk] Riverside Chao Phraya Path | tags: walk, river, scenic, sunset, relaxed | excellence: 0.90
+•	[walk] Yaowarat Chinatown Stroll | tags: walk, street_food, heritage, urban, day_night | excellence: 0.92
+•	[walk] Khao San Road Walk | tags: walk, backpacker_area, neon, social, night | excellence: 0.89
+•	[walk] Sukhumvit Avenue Trek | tags: walk, shopping, urban, modern, daytime | excellence: 0.88
+•	[walk] Silom Night Market Circuit | tags: walk, night, market, lively, casual | excellence: 0.87
+•	[walk] Old Town Heritage Walk | tags: walk, historic, temples, culture, daytime | excellence: 0.91
+•	[walk] Lumpini Park Loop | tags: walk, park, nature, serene, daytime | excellence: 0.89
+•	[walk] Talad Noi Creative Lane | tags: walk, art, narrow_streets, creative, local | excellence: 0.88
+•	[walk] Asiatique Waterfront Promenade | tags: walk, riverfront, lights, night, leisure | excellence: 0.90
+•	[walk] Bangkok Canalside Path | tags: walk, canals, local_life, scenic, outdoor | excellence: 0.87
+•	[walk] Victory Monument Circle | tags: walk, urban, fluvial, day_night, busy | excellence: 0.86  
+
+
+
+City: london
+•	[food] Borough Market Stalls | tags: market, street_food, local, fresh, casual | excellence: 0.92
+•	[food] Dishoom Covent Garden | tags: indian, breakfast, lunch, dinner, casual | excellence: 0.90
+•	[food] Flat Iron Steakhouse | tags: british_steak, grill, hearty, casual, dinner | excellence: 0.88
+•	[food] Padella | tags: italian, pasta, casual, lunch, local | excellence: 0.89
+•	[food] Bob Bob Ricard | tags: british, champagne_button, refined, dinner, creative | excellence: 0.91
+•	[food] Sketch Gallery | tags: modern_british, creative, afternoon_tea, stylish, elegant | excellence: 0.90
+•	[food] The Ledbury | tags: modern_european, michelin, tasting_menu, refined, dinner | excellence: 0.96
+•	[food] Hakkasan Mayfair | tags: chinese, fine_dining, modern, dinner, elegant | excellence: 0.93
+•	[food] Shanghai Me | tags: pan_asian, fusion, skyline_view, dinner, modern | excellence: 0.89
+•	[food] Forza Wine South Bank | tags: italian, wine_bar, river_view, casual, sunset | excellence: 0.88
+•	[food] Homeslice Neal’s Yard | tags: pizza, wood_fired, casual, group, lunch | excellence: 0.87
+•	[food] The Palomar | tags: middle_eastern, modern, dinner, creative, lively | excellence: 0.89
+•	[food] M.Manze Pie & Mash | tags: british_tradition, pie_and_mash, casual, heritage, cheap | excellence: 0.85
+•	[food] Camden Market Street Bites | tags: street_food, eclectic, local, casual, budget | excellence: 0.88
+•	[food] Temple Brew House | tags: pub_food, beer, casual, social, lunch | excellence: 0.84
+•	[food] OXO Tower Restaurant | tags: british, river_view, dinner, refined, skyline | excellence: 0.90
+•	[food] Brasserie Zédel | tags: french, brasserie, classic, affordable, casual | excellence: 0.86
+•	[food] Plates London | tags: vegan, michelin, modern, creative, dinner | excellence: 0.92
+•	[food] Guzman y Gomez | tags: mexican, tacos, casual, quick_bite, fun | excellence: 0.81
+•	[food] Bute Street Bakeries | tags: bakery, pastries, european, casual, sweets | excellence: 0.83
+•	[food] Covent Garden Cafés | tags: cafe, coffee, pastries, relaxed, daytime | excellence: 0.82
+•	[culture] Tower of London | tags: historic, castle, crown_jewels, heritage, iconic | excellence: 0.95  
+•	[culture] British Museum | tags: museum, history, culture, exhibits, free | excellence: 0.94  
+•	[culture] London Eye | tags: observation_wheel, skyline, river, landmark, photo | excellence: 0.93  
+•	[culture] Buckingham Palace | tags: palace, royal, heritage, ceremonial, landmark | excellence: 0.92
+•	[culture] Westminster Abbey | tags: abbey, gothic, history, heritage, sacred | excellence: 0.91
+•	[culture] National Gallery | tags: art, museum, classics, culture, free | excellence: 0.92
+•	[culture] Tate Modern | tags: modern_art, museum, creative, exhibits, urban | excellence: 0.90
+•	[culture] Victoria & Albert Museum | tags: design, art, fashion, culture, historic | excellence: 0.89
+•	[culture] Natural History Museum | tags: museum, science, nature, family, iconic | excellence: 0.90
+•	[culture] Shakespeare’s Globe | tags: theatre, historic, performance, culture, riverside | excellence: 0.88
+•	[culture] Camden Town Music Scene | tags: music_history, culture, punk, market, urban | excellence: 0.87  
+•	[culture] St Paul’s Cathedral | tags: cathedral, architecture, heritage, dome, iconic | excellence: 0.92
+•	[culture] Kew Gardens | tags: botanical_garden, nature, plants, heritage, scenic | excellence: 0.90
+•	[culture] Greenwich Park | tags: park, observatory, historic, views, outdoors | excellence: 0.89
+•	[culture] Science Museum | tags: museum, science, interactive, family, learning | excellence: 0.88
+•	[culture] Royal Opera House | tags: opera, performance, arts, culture, refined | excellence: 0.89
+•	[culture] Covent Garden Street Performers | tags: performance, street_art, theatre, lively, urban | excellence: 0.88
+•	[culture] Hidden London Tours | tags: underground, history, secret, urban, unique | excellence: 0.86  
+•	[walk] South Bank Riverside Walk | tags: walk, river, skyline, photo, daytime | excellence: 0.92  
+•	[walk] Hyde Park & Kensington Gardens | tags: walk, park, trees, lake, leisure | excellence: 0.91  
+•	[walk] Thames Path Section | tags: walk, river, scenic, outdoor, exercise | excellence: 0.90  
+•	[walk] Camden High Street Stroll | tags: walk, market, music, urban, culture | excellence: 0.89  
+•	[walk] Jubilee Walkway | tags: walk, landmarks, urban, history, photo | excellence: 0.90  
+•	[walk] Regent’s Canal Towpath | tags: walk, canal, nature, city, relaxed | excellence: 0.88
+•	[walk] Greenwich Foot Tunnel to Park | tags: walk, river, park, heritage, scenic | excellence: 0.89  
+•	[walk] Covent Garden & Soho Lane | tags: walk, shopping, food, urban, daytime | excellence: 0.87
+•	[walk] Notting Hill Lanes | tags: walk, pastel_houses, boutiques, market, relaxed | excellence: 0.88
+•	[walk] Borough Market Evening Loop | tags: walk, market, lights, food, lively | excellence: 0.89  
+
+
+
+City: edinburgh
+•	[food] The Witchery | tags: scottish, fine_dining, heritage, romantic, dinner | excellence: 0.94
+•	[food] Timberyard | tags: scottish, seasonal, farm_to_table, modern, dinner | excellence: 0.92
+•	[food] The Kitchin | tags: scottish, michelin, seafood, refined, tasting_menu | excellence: 0.95
+•	[food] Ondine | tags: seafood, oysters, elegant, dinner, british | excellence: 0.91
+•	[food] Dishoom Edinburgh | tags: indian, brunch, casual, lively, modern | excellence: 0.88
+•	[food] Noto | tags: small_plates, contemporary, creative, dinner, modern | excellence: 0.87
+•	[food] Aizle | tags: seasonal_menu, tasting_menu, refined, local, dinner | excellence: 0.93
+•	[food] Makars Mash Bar | tags: scottish, comfort_food, casual, lunch, traditional | excellence: 0.89
+•	[food] The Outsider | tags: european, bistro, scenic_view, casual, lunch | excellence: 0.86
+•	[food] Cafe St Honoré | tags: french, classic, wine, cozy, dinner | excellence: 0.88
+•	[food] Mother India Cafe | tags: indian, tapas_style, casual, spicy, dinner | excellence: 0.87
+•	[food] Ting Thai Caravan | tags: thai, street_food_style, casual, affordable, lunch | excellence: 0.85
+•	[food] Oink Victoria Street | tags: hog_roast, sandwich, street_food, quick_bite, local | excellence: 0.84
+•	[food] Mosque Kitchen | tags: indian, curry, budget, casual, lunch | excellence: 0.83
+•	[food] The Scran & Scallie | tags: gastropub, scottish, hearty, dinner, local | excellence: 0.88
+•	[food] Fishers Leith | tags: seafood, waterfront, classic, dinner, relaxed | excellence: 0.87
+•	[food] Sora Lella | tags: italian, pasta, cozy, dinner, casual | excellence: 0.84
+•	[food] Hendersons | tags: vegetarian, healthy, casual, lunch, local | excellence: 0.82
+•	[food] Lovecrumbs | tags: cafe, cake, dessert, cozy, daytime | excellence: 0.83
+•	[food] Mary’s Milk Bar | tags: gelato, dessert, artisan, sweet, casual | excellence: 0.86
+•	[food] Panda & Sons | tags: cocktail_bar, speakeasy, nightlife, creative, social | excellence: 0.85
+•	[food] The Hanging Bat | tags: craft_beer, pub, casual, social, evening | excellence: 0.82
+•	[culture] Edinburgh Castle | tags: castle, medieval, landmark, heritage, history | excellence: 0.97
+•	[culture] Royal Mile | tags: historic_street, old_town, heritage, architecture, cultural | excellence: 0.95
+•	[culture] Palace of Holyroodhouse | tags: palace, royal_history, heritage, architecture, landmark | excellence: 0.92
+•	[culture] National Museum of Scotland | tags: museum, history, exhibits, educational, family | excellence: 0.93
+•	[culture] Scottish National Gallery | tags: art_museum, classics, culture, exhibits, heritage | excellence: 0.91
+•	[culture] St Giles Cathedral | tags: cathedral, gothic, spiritual, heritage, architecture | excellence: 0.92
+•	[culture] Calton Hill | tags: viewpoint, monuments, skyline, heritage, outdoor | excellence: 0.93
+•	[culture] Arthur Seat | tags: hilltop, hiking, scenic, nature, outdoor | excellence: 0.94
+•	[culture] Holyrood Park | tags: nature_reserve, landscape, outdoor, scenic, heritage | excellence: 0.90
+•	[culture] Real Mary Kings Close | tags: underground, history, interactive, mystery, heritage | excellence: 0.90
+•	[culture] Scottish Parliament Building | tags: modern_architecture, civic, design, political, contemporary | excellence: 0.87
+•	[culture] Georgian House | tags: georgian_architecture, heritage, interior, museum, history | excellence: 0.88
+•	[culture] Surgeons Hall Museums | tags: medical_history, museum, unusual, educational, exhibits | excellence: 0.86
+•	[culture] Dean Village | tags: historic_village, riverside, scenic, heritage, tranquil | excellence: 0.89
+•	[culture] Leith Shore | tags: waterfront, maritime_history, dining_scene, scenic, cultural | excellence: 0.90
+•	[culture] Princes Street Gardens | tags: urban_park, scenic, heritage, relax, public_space | excellence: 0.91
+•	[culture] Edinburgh Festival Fringe | tags: arts_festival, performance, creative, seasonal, cultural | excellence: 0.95
+•	[culture] Camera Obscura World of Illusions | tags: interactive, optical_illusion, family, fun, historic_building | excellence: 0.88
+•	[walk] Victoria Street Walk | tags: walk, colorful, old_town, photography, daytime | excellence: 0.93
+•	[walk] Royal Mile Stroll | tags: walk, historic, architecture, lively, daytime | excellence: 0.94
+•	[walk] Water of Leith Walkway | tags: walk, river, nature, calm, scenic | excellence: 0.90
+•	[walk] Calton Hill Sunset Path | tags: walk, hill, sunset, skyline, scenic | excellence: 0.94
+•	[walk] Arthur Seat Sunrise Trail | tags: walk, hike, sunrise, outdoor, scenic | excellence: 0.95
+•	[walk] Stockbridge Village Loop | tags: walk, village_charm, cafes, relaxed, daytime | excellence: 0.88
+•	[walk] Grassmarket Evening Walk | tags: walk, historic, pubs, nightlife, social | excellence: 0.89
+•	[walk] Dean Village Riverside Path | tags: walk, riverside, tranquil, heritage, scenic | excellence: 0.90
+•	[walk] New Town Georgian Walk | tags: walk, architecture, heritage, urban, daytime | excellence: 0.91
+•	[walk] Holyrood Park Circuit | tags: walk, nature, landscape, outdoor, exploration | excellence: 0.89
+
+
+
+City: paris
+•	[food] Septime | tags: modern_french, michelin, tasting_menu, refined, dinner | excellence: 0.96
+•	[food] Le Chateaubriand | tags: avant_garde, french, creative, dinner, trendy | excellence: 0.94
+•	[food] Clamato | tags: seafood, casual, natural_wine, modern, lunch | excellence: 0.90
+•	[food] Frenchie | tags: contemporary_french, bistro, dinner, stylish, local | excellence: 0.91
+•	[food] Le Relais de lEntrecote | tags: steak_frites, classic, french, casual, iconic | excellence: 0.90
+•	[food] Bouillon Pigalle | tags: bouillon, traditional, affordable, lively, dinner | excellence: 0.88
+•	[food] Bistrot Paul Bert | tags: bistro, steak, classic, cozy, dinner | excellence: 0.89
+•	[food] Chez Janou | tags: provençal, courtyard, casual, dinner, charming | excellence: 0.87
+•	[food] LAs du Fallafel | tags: middle_eastern, street_food, sandwich, casual, local | excellence: 0.89
+•	[food] Breizh Cafe | tags: creperie, galette, casual, lunch, regional | excellence: 0.86
+•	[food] Du Pain et des Idees | tags: bakery, pastries, artisan, breakfast, casual | excellence: 0.88
+•	[food] Pierre Herme Boutique | tags: patisserie, macarons, dessert, luxury, sweet | excellence: 0.90
+•	[food] Angelina Rivoli | tags: cafe, hot_chocolate, elegant, dessert, classic | excellence: 0.89
+•	[food] Cafe de Flore | tags: historic_cafe, coffee, literary, classic, brunch | excellence: 0.87
+•	[food] Kodawari Ramen | tags: ramen, japanese, immersive, casual, noodles | excellence: 0.85
+•	[food] Lao Siam | tags: thai, spicy, authentic, casual, dinner | excellence: 0.83
+•	[food] Le Mary Celeste | tags: tapas, seafood, natural_wine, trendy, casual | excellence: 0.84
+•	[food] Pink Mamma | tags: italian, pasta, lively, casual, instagrammable | excellence: 0.86
+•	[food] Le Baratin | tags: bistro, natural_wine, local, dinner, authentic | excellence: 0.88
+•	[food] Shabour | tags: israeli, fine_dining, creative, tasting_menu, modern | excellence: 0.92
+•	[food] Le Comptoir du Relais | tags: french, bistro, refined, lunch, dinner | excellence: 0.91
+•	[food] La Fontaine de Belleville | tags: cafe, coffee, casual, neighborhood, daytime | excellence: 0.82
+•	[culture] Eiffel Tower | tags: landmark, architecture, iconic, skyline, historic | excellence: 0.98
+•	[culture] Louvre Museum | tags: museum, art_masterpieces, historic, global_icon, cultural | excellence: 0.97
+•	[culture] Notre Dame Cathedral | tags: cathedral, gothic, heritage, spiritual, landmark | excellence: 0.94
+•	[culture] Musee dOrsay | tags: impressionism, museum, art, historic, cultural | excellence: 0.93
+•	[culture] Centre Pompidou | tags: modern_art, museum, contemporary, architecture, cultural | excellence: 0.91
+•	[culture] Sacre Coeur Basilica | tags: basilica, hilltop, panoramic_view, spiritual, heritage | excellence: 0.92
+•	[culture] Arc de Triomphe | tags: monument, napoleon_history, viewpoint, iconic, heritage | excellence: 0.93
+•	[culture] Sainte Chapelle | tags: stained_glass, gothic, chapel, heritage, masterpiece | excellence: 0.92
+•	[culture] Palais Garnier | tags: opera_house, architecture, performance, heritage, elegant | excellence: 0.91
+•	[culture] Musee Rodin | tags: sculpture, garden, museum, artistic, tranquil | excellence: 0.90
+•	[culture] Musee de lOrangerie | tags: impressionism, water_lilies, museum, serene, art | excellence: 0.89
+•	[culture] Pantheon | tags: neoclassical, monument, historic_figures, heritage, landmark | excellence: 0.90
+•	[culture] Catacombs of Paris | tags: underground, macabre, history, niche, heritage | excellence: 0.88
+•	[culture] Fondation Louis Vuitton | tags: contemporary_art, architecture, modern, exhibitions, design | excellence: 0.89
+•	[culture] Shakespeare and Company | tags: bookstore, literary_history, cultural_icon, cozy, heritage | excellence: 0.87
+•	[culture] Place des Vosges | tags: historic_square, gardens, architecture, relaxed, heritage | excellence: 0.90
+•	[culture] Jardin du Luxembourg | tags: formal_garden, park, classic, leisure, cultural | excellence: 0.91
+•	[culture] Montmartre District | tags: bohemian, artists, historic, cultural, hillside | excellence: 0.92
+•	[walk] Seine Riverside Walk | tags: walk, river, romantic, scenic, daytime | excellence: 0.93
+•	[walk] Montmartre Hill Stroll | tags: walk, artistic, panoramic, historic, daytime | excellence: 0.92
+•	[walk] Le Marais Walk | tags: walk, boutiques, heritage, culture, daytime | excellence: 0.91
+•	[walk] Latin Quarter Walk | tags: walk, literary, cafes, heritage, day_night | excellence: 0.90
+•	[walk] Champs Elysees Walk | tags: walk, iconic_avenue, shopping, urban, daytime | excellence: 0.90
+•	[walk] Tuileries Garden Path | tags: walk, formal_garden, scenic, relaxed, daytime | excellence: 0.89
+•	[walk] Canal Saint Martin Path | tags: walk, canal, local_life, casual, scenic | excellence: 0.88
+•	[walk] Belleville Viewpoint Walk | tags: walk, hill_views, street_art, multicultural, urban | excellence: 0.89
+•	[walk] Ile de la Cite Loop | tags: walk, island, heritage, river, scenic | excellence: 0.91
+•	[walk] Saint Germain Cafe Walk | tags: walk, cafes, heritage, relaxed, daytime | excellence: 0.90
+
+
+
+City: barcelona
+•	[food] Tickets | tags: avant_garde, tasting_menu, creative, fine_dining, dinner | excellence: 0.96
+•	[food] Disfrutar | tags: modern_catalan, michelin, experimental, refined, dinner | excellence: 0.98
+•	[food] Lasarte | tags: haute_cuisine, michelin, elegant, tasting_menu, dinner | excellence: 0.97
+•	[food] Can Culleretes | tags: catalan, traditional, historic, casual, lunch | excellence: 0.88
+•	[food] Cal Pep | tags: tapas, seafood, lively, casual, bar_style | excellence: 0.92
+•	[food] Bar Cañete | tags: tapas, spanish, classic, social, dinner | excellence: 0.90
+•	[food] Cerveceria Catalana | tags: tapas, bustling, casual, local, seafood | excellence: 0.89
+•	[food] El Xampanyet | tags: cava_bar, tapas, traditional, lively, casual | excellence: 0.87
+•	[food] La Boqueria Market Bar | tags: market_food, seafood, fresh, casual, lunch | excellence: 0.91
+•	[food] Bodega Biarritz 1881 | tags: tapas, small_plates, cozy, dinner, local | excellence: 0.88
+•	[food] Paco Meralgo | tags: tapas, seafood, lively, casual, dinner | excellence: 0.89
+•	[food] Viana | tags: mediterranean, tapas, refined, dinner, modern | excellence: 0.86
+•	[food] Brunch and Cake | tags: brunch, cafe, modern, casual, daytime | excellence: 0.82
+•	[food] Federal Cafe | tags: cafe, brunch, coffee, casual, relaxed | excellence: 0.81
+•	[food] Flax & Kale | tags: healthy, vegetarian_friendly, brunch, modern, casual | excellence: 0.83
+•	[food] Koy Shunka | tags: japanese, omakase, refined, dinner, premium | excellence: 0.93
+•	[food] Ramen-Ya Hiro | tags: ramen, japanese, noodles, casual, local | excellence: 0.84
+•	[food] Dos Pebrots | tags: ancient_cuisine, mediterranean, experimental, dinner, niche | excellence: 0.88
+•	[food] Can Paixano | tags: cava, sandwiches, casual, lively, budget | excellence: 0.85
+•	[food] La Paradeta | tags: seafood, choose_and_cook, casual, fresh, lunch | excellence: 0.86
+•	[food] Casa Amalia | tags: modern_catalan, market_restaurant, casual, lunch, local | excellence: 0.87
+•	[food] Gelateria Delacrem | tags: gelato, dessert, artisan, sweet, casual | excellence: 0.83
+•	[culture] Sagrada Familia | tags: basilica, gaudi, landmark, architecture, iconic | excellence: 0.99
+•	[culture] Park Güell | tags: park, gaudi, mosaic, viewpoint, heritage | excellence: 0.95
+•	[culture] Casa Batlló | tags: modernisme, gaudi, architecture, iconic, museum | excellence: 0.94
+•	[culture] Casa Milà | tags: modernisme, architecture, rooftop, heritage, museum | excellence: 0.93
+•	[culture] Picasso Museum | tags: museum, art, cubism, historic, cultural | excellence: 0.91
+•	[culture] Museu Nacional dArt de Catalunya | tags: museum, art_history, panoramic, heritage, cultural | excellence: 0.92
+•	[culture] Barcelona Cathedral | tags: gothic, cathedral, old_town, heritage, religious | excellence: 0.90
+•	[culture] Palau de la Música Catalana | tags: concert_hall, modernisme, music, architecture, heritage | excellence: 0.93
+•	[culture] Montjuïc Castle | tags: fortress, history, viewpoint, heritage, military | excellence: 0.89
+•	[culture] Fundació Joan Miró | tags: modern_art, museum, artist, cultural, hilltop | excellence: 0.90
+•	[culture] El Born Cultural Centre | tags: archaeology, urban_history, cultural, exhibits, heritage | excellence: 0.88
+•	[culture] Hospital de Sant Pau | tags: modernisme, unesco, architecture, heritage, landmark | excellence: 0.94
+•	[culture] Camp Nou Experience | tags: football, stadium, sports_culture, iconic, modern | excellence: 0.91
+•	[culture] Tibidabo Amusement Park | tags: vintage_amusement, views, family, historic, leisure | excellence: 0.87
+•	[culture] Barceloneta Beach | tags: beach, urban_coast, leisure, social, daytime | excellence: 0.88
+•	[culture] Gothic Quarter | tags: medieval, streets, heritage, old_town, cultural | excellence: 0.92
+•	[culture] El Raval Art Scene | tags: contemporary, street_art, multicultural, cultural, urban | excellence: 0.86
+•	[culture] Design Museum | tags: design, modern, exhibitions, creative, cultural | excellence: 0.85
+•	[walk] La Rambla Walk | tags: walk, boulevard, street_life, iconic, daytime | excellence: 0.90
+•	[walk] Gothic Quarter Alley Walk | tags: walk, narrow_streets, medieval, heritage, exploration | excellence: 0.92
+•	[walk] El Born District Walk | tags: walk, boutiques, culture, historic, daytime | excellence: 0.91
+•	[walk] Barceloneta Seafront Walk | tags: walk, seaside, breeze, leisure, daytime | excellence: 0.89
+•	[walk] Montjuïc Garden Path | tags: walk, hill, gardens, scenic, relaxed | excellence: 0.88
+•	[walk] Gràcia Neighborhood Stroll | tags: walk, local_life, plazas, bohemian, casual | excellence: 0.87
+•	[walk] Passeig de Gràcia Walk | tags: walk, architecture, luxury, urban, daytime | excellence: 0.90
+•	[walk] Tibidabo Viewpoint Route | tags: walk, hilltop, panoramic, scenic, outdoor | excellence: 0.89
+•	[walk] Ciutadella Park Loop | tags: walk, park, greenery, leisure, daytime | excellence: 0.88
+•	[walk] Night Port Vell Walk | tags: walk, harbor, lights, night, relaxed | excellence: 0.87
+
+
+
+City: milan
+•	[food] Trattoria Milanese | tags: lombard, traditional, ossobuco, casual, dinner | excellence: 0.88
+•	[food] Ratanà | tags: modern_italian, seasonal, local_ingredients, dinner, refined | excellence: 0.91
+•	[food] Da Giacomo | tags: seafood, classic, elegant, dinner, italian | excellence: 0.90
+•	[food] Luini | tags: panzerotti, street_food, quick_bite, iconic, casual | excellence: 0.87
+•	[food] Piz | tags: pizza, casual, lively, affordable, lunch | excellence: 0.85
+•	[food] Langosteria | tags: seafood, upscale, elegant, dinner, premium | excellence: 0.93
+•	[food] Il Luogo di Aimo e Nadia | tags: haute_cuisine, michelin, tasting_menu, refined, dinner | excellence: 0.96
+•	[food] Niko Romito Bistrot | tags: contemporary_italian, refined, modern, dinner, stylish | excellence: 0.92
+•	[food] Pavé | tags: cafe, brunch, pastries, casual, daytime | excellence: 0.84
+•	[food] Panificio Pattini | tags: bakery, focaccia, breakfast, casual, local | excellence: 0.83
+•	[food] Giacomo Arengario | tags: italian, terrace_view, elegant, dinner, central | excellence: 0.90
+•	[food] Ratana Ristorante | tags: lombard, risotto, seasonal, modern, dinner | excellence: 0.89
+•	[food] Iyo | tags: japanese, sushi, fine_dining, fusion, dinner | excellence: 0.94
+•	[food] Casa Lucia | tags: southern_italian, pasta, cozy, casual, dinner | excellence: 0.82
+•	[food] Flower Burger | tags: vegan, colorful, casual, trendy, lunch | excellence: 0.80
+•	[food] Al Mercato Taco Bar | tags: mexican, tacos, casual, lively, dinner | excellence: 0.81
+•	[food] Temakinho | tags: brazilian_japanese, fusion, vibrant, casual, dinner | excellence: 0.83
+•	[food] Sorbillo | tags: neapolitan_pizza, classic, lively, casual, dinner | excellence: 0.88
+•	[food] Peck | tags: gourmet_shop, deli, premium, lunch, italian | excellence: 0.87
+•	[food] Pasticceria Marchesi | tags: pastry, historic, elegant, dessert, cafe | excellence: 0.89
+•	[food] Cioccolati Italiani | tags: chocolate, dessert, sweet, casual, modern | excellence: 0.82
+•	[food] Nottingham Forest | tags: cocktail_bar, creative, nightlife, experimental, social | excellence: 0.85
+•	[culture] Duomo di Milano | tags: cathedral, gothic, landmark, iconic, heritage | excellence: 0.98
+•	[culture] Galleria Vittorio Emanuele II | tags: arcade, architecture, luxury, historic, landmark | excellence: 0.94
+•	[culture] Santa Maria delle Grazie | tags: church, renaissance, leonardo, heritage, historic | excellence: 0.96
+•	[culture] Sforza Castle | tags: fortress, museum_complex, heritage, renaissance, landmark | excellence: 0.93
+•	[culture] Pinacoteca di Brera | tags: art_museum, renaissance, cultural, exhibits, heritage | excellence: 0.92
+•	[culture] Teatro alla Scala | tags: opera_house, music, historic, cultural, elegant | excellence: 0.94
+•	[culture] Fondazione Prada | tags: contemporary_art, modern, architecture, exhibitions, cultural | excellence: 0.90
+•	[culture] MUDEC | tags: design_museum, multicultural, exhibitions, modern, cultural | excellence: 0.88
+•	[culture] Basilica di SantAmbrogio | tags: romanesque, church, heritage, spiritual, historic | excellence: 0.90
+•	[culture] Cimitero Monumentale | tags: monumental_cemetery, sculpture, artistic, heritage, unique | excellence: 0.89
+•	[culture] Navigli District | tags: canals, nightlife, cultural_scene, historic, lively | excellence: 0.91
+•	[culture] Bosco Verticale | tags: modern_architecture, green_design, iconic, urban, contemporary | excellence: 0.88
+•	[culture] Palazzo Reale | tags: palace, exhibitions, historic, art, cultural | excellence: 0.89
+•	[culture] Armani Silos | tags: fashion, design, museum, modern, cultural | excellence: 0.87
+•	[culture] San Siro Stadium | tags: football, stadium, sports_culture, iconic, modern | excellence: 0.90
+•	[culture] Brera District | tags: artistic_quarter, galleries, heritage, cultural, charming | excellence: 0.88
+•	[culture] Piazza Mercanti | tags: medieval_square, heritage, architecture, historic, urban | excellence: 0.87
+•	[culture] Porta Nuova | tags: skyline, modern_district, architecture, urban, contemporary | excellence: 0.86
+•	[walk] Duomo Rooftop Walk | tags: walk, rooftop, gothic_views, panoramic, daytime | excellence: 0.95
+•	[walk] Navigli Canal Walk | tags: walk, canals, nightlife, social, evening | excellence: 0.92
+•	[walk] Brera Street Stroll | tags: walk, boutiques, artistic, heritage, daytime | excellence: 0.90
+•	[walk] Sempione Park Loop | tags: walk, park, greenery, relaxed, daytime | excellence: 0.89
+•	[walk] Porta Nuova Skyline Walk | tags: walk, modern, skyscrapers, urban, daytime | excellence: 0.88
+•	[walk] Corso Como Night Walk | tags: walk, nightlife, fashion, lively, night | excellence: 0.87
+•	[walk] Piazza del Duomo Circuit | tags: walk, landmark, historic, urban, daytime | excellence: 0.91
+•	[walk] Quadrilatero della Moda Walk | tags: walk, luxury, fashion, urban, daytime | excellence: 0.89
+•	[walk] Ticinese Evening Walk | tags: walk, local_life, bars, relaxed, night | excellence: 0.86
+•	[walk] Isola Neighborhood Stroll | tags: walk, creative, cafes, urban, daytime | excellence: 0.87
+
+
+
+City: naples
+•	[food] LAntica Pizzeria da Michele | tags: neapolitan_pizza, traditional, iconic, casual, dinner | excellence: 0.95
+•	[food] Sorbillo | tags: neapolitan_pizza, lively, classic, casual, lunch | excellence: 0.92
+•	[food] Starita | tags: fried_pizza, traditional, local, casual, authentic | excellence: 0.90
+•	[food] Di Matteo | tags: street_food, pizza_fritta, local, quick_bite, casual | excellence: 0.88
+•	[food] Tandem Ragù | tags: ragu, slow_cooked, traditional, hearty, dinner | excellence: 0.89
+•	[food] Trattoria da Nennella | tags: trattoria, homestyle, lively, budget, lunch | excellence: 0.87
+•	[food] La Notizia | tags: gourmet_pizza, modern, refined, dinner, creative | excellence: 0.91
+•	[food] Palazzo Petrucci | tags: fine_dining, seaside, tasting_menu, elegant, dinner | excellence: 0.94
+•	[food] Mimi alla Ferrovia | tags: classic_campanian, historic, refined, dinner, traditional | excellence: 0.90
+•	[food] Osteria della Mattonella | tags: trattoria, cozy, traditional, dinner, authentic | excellence: 0.86
+•	[food] Pasticceria Scaturchio | tags: sfogliatella, pastry, dessert, historic, sweet | excellence: 0.89
+•	[food] Pintauro | tags: sfogliatella, bakery, street_food, traditional, snack | excellence: 0.87
+•	[food] Gay Odin | tags: chocolate, dessert, artisan, sweet, historic | excellence: 0.85
+•	[food] Chalet Ciro | tags: gelato, seaside, dessert, casual, sweet | excellence: 0.84
+•	[food] Caffe Gambrinus | tags: historic_cafe, coffee, elegant, pastry, classic | excellence: 0.88
+•	[food] Puok Burger Store | tags: street_burger, modern, casual, creative, local | excellence: 0.83
+•	[food] Hachi Ristorante | tags: japanese, sushi, refined, dinner, international | excellence: 0.90
+•	[food] Keste | tags: gluten_free_pizza, modern, casual, specialty, dinner | excellence: 0.82
+•	[food] Il Transatlantico | tags: seafood, waterfront, classic, dinner, romantic | excellence: 0.91
+•	[food] Antica Capri | tags: seafood, traditional, dinner, cozy, local | excellence: 0.88
+•	[food] Cuccuma Caffe | tags: cafe, espresso, casual, daytime, local | excellence: 0.80
+•	[food] Barril | tags: tapas, spanish, casual, nightlife, lively | excellence: 0.79
+•	[culture] Pompeii Archaeological Park | tags: unesco, ancient_roman, ruins, historic, landmark | excellence: 0.98
+•	[culture] Herculaneum | tags: unesco, roman_ruins, preserved, heritage, historic | excellence: 0.96
+•	[culture] Naples National Archaeological Museum | tags: museum, roman_artifacts, cultural, historic, educational | excellence: 0.94
+•	[culture] Mount Vesuvius | tags: volcano, natural_landmark, hiking, scenic, iconic | excellence: 0.97
+•	[culture] Naples Cathedral | tags: cathedral, gothic, religious, heritage, historic | excellence: 0.92
+•	[culture] Royal Palace of Naples | tags: palace, bourbon_history, heritage, architecture, landmark | excellence: 0.91
+•	[culture] Castel dellOvo | tags: seaside_castle, medieval, scenic, heritage, historic | excellence: 0.93
+•	[culture] Castel Nuovo | tags: fortress, medieval, landmark, historic, architecture | excellence: 0.92
+•	[culture] Sansevero Chapel | tags: baroque, sculpture, artistic_masterpiece, heritage, cultural | excellence: 0.94
+•	[culture] Spaccanapoli | tags: historic_street, urban_history, heritage, vibrant, cultural | excellence: 0.91
+•	[culture] Teatro di San Carlo | tags: opera_house, historic, performance, elegant, cultural | excellence: 0.93
+•	[culture] Certosa di San Martino | tags: monastery, panoramic_view, baroque, heritage, museum | excellence: 0.92
+•	[culture] Quartieri Spagnoli | tags: neighborhood, street_art, local_life, vibrant, cultural | excellence: 0.88
+•	[culture] Capodimonte Museum | tags: art_museum, renaissance, cultural, scenic, heritage | excellence: 0.90
+•	[culture] Underground Naples | tags: underground, tunnels, history, unique, exploration | excellence: 0.89
+•	[culture] Piazza del Plebiscito | tags: monumental_square, landmark, civic_space, heritage, urban | excellence: 0.90
+•	[culture] Santa Chiara Complex | tags: cloister, religious, heritage, colorful_tiles, historic | excellence: 0.91
+•	[culture] Galleria Umberto I | tags: arcade, architecture, historic, urban, elegant | excellence: 0.88
+•	[walk] Lungomare Caracciolo Walk | tags: walk, seaside, scenic, sunset, relaxed | excellence: 0.94
+•	[walk] Spaccanapoli Walk | tags: walk, narrow_street, heritage, vibrant, daytime | excellence: 0.92
+•	[walk] Vomero Hill Walk | tags: walk, hilltop, panoramic, scenic, outdoor | excellence: 0.91
+•	[walk] Castel dellOvo Promenade | tags: walk, waterfront, historic, romantic, evening | excellence: 0.93
+•	[walk] Quartieri Spagnoli Stroll | tags: walk, street_art, local_life, urban, lively | excellence: 0.88
+•	[walk] Piazza Bellini Night Walk | tags: walk, nightlife, social, lively, evening | excellence: 0.87
+•	[walk] Chiaia District Walk | tags: walk, boutiques, elegant, urban, daytime | excellence: 0.89
+•	[walk] Capodimonte Park Path | tags: walk, park, greenery, relaxed, scenic | excellence: 0.90
+•	[walk] Via Toledo Walk | tags: walk, shopping, urban, busy, daytime | excellence: 0.88
+•	[walk] Posillipo Coastal Route | tags: walk, cliffside, sea_view, scenic, sunset | excellence: 0.95
+
+
+
+City: rome
+•	[food] Roscioli Salumeria | tags: roman_cuisine, deli, wine_bar, refined, dinner | excellence: 0.92
+•	[food] Da Enzo al 29 | tags: trattoria, traditional, cozy, dinner, local | excellence: 0.90
+•	[food] Armando al Pantheon | tags: roman_cuisine, classic, historic, dinner, authentic | excellence: 0.91
+•	[food] Pizzarium | tags: pizza_al_taglio, street_food, casual, lunch, creative | excellence: 0.88
+•	[food] Bonci Bakery | tags: bakery, focaccia, casual, breakfast, local | excellence: 0.85
+•	[food] Trattoria Pennestri | tags: modern_roman, seasonal, casual, dinner, neighborhood | excellence: 0.87
+•	[food] Felice a Testaccio | tags: cacio_e_pepe, classic, roman_cuisine, dinner, lively | excellence: 0.89
+•	[food] Emma Pizzeria | tags: pizza, contemporary, casual, dinner, central | excellence: 0.86
+•	[food] La Pergola | tags: haute_cuisine, michelin, panoramic_view, elegant, dinner | excellence: 0.97
+•	[food] Il Pagliaccio | tags: fine_dining, tasting_menu, creative, refined, dinner | excellence: 0.95
+•	[food] Gelateria del Teatro | tags: gelato, artisan, dessert, sweet, casual | excellence: 0.87
+•	[food] Two Sizes Tiramisu | tags: tiramisu, dessert, sweet, casual, takeaway | excellence: 0.85
+•	[food] SantEustachio Il Caffe | tags: espresso, historic_cafe, casual, iconic, daytime | excellence: 0.88
+•	[food] Trattoria Monti | tags: regional_italian, homestyle, dinner, authentic, cozy | excellence: 0.87
+•	[food] Osteria Fernanda | tags: modern_italian, creative, dinner, refined, trendy | excellence: 0.90
+•	[food] Trapizzino | tags: street_food, pizza_pocket, casual, quick_bite, local | excellence: 0.84
+•	[food] Hasekura | tags: japanese, sushi, refined, dinner, international | excellence: 0.89
+•	[food] Himalaya Palace | tags: indian, curry, casual, dinner, international | excellence: 0.82
+•	[food] Dar Filettaro | tags: fried_cod, street_food, traditional, casual, local | excellence: 0.86
+•	[food] Bonci Pizzarium Lab | tags: gourmet_pizza, experimental, casual, creative, lunch | excellence: 0.88
+•	[food] Marzapane | tags: contemporary_italian, refined, dinner, modern, tasting_menu | excellence: 0.91
+•	[food] Ai Tre Scalini | tags: wine_bar, roman, casual, social, evening | excellence: 0.83
+•	[culture] Colosseum | tags: ancient_rome, amphitheatre, iconic, unesco, landmark | excellence: 0.99
+•	[culture] Roman Forum | tags: ruins, ancient_history, unesco, heritage, landmark | excellence: 0.97
+•	[culture] Pantheon | tags: temple, ancient_architecture, dome, heritage, iconic | excellence: 0.96
+•	[culture] Vatican Museums | tags: museum, renaissance_art, sistine_chapel, unesco, cultural | excellence: 0.98
+•	[culture] St Peters Basilica | tags: basilica, renaissance, spiritual, landmark, heritage | excellence: 0.97
+•	[culture] Trevi Fountain | tags: fountain, baroque, iconic, landmark, heritage | excellence: 0.94
+•	[culture] Piazza Navona | tags: baroque_square, fountains, heritage, lively, urban | excellence: 0.92
+•	[culture] Spanish Steps | tags: monumental_staircase, landmark, urban, iconic, historic | excellence: 0.91
+•	[culture] Castel SantAngelo | tags: fortress, museum, riverside, historic, heritage | excellence: 0.93
+•	[culture] Capitoline Museums | tags: art_museum, ancient_sculpture, cultural, heritage, exhibits | excellence: 0.91
+•	[culture] Borghese Gallery | tags: art_museum, renaissance, baroque, refined, cultural | excellence: 0.94
+•	[culture] Villa Borghese Gardens | tags: park, leisure, heritage, scenic, outdoor | excellence: 0.90
+•	[culture] Baths of Caracalla | tags: ancient_ruins, monumental, heritage, historic, outdoor | excellence: 0.92
+•	[culture] Trastevere District | tags: historic_neighborhood, cobblestones, cultural, lively, heritage | excellence: 0.91
+•	[culture] Basilica di San Clemente | tags: layered_history, church, underground, heritage, unique | excellence: 0.89
+•	[culture] Piazza del Campidoglio | tags: renaissance_square, michelangelo, heritage, urban, landmark | excellence: 0.90
+•	[culture] Via Appia Antica | tags: ancient_road, heritage, ruins, outdoor, historic | excellence: 0.93
+•	[culture] MAXXI Museum | tags: contemporary_art, modern_architecture, exhibitions, cultural, design | excellence: 0.88
+•	[walk] Colosseum to Forum Walk | tags: walk, ancient_rome, ruins, iconic, daytime | excellence: 0.97
+•	[walk] Trastevere Evening Stroll | tags: walk, cobblestones, nightlife, local_life, evening | excellence: 0.92
+•	[walk] Via Appia Antica Path | tags: walk, ancient_road, countryside, scenic, outdoor | excellence: 0.94
+•	[walk] Vatican Riverside Walk | tags: walk, river, scenic, heritage, daytime | excellence: 0.90
+•	[walk] Campo de Fiori Loop | tags: walk, market, lively, urban, daytime | excellence: 0.88
+•	[walk] Spanish Steps to Trevi Walk | tags: walk, landmarks, shopping, urban, daytime | excellence: 0.91
+•	[walk] Villa Borghese Loop | tags: walk, park, greenery, relaxed, daytime | excellence: 0.89
+•	[walk] Jewish Ghetto Walk | tags: walk, heritage, historic, cultural, daytime | excellence: 0.90
+•	[walk] Gianicolo Hill Sunset Walk | tags: walk, hilltop, panoramic, sunset, scenic | excellence: 0.93
+•	[walk] Piazza Navona Night Walk | tags: walk, baroque, lights, social, night | excellence: 0.91
+
+
+
+City: munich
+•	[food] Hofbräuhaus München | tags: bavarian, beer_hall, traditional, lively, dinner | excellence: 0.93
+•	[food] Augustiner Bräustuben | tags: bavarian, beer_garden, classic, casual, local | excellence: 0.91
+•	[food] Schneider Bräuhaus | tags: weissbier, bavarian, hearty, traditional, dinner | excellence: 0.89
+•	[food] Viktualienmarkt Stalls | tags: market, street_food, local, casual, lunch | excellence: 0.90
+•	[food] Wirtshaus in der Au | tags: dumplings, bavarian, cozy, dinner, traditional | excellence: 0.88
+•	[food] Tantris | tags: haute_cuisine, michelin, refined, tasting_menu, dinner | excellence: 0.97
+•	[food] Atelier | tags: fine_dining, modern, creative, elegant, dinner | excellence: 0.95
+•	[food] Restaurant Dallmayr | tags: gourmet, refined, classic, lunch, elegant | excellence: 0.92
+•	[food] Andechser am Dom | tags: beer_hall, hearty, bavarian, casual, central | excellence: 0.87
+•	[food] Zum Dürnbräu | tags: traditional, sausage, rustic, dinner, local | excellence: 0.86
+•	[food] Hans im Glück | tags: burger, modern, casual, social, dinner | excellence: 0.82
+•	[food] Takumi Ramen | tags: ramen, japanese, noodles, casual, lunch | excellence: 0.84
+•	[food] Savanna | tags: african, exotic, dinner, international, cozy | excellence: 0.83
+•	[food] Little London Bar & Grill | tags: steakhouse, british, dinner, refined, modern | excellence: 0.85
+•	[food] LeDu Happy Dumplings | tags: dumplings, asian_fusion, casual, lunch, quick_bite | excellence: 0.80
+•	[food] Café Frischhut | tags: bakery, pastries, sweet, breakfast, casual | excellence: 0.84
+•	[food] Rischart Café | tags: cafe, cake, coffee, casual, daytime | excellence: 0.83
+•	[food] Eataly München | tags: italian, deli, market_style, casual, lunch | excellence: 0.86
+•	[food] Cotidiano | tags: brunch, cafe, healthy, modern, casual | excellence: 0.81
+•	[food] Osteria Italiana | tags: italian, historic, pasta, cozy, dinner | excellence: 0.87
+•	[food] Curry 73 | tags: currywurst, street_food, quick_bite, local, casual | excellence: 0.79
+•	[food] Giesinger Bräu | tags: craft_beer, brewery, casual, local, lively | excellence: 0.82
+•	[culture] Marienplatz | tags: central_square, landmark, gothic_architecture, urban, iconic | excellence: 0.95
+•	[culture] Neuschwanstein Castle | tags: fairy_tale, castle, unesco, landmark, scenic | excellence: 0.98
+•	[culture] Nymphenburg Palace | tags: palace, baroque, gardens, heritage, historic | excellence: 0.93
+•	[culture] Deutsches Museum | tags: science_museum, interactive, educational, cultural, exhibits | excellence: 0.94
+•	[culture] BMW Welt | tags: automotive, modern_architecture, exhibition, design, contemporary | excellence: 0.91
+•	[culture] Munich Residenz | tags: royal_palace, heritage, art_collections, historic, cultural | excellence: 0.93
+•	[culture] Alte Pinakothek | tags: art_museum, old_masters, cultural, heritage, exhibits | excellence: 0.92
+•	[culture] Englischer Garten | tags: urban_park, nature, leisure, scenic, outdoor | excellence: 0.90
+•	[culture] Frauenkirche | tags: cathedral, gothic, landmark, heritage, skyline | excellence: 0.91
+•	[culture] Viktualienmarkt | tags: market, food_culture, local_life, vibrant, heritage | excellence: 0.90
+•	[culture] Olympiapark | tags: modern_landmark, stadium, outdoor, panoramic, leisure | excellence: 0.89
+•	[culture] Asamkirche | tags: baroque, church, ornate, heritage, intimate | excellence: 0.88
+•	[culture] Dachau Memorial Site | tags: memorial, history, educational, solemn, heritage | excellence: 0.92
+•	[culture] Lenbachhaus | tags: modern_art, expressionism, museum, cultural, exhibits | excellence: 0.89
+•	[culture] Bavarian National Museum | tags: heritage, decorative_arts, museum, historic, cultural | excellence: 0.88
+•	[culture] Hofgarten | tags: renaissance_garden, urban, tranquil, heritage, scenic | excellence: 0.87
+•	[culture] Gärtnerplatz Theater | tags: performing_arts, opera, cultural, historic, elegant | excellence: 0.86
+•	[culture] Allianz Arena | tags: football_stadium, modern, architecture, sports_culture, landmark | excellence: 0.90
+•	[walk] Englischer Garten Loop | tags: walk, park, greenery, relaxed, daytime | excellence: 0.91
+•	[walk] Isar Riverside Walk | tags: walk, river, scenic, outdoor, leisure | excellence: 0.89
+•	[walk] Old Town Altstadt Walk | tags: walk, historic, cobblestones, architecture, daytime | excellence: 0.93
+•	[walk] Viktualienmarkt Stroll | tags: walk, market, lively, local_life, daytime | excellence: 0.88
+•	[walk] Nymphenburg Garden Path | tags: walk, palace_gardens, baroque, scenic, relaxed | excellence: 0.90
+•	[walk] Olympiapark Hill Walk | tags: walk, panoramic, modern, outdoor, scenic | excellence: 0.89
+•	[walk] Glockenbachviertel Walk | tags: walk, neighborhood, cafes, urban, trendy | excellence: 0.87
+•	[walk] Hofgarten Evening Walk | tags: walk, gardens, tranquil, sunset, relaxed | excellence: 0.88
+•	[walk] Schwabing District Stroll | tags: walk, bohemian, historic, cafes, daytime | excellence: 0.86
+•	[walk] Marienplatz Night Walk | tags: walk, lights, landmark, urban, night | excellence: 0.92
+
+
+
+City: berlin
+•	[food] Nobelhart & Schmutzig | tags: modern_german, tasting_menu, local_produce, refined, dinner | excellence: 0.95
+•	[food] Tim Raue | tags: asian_inspired, modern_german, michelin, creative, dinner | excellence: 0.96  
+•	[food] Azzam Restaurant | tags: middle_eastern, refined, dinner, upscale, flavorful | excellence: 0.92  
+•	[food] Burgermeister | tags: burger, street_food, casual, local, quick_bite | excellence: 0.89  
+•	[food] Mustafa’s Gemüse Kebap | tags: kebab, street_food, iconic, casual, local | excellence: 0.90  
+•	[food] Markthalle Neun | tags: market, street_food, varied, local, casual | excellence: 0.91  
+•	[food] Schoppe Brau Taproom | tags: brewery, craft_beer, casual, social, nightlife | excellence: 0.88  
+•	[food] Doyum Kebab | tags: turkish, kebab, casual, local, street_food | excellence: 0.87  
+•	[food] Cafe Dots | tags: cafe, coffee, brunch, casual, relaxed | excellence: 0.86  
+•	[food] Tischendorf Cafe | tags: cafe, breakfast, cozy, casual, local | excellence: 0.85  
+•	[food] Balikci Ergun Baba | tags: seafood, grill, casual, local, authentic | excellence: 0.88  
+•	[food] Prinzessinnengarten | tags: urban_garden, organic, al_fresco, casual, lunch | excellence: 0.87  
+•	[food] Burgeramt | tags: burgers, casual, popular, creative, lunch | excellence: 0.86  
+•	[food] Maroush Falafel & Grill | tags: middle_eastern, falafel, casual, local, lunch | excellence: 0.84  
+•	[food] Berlin Currywurst Stand | tags: currywurst, street_food, german, casual, quick_bite | excellence: 0.88  
+•	[food] Eisbein House | tags: german_classic, hearty, casual, dinner, local | excellence: 0.83  
+•	[food] Pfannkuchen Stall | tags: german_street_food, pancake, casual, snack, local | excellence: 0.82  
+•	[food] Asian Street Food Pop-up | tags: asian, street_food, fusion, casual, lively | excellence: 0.81
+•	[food] Vegan Bistro Kreuzberg | tags: vegan, healthy, casual, lunch, modern | excellence: 0.80
+•	[food] Prenzlauer Berg Cafe | tags: cafe, brunch, local, relaxed, daytime | excellence: 0.83
+•	[food] Späti Snacks | tags: convenience_snacks, local, casual, night, quick_bite | excellence: 0.78
+•	[culture] Brandenburg Gate | tags: monument, history, landmark, heritage, iconic | excellence: 0.96  
+•	[culture] Reichstag Building | tags: parliament, glass_dome, history, architecture, landmark | excellence: 0.94  
+•	[culture] Museum Island | tags: museums, art, history, unesco, cultural | excellence: 0.95  
+•	[culture] Berlin Cathedral | tags: cathedral, dome, heritage, architecture, historic | excellence: 0.91
+•	[culture] East Side Gallery | tags: murals, street_art, history, culture, waterfront | excellence: 0.92
+•	[culture] Checkpoint Charlie | tags: cold_war, history, urban, heritage, iconic | excellence: 0.89  
+•	[culture] Holocaust Memorial | tags: memorial, history, remembrance, cultural, solemn | excellence: 0.93
+•	[culture] Pergamon Museum | tags: ancient_art, museum, exhibits, heritage, iconic | excellence: 0.94
+•	[culture] Topography of Terror | tags: museum, nazi_history, educational, outdoor, cultural | excellence: 0.90  
+•	[culture] Charlottenburg Palace | tags: palace, baroque, gardens, heritage, historic | excellence: 0.92
+•	[culture] Gendarmenmarkt | tags: square, architecture, historic, cultural, elegant | excellence: 0.91
+•	[culture] Berliner Philharmonie | tags: concert_hall, music, culture, architecture, modern | excellence: 0.90
+•	[culture] Kaiser Wilhelm Memorial Church | tags: ruins, memorial, history, architecture, cultural | excellence: 0.89
+•	[culture] Jewish Museum Berlin | tags: museum, history, jewish_culture, exhibits, educational | excellence: 0.90
+•	[culture] DDR Museum | tags: interactive, history, everyday_life, cultural, educational | excellence: 0.88
+•	[culture] German Historical Museum | tags: history, exhibits, cultural, educational, comprehensive | excellence: 0.89
+•	[culture] Contemporary Art Space | tags: modern_art, exhibitions, urban, cultural, creative | excellence: 0.87
+•	[culture] Berlin Techno Scene | tags: music_culture, nightlife, techno, heritage, cultural | excellence: 0.90 k] Unter den Linden Boulevard | tags: walk, historic_avenue, architecture, iconic, daytime | excellence: 0.93
+•	[walk] Tiergarten Promenade | tags: walk, park, trees, urban, relaxed | excellence: 0.92
+•	[walk] Spree Riverside Path | tags: walk, river, scenic, urban, daytime | excellence: 0.91
+•	[walk] East Side Gallery Stroll | tags: walk, murals, art, heritage, photo_spot | excellence: 0.92
+•	[walk] Hackescher Markt Lanes | tags: walk, boutiques, cafes, urban, lively | excellence: 0.90
+•	[walk] Potsdamer Platz Urban Trek | tags: walk, modern_architecture, urban, daytime, skyline | excellence: 0.89
+•	[walk] Kreuzberg Canal Walk | tags: walk, canal, local_life, relaxed, scenic | excellence: 0.88
+•	[walk] Friedrichshain Night Loop | tags: walk, nightlife, lights, social, evening | excellence: 0.89
+•	[walk] Prenzlauer Berg Tree Line Path | tags: walk, neighborhood, cafes, daytime, relaxed | excellence: 0.87
+•	[walk] Charlottenburg Palace Gardens | tags: walk, gardens, baroque, scenic, relaxed | excellence: 0.90
+
+
+
+City: budapest
+•	[food] New York Café | tags: historic_cafe, elegant, coffee, pastry, classic | excellence: 0.91
+•	[food] Mazel Tov | tags: middle_eastern, ruin_bar_style, casual, vibrant, dinner | excellence: 0.90  
+•	[food] Bors GasztroBar | tags: street_food, creative_sandwiches, casual, local, lunch | excellence: 0.89  
+•	[food] Stand25 Bisztró | tags: modern_hungarian, refined, lunch, dinner, seasonal | excellence: 0.92  
+•	[food] Café Kör | tags: hungarian, classic, casual, lunch, homestyle | excellence: 0.88  
+•	[food] Gettó Gulyás | tags: hungarian, goulash, traditional, hearty, dinner | excellence: 0.87  
+•	[food] Retek Bisztró | tags: hungarian, local_menu, modern, lunch, dinner | excellence: 0.89  
+•	[food] Fakanál Bistro | tags: market, hungarian_food, casual, lunch, quick_bite | excellence: 0.88  
+•	[food] Central Market Hall Deli | tags: hungarian, market_food, fresh, casual, local | excellence: 0.89  
+•	[food] Dunacorso Restaurant | tags: river_view, european, refined, dinner, scenic | excellence: 0.90  
+•	[food] 0,75 Basilica Wine Bar | tags: wine_bar, european, casual, dinner, social | excellence: 0.88  
+•	[food] Ida Bistro | tags: hungarian, bistro, casual, lunch, local | excellence: 0.87  
+•	[food] Tapassio | tags: seafood_mediterranean, refined, dinner, modern, urban | excellence: 0.89  
+•	[food] Gelarto Rosa | tags: gelato, dessert, artisan, sweet, casual | excellence: 0.85
+•	[food] Chimney Cake Stall | tags: hungarian_pastry, desssert, street_food, casual, quick_bite | excellence: 0.86
+•	[food] Street Lángos Stand | tags: hungarian, street_food, snack, casual, local | excellence: 0.87
+•	[food] Espresso Embassy | tags: cafe, coffee, brunch, modern, casual | excellence: 0.84  
+•	[food] Zërgë Coffeeshop | tags: cafe, specialty_coffee, casual, relaxed, local | excellence: 0.83  
+•	[food] High Note SkyBar | tags: rooftop_bar, drinks, skyline, sunset, social | excellence: 0.89  
+•	[food] Beer Brothers Pub | tags: craft_beer, pub, casual, night, local | excellence: 0.82  
+•	[food] Warm Up Bar | tags: bar, cocktails, lively, social, night | excellence: 0.81  
+•	[culture] Hungarian Parliament Building | tags: parliament, gothic, landmark, architecture, riverfront | excellence: 0.96  
+•	[culture] Buda Castle | tags: castle, heritage, historic, panoramic, museum | excellence: 0.94  
+•	[culture] Fisherman’s Bastion | tags: viewpoint, neo_roman, panorama, heritage, photography | excellence: 0.93  
+•	[culture] St Stephen’s Basilica | tags: basilica, neoclassical, spiritual, landmark, architecture | excellence: 0.92
+•	[culture] Heroes’ Square | tags: monumental_square, history, heritage, architecture, iconic | excellence: 0.91  
+•	[culture] Shoes on the Danube Bank | tags: memorial, history, poignant, riverside, heritage | excellence: 0.90  
+•	[culture] Matthias Church | tags: gothic, religious, heritage, intricate, landmark | excellence: 0.93
+•	[culture] Gellért Hill & Citadel | tags: hilltop_view, park, panorama, history, scenic | excellence: 0.92
+•	[culture] Central Market Hall | tags: market, architecture, food_culture, heritage, vibrant | excellence: 0.91  
+•	[culture] Hungarian State Opera | tags: opera_house, performance, architecture, elegant, cultural | excellence: 0.90
+•	[culture] Museum of Fine Arts | tags: art_museum, classics, exhibits, culture, heritage | excellence: 0.89
+•	[culture] House of Terror Museum | tags: museum, history, 20th_century, educational, solemn | excellence: 0.90
+•	[culture] Budapest History Museum | tags: city_history, museum, exhibits, heritage, educational | excellence: 0.88
+•	[culture] Memento Park | tags: outdoor_museum, cold_war, statues, history, unique | excellence: 0.87
+•	[culture] Hungarian National Gallery | tags: gallery, art, culture, historic, collections | excellence: 0.90
+•	[culture] Vörösmarty Square | tags: public_square, market, social_space, cultural, urban | excellence: 0.89
+•	[culture] City Park & Vajdahunyad Castle | tags: park, castle, museum, leisure, scenic | excellence: 0.91
+•	[culture] Aquincum Roman Ruins | tags: ruins, roman_history, archaeology, outdoor, heritage | excellence: 0.88
+•	[walk] Danube Riverside Promenade | tags: walk, river, scenic, sunset, relaxed | excellence: 0.93  
+•	[walk] Castle District Stroll | tags: walk, historic, architecture, hillside, daytime | excellence: 0.92  
+•	[walk] Central Pest Historic Loop | tags: walk, old_town, landmarks, cultural, daytime | excellence: 0.91  
+•	[walk] Andrássy Avenue Walk | tags: walk, boulevard, heritage, architecture, urban | excellence: 0.90
+•	[walk] Jewish Quarter Night Walk | tags: walk, nightlife, ruin_bars, lights, social | excellence: 0.89
+•	[walk] Vörösmarty Square Circuit | tags: walk, market, urban, daytime, lively | excellence: 0.88
+•	[walk] Gellért Hill Path | tags: walk, park, viewpoint, scenic, morning | excellence: 0.92
+•	[walk] Margaret Island Loop | tags: walk, park, greenery, relaxed, family | excellence: 0.90
+•	[walk] Heroes’ Square to City Park | tags: walk, monuments, greenery, scenic, culture | excellence: 0.89
+•	[walk] Danube Bridge Crossing Walk | tags: walk, bridges, urban, skyline, daytime | excellence: 0.90
+•	[walk] Budapest Castle Grounds Trail | tags: walk, castle_views, ruins, heritage, daytime | excellence: 0.91
+
+
+
+City: vienna
+•	[food] Figlmüller | tags: austrian, schnitzel, classic, hearty, lunch | excellence: 0.91
+•	[food] Café Central | tags: viennese_cafe, coffee, pastries, historic, social | excellence: 0.90
+•	[food] Café Landtmann | tags: viennese_cafe, classic, coffee, elegant, brunch | excellence: 0.89
+•	[food] Café Sperl | tags: viennese_cafe, coffee, historic, relaxed, brunch | excellence: 0.88
+•	[food] Schweizerhaus | tags: beer_garden, bavarian_style, pork_knuckle, casual, outdoor | excellence: 0.90
+•	[food] Naschmarkt Stalls | tags: market_food, street_food, fresh, local, casual | excellence: 0.92
+•	[food] Gasthaus Pöschl | tags: austrian, traditional, schnitzel, cozy, dinner | excellence: 0.89
+•	[food] Bitzinger Würstelstand | tags: wurstelstand, sausage, street_food, casual, local | excellence: 0.88
+•	[food] Steirereck | tags: fine_dining, modern_austrian, creative, refined, dinner | excellence: 0.95
+•	[food] Tian Restaurant | tags: vegetarian, michelin, seasonal, refined, modern | excellence: 0.94
+•	[food] Glacis Beisl | tags: bistro, garden, viennese, casual, lunch | excellence: 0.87
+•	[food] Skopik & Lohn | tags: european_bistro, refined, dinner, modern, elegant | excellence: 0.92
+•	[food] Café Prückel | tags: viennese_cafe, retro, coffee, brunch, casual | excellence: 0.86
+•	[food] Demel | tags: patisserie, historic, cake, sweet, classic | excellence: 0.89
+•	[food] Bitzinger Wurstelstand Albertina | tags: wurstelstand, street_food, sausage, local, casual | excellence: 0.87
+•	[food] Naschmarkt Restaurant Row | tags: varied_cuisine, market, lunch, casual, local | excellence: 0.88
+•	[food] Ali’s Grill | tags: turkish, kebab, casual, dinner, local | excellence: 0.84
+•	[food] Via Toledo Enopizzeria | tags: italian, pizza, wine, casual, dinner | excellence: 0.83
+•	[food] Artner Restaurant | tags: meat_specialties, upscale, dinner, refined, local | excellence: 0.90
+•	[food] Mon Cher | tags: bakery, desserts, cafe, casual, sweet | excellence: 0.82
+•	[food] Odessa Restaurant | tags: eastern_european, fusion, dinner, modern, cozy | excellence: 0.81
+•	[food] Bolena | tags: bakery_cafe, breads, pastries, casual, local | excellence: 0.80
+•	[culture] Schönbrunn Palace | tags: palace, unesco, gardens, heritage, historic | excellence: 0.96
+•	[culture] Hofburg Palace | tags: imperial_residence, history, architecture, museum, heritage | excellence: 0.95
+•	[culture] St. Stephen’s Cathedral | tags: cathedral, gothic, landmark, historic, spiritual | excellence: 0.94
+•	[culture] Belvedere Palace | tags: art_museum, gardens, Klimt, heritage, cultural | excellence: 0.93
+•	[culture] Kunsthistorisches Museum | tags: art_museum, classics, heritage, exhibits, cultural | excellence: 0.92
+•	[culture] Albertina Museum | tags: art, prints, photography, cultural, historic | excellence: 0.91
+•	[culture] MuseumsQuartier | tags: cultural_complex, museums, art, modern, social | excellence: 0.90
+•	[culture] Vienna State Opera | tags: opera_house, performance, architecture, cultural, historic | excellence: 0.95
+•	[culture] Musikverein | tags: concert_hall, classical_music, acoustics, cultural, elegant | excellence: 0.93
+•	[culture] Secession Building | tags: modern_art, architecture, historic, exhibitions, cultural | excellence: 0.89
+•	[culture] Sigmund Freud Museum | tags: museum, psychology, history, educational, cultural | excellence: 0.88
+•	[culture] Haus der Musik | tags: interactive, music_museum, family, indoor, cultural | excellence: 0.87
+•	[culture] Vienna City Hall | tags: neo_gothic, landmark, civic, heritage, urban | excellence: 0.90
+•	[culture] Prater & Riesenrad | tags: amusement_park, ferris_wheel, historic, leisure, family | excellence: 0.91
+•	[culture] Zentralfriedhof | tags: cemetery, history, culture, tranquil, heritage | excellence: 0.88
+•	[culture] Stadtpark | tags: park, sculpture, relax, urban, greenery | excellence: 0.89
+•	[culture] Donauturm | tags: tower, skyline, observation, modern, view | excellence: 0.90
+•	[culture] Vienna Coffeehouse Culture | tags: coffee_culture, heritage, social, historic, tradition | excellence: 0.92
+•	[walk] Ringstrasse Boulevard | tags: walk, grand_avenue, architecture, historic, daytime | excellence: 0.95
+•	[walk] Danube Canal Path | tags: walk, river, urban, scenic, casual | excellence: 0.92
+•	[walk] Stadtpark Path | tags: walk, park, sculptures, relaxed, daytime | excellence: 0.90
+•	[walk] Naschmarkt Stroll | tags: walk, market, food, lively, daytime | excellence: 0.91
+•	[walk] Schönbrunn Gardens Walk | tags: walk, gardens, heritage, scenic, daytime | excellence: 0.94
+•	[walk] Prater Park Loop | tags: walk, green_space, leisure, family, daytime | excellence: 0.89
+•	[walk] Belvedere Garden Path | tags: walk, formal_gardens, art, scenic, daytime | excellence: 0.90
+•	[walk] Vienna Woods Edge | tags: walk, forest, outskirts, nature, outdoor | excellence: 0.88
+•	[walk] Donauinsel Path | tags: walk, island, water, cycling, leisure | excellence: 0.90
+•	[walk] Historic Inner City Lanes | tags: walk, old_town, architecture, urban, daytime | excellence: 0.93
+•	[walk] Prater Amusement Promenade | tags: walk, park, historic, social, relaxed | excellence: 0.91
+
+
+
+City: prague
+•	[food] Lokál Dlouhááá | tags: czech, traditional_food, beer, casual, local | excellence: 0.92
+•	[food] Field Restaurant | tags: modern_european, tasting_menu, refined, dinner, creative | excellence: 0.95
+•	[food] La Degustation Bohême Bourgeoise | tags: michelin, czech_modern, refined, tasting_menu, dinner | excellence: 0.96
+•	[food] Kantýna | tags: butcher_shop, czech_meat, casual, lunch, hearty | excellence: 0.89  
+•	[food] Čestr | tags: steakhouse, beef, local, refined, dinner | excellence: 0.91  
+•	[food] Naše Maso | tags: butcher_shop, street_food, grill, casual, lunch | excellence: 0.88  
+•	[food] Mléjnice | tags: czech, tavern_style, hearty, casual, dinner | excellence: 0.87  
+•	[food] Café Louvre | tags: viennese_cafe, historic, coffee, brunch, elegant | excellence: 0.90  
+•	[food] Good Food Coffee & Bakery | tags: bakery, coffee, churros, sidewalk, casual | excellence: 0.85  
+•	[food] Bella Vida Café | tags: cafe, brunch, riverside, relaxed, casual | excellence: 0.84  
+•	[food] Beam | tags: modern_international, cocktails, dinner, trendy, night | excellence: 0.86
+•	[food] Portfolio Restaurant | tags: european, refined, dinner, elegant, seasonal | excellence: 0.89  
+•	[food] Café Savoy | tags: viennese_cafe, breakfast, pastries, classic, elegant | excellence: 0.88
+•	[food] Sad Man’s Tongue Bar & Bistro | tags: bistro, european, dinner, cozy, modern | excellence: 0.90  
+•	[food] V Zátiší | tags: international, refined, dinner, elegant, local | excellence: 0.91  
+•	[food] Cloud 9 Sky Bar & Lounge | tags: rooftop, drinks, skyline, chic, night | excellence: 0.88  
+•	[food] BEEF BAR Prague | tags: steak, grill, bold_flavor, casual, night | excellence: 0.89  
+•	[food] U Modré Kachničky | tags: classic_czech, duck_specialties, refined, dinner, heritage | excellence: 0.90  
+•	[food] Asian Fusion Spot | tags: asian_fusion, creative, dinner, modern, refined | excellence: 0.85
+•	[food] Vegan Bistro Prague | tags: vegan, healthy, casual, modern, lunch | excellence: 0.82
+•	[food] Street Food Stand Old Town | tags: street_food, local_snacks, quick_bite, casual, daytime | excellence: 0.87  
+•	[culture] Prague Castle | tags: castle, heritage, skyline, historic, landmark | excellence: 0.98
+•	[culture] Charles Bridge | tags: historic_bridge, gothic, landmark, photo_spot, scenic | excellence: 0.96
+•	[culture] Old Town Square | tags: square, astronomical_clock, medieval, heritage, vibrant | excellence: 0.95
+•	[culture] St Vitus Cathedral | tags: cathedral, gothic, spiritual, heritage, architecture | excellence: 0.94
+•	[culture] Jewish Quarter | tags: historic_neighborhood, synagogues, heritage, medieval, urban | excellence: 0.93
+•	[culture] National Museum | tags: museum, history, exhibits, culture, educational | excellence: 0.91
+•	[culture] Wenceslas Square | tags: boulevard, shops, history, urban, cultural | excellence: 0.90
+•	[culture] Powder Tower | tags: medieval_gate, historic, architecture, landmark, heritage | excellence: 0.89
+•	[culture] Municipal House | tags: art_nouveau, concert_hall, heritage, architecture, cultural | excellence: 0.90
+•	[culture] Lennon Wall | tags: graffiti, street_art, culture, vibrant, photo_spot | excellence: 0.88
+•	[culture] Vyšehrad Fortress | tags: fortress, park, history, views, scenic | excellence: 0.92
+•	[culture] Dancing House | tags: modern_architecture, contemporary, design, urban, landmark | excellence: 0.89
+•	[culture] Kampa Island | tags: island, riverside, park, art, relaxed | excellence: 0.88  
+•	[culture] National Gallery Prague | tags: art_museum, exhibits, culture, heritage, creative | excellence: 0.90
+•	[culture] Strahov Monastery Library | tags: library, baroque, history, heritage, iconic | excellence: 0.93
+•	[culture] Loreta Prague | tags: baroque_shrine, architecture, culture, spiritual, heritage | excellence: 0.89
+•	[culture] Estates Theatre | tags: historic_theatre, opera, culture, heritage, performance | excellence: 0.87
+•	[culture] Museum of Communism | tags: history, exhibits, urban, educational, cultural | excellence: 0.88
+•	[culture] Church of Our Lady before Týn | tags: gothic, architecture, historic, heritage, iconic | excellence: 0.94
+•	[walk] Vltava Riverside Promenade | tags: walk, river, scenic, sunset, relaxed | excellence: 0.93  
+•	[walk] Old Town Historic Lanes | tags: walk, medieval_streets, heritage, exploration, daytime | excellence: 0.95
+•	[walk] Charles Bridge Stroll | tags: walk, historic_bridge, photo_spot, sunrise, daytime | excellence: 0.96
+•	[walk] Kampa Riverside Path | tags: walk, riverside, parks, scenic, relaxed | excellence: 0.92  
+•	[walk] Naplavka Rasinovo nabrezi | tags: walk, riverbank, bars, social, scenic | excellence: 0.90  
+•	[walk] Letná Park Views | tags: walk, park, panoramic, skyline, sunset | excellence: 0.91
+•	[walk] Petrin Hill Path | tags: walk, hill_views, gardens, cityscape, outdoor | excellence: 0.93
+•	[walk] Castle District Path | tags: walk, historic, castle_grounds, heritage, exploration | excellence: 0.94
+•	[walk] Jewish Quarter Night Walk | tags: walk, heritage, night, atmospheric, urban | excellence: 0.89
+•	[walk] Royal Route Walk | tags: walk, landmarks, historic, urban, daytime | excellence: 0.95
+•	[walk] Letná Beer Garden Loop | tags: walk, park, beer_garden, casual, social | excellence: 0.88
+
+
+
+City: reykjavik
+•	[food] Icelandic Street Food | tags: icelandic, casual, local, traditional, lunch | excellence: 0.90
+•	[food] 101 Reykjavik Street Food | tags: seafood, street_food, casual, local, quick_bite | excellence: 0.89
+•	[food] Saeta Svínid Gastropub | tags: european, gastropub, casual, drinks, dinner | excellence: 0.88
+•	[food] ROK | tags: nordic, contemporary, refined, seafood, dinner | excellence: 0.91
+•	[food] Monkeys Reykjavik | tags: nikkei_fusion, creative, dinner, modern, trendy | excellence: 0.90
+•	[food] Valdis Ice Cream | tags: gelato, dessert, artisan, sweet, casual | excellence: 0.85
+•	[food] Café Central Reykjavik | tags: cafe, coffee, breakfast, relaxed, downtown | excellence: 0.87
+•	[food] Reykjavik Röst | tags: cafe, coffee, pastries, casual, cozy | excellence: 0.84
+•	[food] Brauð & Co | tags: bakery, sourdough, pastries, casual, coffee | excellence: 0.88
+•	[food] Apotek Restaurant | tags: european, elegant, dinner, refined, classic | excellence: 0.92
+•	[food] Messinn | tags: seafood, traditional, local, dinner, hearty | excellence: 0.90
+•	[food] Islenski Barinn | tags: icelandic, bar, casual, dinner, local | excellence: 0.88
+•	[food] Fish Company | tags: seafood, creative, refined, dinner, modern | excellence: 0.91
+•	[food] Grillmarkaðurinn | tags: grill, local_ingredients, casual, dinner, modern | excellence: 0.89
+•	[food] Kopar Restaurant | tags: seafood, waterfront, refined, lunch, dinner | excellence: 0.90
+•	[food] Snaps Bistro | tags: bistro, french_influence, dinner, casual, modern | excellence: 0.88
+•	[food] Café Babalú | tags: cafe, quirky, casual, brunch, relaxed | excellence: 0.83
+•	[food] Kaffivagninn | tags: harbor_cafe, seafood, casual, lunch, scenic | excellence: 0.86
+•	[food] Dill Restaurant | tags: nordic, michelin, tasting_menu, refined, dinner | excellence: 0.94
+•	[food] Spúútnik Bar | tags: bar_food, cocktails, nightlife, casual, social | excellence: 0.85
+•	[food] Slippbarinn | tags: cocktail_bar, innovative, social, evening, casual | excellence: 0.84
+•	[food] Street Food Stand Bæjarins Beztu | tags: hot_dog, iconic, street_food, casual, quick_bite | excellence: 0.91
+•	[culture] Hallgrimskirkja | tags: church, landmark, architecture, skyline, iconic | excellence: 0.96
+•	[culture] Harpa Concert Hall | tags: architecture, cultural_centre, concerts, modern, waterfront | excellence: 0.94
+•	[culture] Sun Voyager Sculpture | tags: sculpture, waterfront, photo_spot, modern, iconic | excellence: 0.92
+•	[culture] National Museum of Iceland | tags: museum, history, viking_age, cultural, exhibits | excellence: 0.90
+•	[culture] Reykjavík Art Museum | tags: art, contemporary, exhibits, culture, modern | excellence: 0.89
+•	[culture] Settlement Exhibition | tags: history, archaeology, viking, interactive, cultural | excellence: 0.91
+•	[culture] Perlan Wonders of Iceland | tags: museum, science, nature, panoramic, educational | excellence: 0.92
+•	[culture] Reykjavík Maritime Museum | tags: maritime_history, museum, cultural, interactive, exhibits | excellence: 0.88
+•	[culture] Einar Jónsson Sculpture Garden | tags: sculpture, outdoor, art, serene, cultural | excellence: 0.87
+•	[culture] Icelandic Phallological Museum | tags: quirky_museum, oddities, cultural, unique, indoor | excellence: 0.86
+•	[culture] Árbær Open-Air Museum | tags: open_air_museum, historic_village, heritage, cultural, scenic | excellence: 0.88
+•	[culture] Reykjavík Cathedral | tags: church, history, spiritual, heritage, architecture | excellence: 0.89
+•	[culture] Reykjavík City Hall | tags: civic_building, art, lake_view, architecture, urban | excellence: 0.88
+•	[culture] Reykjavík Saga Museum | tags: history, viking, interactive, exhibits, cultural | excellence: 0.90
+•	[culture] Tjörnin Lake | tags: lake, urban_park, birdlife, relaxed, scenic | excellence: 0.89
+•	[culture] Laugavegur Shopping Street | tags: shopping, urban_walk, boutiques, cafes, lively | excellence: 0.90
+•	[culture] Austurvöllur Square | tags: public_square, civic_space, social, urban, lively | excellence: 0.88
+•	[culture] Reykjavík Jazz Festival | tags: music_festival, seasonal, cultural, performance, social | excellence: 0.87
+•	[walk] Laugavegur Street Walk | tags: walk, shopping, urban, boutiques, daytime | excellence: 0.91
+•	[walk] Skólavörðustígur Rainbow Street | tags: walk, colorful, urban, photo_spot, relaxed | excellence: 0.90
+•	[walk] Old Harbour Promenade | tags: walk, harbor, scenic, seaside, daytime | excellence: 0.92
+•	[walk] Tjörnin Lake Path | tags: walk, lake, birds, calm, relaxed | excellence: 0.89
+•	[walk] Reykjavík Downtown Loop | tags: walk, urban, historic, cafes, daytime | excellence: 0.90
+•	[walk] Perlan Hill Walk | tags: walk, hill, skyline, panoramic, outdoor | excellence: 0.93
+•	[walk] Sculpture & Street Art Route | tags: walk, art, murals, urban, creative | excellence: 0.88
+•	[walk] Harpa Waterfront Walk | tags: walk, waterfront, architecture, lights, evening | excellence: 0.91
+•	[walk] City Hall to Cathedral Walk | tags: walk, heritage, urban, relaxed, daytime | excellence: 0.89
+•	[walk] Winter Lights Festival Stroll | tags: walk, seasonal, lights, urban, night | excellence: 0.87
+•	[walk] Botanical Gardens Path | tags: walk, gardens, flora, serene, outdoor | excellence: 0.88
+
+
+
+City: athens
+•	[food] O Thanasis | tags: greek, souvlaki, pita, street_food, casual | excellence: 0.90
+•	[food] Kostas Souvlaki | tags: greek, souvlaki, traditional, casual, quick_bite | excellence: 0.89
+•	[food] Ta Karamanlidika Tou Fani | tags: deli, greek_cold_cuts, meze, lunch, casual | excellence: 0.91
+•	[food] Avli Tou Thodori | tags: greek, seafood, seaside, dinner, local | excellence: 0.88
+•	[food] Kuzina | tags: mediterranean, modern_greek, dinner, refined, terrace | excellence: 0.92
+•	[food] Psaras Taverna | tags: taverna, greek_classic, casual, seafood, lunch | excellence: 0.87
+•	[food] Mani Mani | tags: greek_regional, refined, dinner, modern, local | excellence: 0.90
+•	[food] Oineas Restaurant | tags: greek, meze, cozy, dinner, traditional | excellence: 0.89
+•	[food] Spondi | tags: fine_dining, french_influence, michelin, refined, dinner | excellence: 0.95
+•	[food] Varoulko Seaside | tags: seafood, refined, dinner, view, elegant | excellence: 0.93
+•	[food] Diporto | tags: hidden_gem, greek_traditional, casual, dinner, local | excellence: 0.86
+•	[food] Modern Greek Brunch Cafe | tags: cafe, brunch, greek_twist, casual, daytime | excellence: 0.85
+•	[food] Lukumades Stand | tags: dessert, loukoumades, sweet, street_food, casual | excellence: 0.87
+•	[food] Greek Salad Bar | tags: greek, salad, healthy, lunch, casual | excellence: 0.84
+•	[food] Traditional Greek Tavern | tags: greek_classic, meze, social, dinner, local | excellence: 0.88
+•	[food] Bread & Olives Bistro | tags: mediterranean, casual, lunch, local, relaxed | excellence: 0.83
+•	[food] Boulevard Wine & Tapas | tags: wine_bar, tapas, modern, evening, chic | excellence: 0.86
+•	[food] Athens Coffee Roasters | tags: cafe, coffee, speciality, casual, morning | excellence: 0.82
+•	[food] Exarchia Food Market Stalls | tags: market, fresh, local_flavors, casual, street_food | excellence: 0.88
+•	[food] Greek Yogurt Shop | tags: dessert, greek_yogurt, healthy, casual, sweet | excellence: 0.81
+•	[food] Seafood Grill Spot | tags: seafood, grill, local, dinner, casual | excellence: 0.85
+•	[culture] Acropolis & Parthenon | tags: ancient_ruins, unesco, landmark, heritage, iconic | excellence: 0.99  
+•	[culture] Acropolis Museum | tags: museum, archaeology, classical_art, cultural, exhibits | excellence: 0.95  
+•	[culture] Ancient Agora | tags: ruins, marketplace, heritage, historic, outdoor | excellence: 0.93  
+•	[culture] Temple of Hephaestus | tags: temple, ancient_architecture, heritage, iconic, outdoor | excellence: 0.91  
+•	[culture] Plaka District | tags: historic_neighborhood, cobblestone, heritage, charming, cultural | excellence: 0.92  
+•	[culture] Monastiraki Flea Market | tags: flea_market, historic, shopping, local_life, vibrant | excellence: 0.90  
+•	[culture] National Archaeological Museum | tags: museum, antiquities, greek_history, cultural, exhibits | excellence: 0.93
+•	[culture] Syntagma Square | tags: public_square, politics, history, urban, civic | excellence: 0.89
+•	[culture] Panathenaic Stadium | tags: olympic_history, stadium, heritage, iconic, sport | excellence: 0.90
+•	[culture] Byzantine & Christian Museum | tags: museum, byzantine_art, culture, history, exhibits | excellence: 0.88
+•	[culture] Benaki Museum | tags: greek_art, culture, heritage, exhibits, comprehensive | excellence: 0.89
+•	[culture] Museum of Cycladic Art | tags: ancient_art, museum, cycladic_sculpture, cultural, heritage | excellence: 0.88
+•	[culture] Greek Folk Art Museum | tags: folk_art, tradition, culture, heritage, exhibits | excellence: 0.87
+•	[culture] Odeon of Herodes Atticus | tags: ancient_theatre, cultural_events, history, landmark, outdoor | excellence: 0.92  
+•	[culture] Temple of Olympian Zeus | tags: ancient_ruins, monumental, heritage, historic, iconic | excellence: 0.90
+•	[culture] Hadrian’s Arch | tags: triumphal_arch, heritage, roman_history, iconic, photo_spot | excellence: 0.89
+•	[culture] National Garden | tags: park, green_space, relaxing, nature, urban | excellence: 0.88
+•	[walk] Plaka Old Town Walk | tags: walk, historic, cobblestone, heritage, daytime | excellence: 0.94
+•	[walk] Monastiraki Streets Stroll | tags: walk, market, urban, lively, daytime | excellence: 0.92
+•	[walk] Acropolis Hill Path | tags: walk, ruins, panoramic_views, heritage, outdoor | excellence: 0.95
+•	[walk] Anafiotika Terrace Walk | tags: walk, hillside, charm, scenic, daytime | excellence: 0.93
+•	[walk] Syntagma Parade Route | tags: walk, evzones, ceremonial, urban, cultural | excellence: 0.90
+•	[walk] Ermou Street Path | tags: walk, shopping, urban, lively, daytime | excellence: 0.89
+•	[walk] National Garden Loop | tags: walk, park, shaded, relaxed, daytime | excellence: 0.88
+•	[walk] Lycabettus Hill Trail | tags: walk, hill, panoramic_skyline, sunset, outdoor | excellence: 0.96
+•	[walk] Exarchia Street Art Route | tags: walk, murals, urban, creative, daytime | excellence: 0.87
+•	[walk] Athens Waterfront Boardwalk | tags: walk, sea_breeze, scenic, sunset, relaxed | excellence: 0.90
+
+
+
+City: istanbul
+•	[food] Çiya Sofrası | tags: turkish, regional_cuisine, meze, casual, lunch | excellence: 0.92
+•	[food] Durumzade | tags: kebab, durum_wrap, street_food, local, casual | excellence: 0.90  
+•	[food] Ulaş Balıkçılık | tags: seafood, grilled_fish, local, dinner, casual | excellence: 0.91  
+•	[food] Karaköy Güllüoğlu | tags: baklava, pastry, dessert, traditional, casual | excellence: 0.89  
+•	[food] Pandeli | tags: historic_restaurant, ottoman, classic_turkish, lunch, elegant | excellence: 0.91  
+•	[food] Bi Kahvalti Breakfast Street | tags: turkish_breakfast, beşiktaş, spread, local, brunch | excellence: 0.90  
+•	[food] Balık Ekmek Stand | tags: fish_sandwich, street_food, marina, casual, quick_bite | excellence: 0.88  
+•	[food] Simit Vendors | tags: street_food, bread_ring, sesame, local, snack | excellence: 0.88  
+•	[food] Börek Stall | tags: pastry, savory, street_food, local, casual | excellence: 0.87  
+•	[food] Meşhur Özcan Turşu | tags: pickle_juice, traditional_drink, local, casual, snack | excellence: 0.85  
+•	[food] Meshur Menemenci | tags: menemen, egg_dish, breakfast, traditional, casual | excellence: 0.86  
+•	[food] Ekspres İnegöl Köftecisi | tags: köfte, meatballs, local, casual, lunch | excellence: 0.87  
+•	[food] Balıkçı Lokantası (Kadıköy) | tags: fish_restaurant, seafood, local, dinner, authentic | excellence: 0.90  
+•	[food] Turkish Coffee House | tags: coffee, turkish_coffee, tradition, casual, cafe | excellence: 0.84
+•	[food] Rakı and Meze Bar | tags: rakı, meze, drinks, social, dinner | excellence: 0.83
+•	[food] Vegan Bistro Istanbul | tags: vegan, modern, casual, lunch, healthy | excellence: 0.80
+•	[food] Turkish Delight Shop | tags: lokum, sweets, traditional, casual, gift | excellence: 0.82
+•	[food] Istanbul Kebab Cafe | tags: kebab, casual, local, lunch, quick_bite | excellence: 0.81  
+•	[food] Mivan Restaurant & Cafe | tags: cafe, dinner, modern, casual, local | excellence: 0.82  
+•	[food] Last Ottoman Cafe & Restaurant | tags: turkish, dinner, elegant, local, refined | excellence: 0.83  
+•	[food] Street Lahmacun Stand | tags: lahmacun, flatbread, street_food, casual, local | excellence: 0.85
+•	[culture] Hagia Sophia | tags: ancient, mosque, museum, unesco, landmark | excellence: 0.98  
+•	[culture] Topkapi Palace | tags: palace, ottoman_history, museum, heritage, landmark | excellence: 0.97  
+•	[culture] Blue Mosque | tags: mosque, ottoman_architecture, spiritual, heritage, landmark | excellence: 0.96  
+•	[culture] Basilica Cistern | tags: underground, byzantine, engineering, historic, unique | excellence: 0.94  
+•	[culture] Grand Bazaar | tags: market, historic, shopping, tradition, vibrant | excellence: 0.95  
+•	[culture] Dolmabahçe Palace | tags: palace, ottoman_modern, architecture, heritage, historic | excellence: 0.93  
+•	[culture] Galata Tower | tags: tower, skyline, view, medieval, iconic | excellence: 0.92  
+•	[culture] Süleymaniye Mosque | tags: mosque, ottoman, architecture, heritage, spiritual | excellence: 0.94  
+•	[culture] Archaeology Museum | tags: museum, artifacts, history, educational, cultural | excellence: 0.91  
+•	[culture] Spice Bazaar | tags: bazaar, spices, market, culture, aromatic | excellence: 0.93  
+•	[culture] Istanbul Modern Art Museum | tags: modern_art, museum, contemporary, exhibits, cultural | excellence: 0.90
+•	[culture] Sakıp Sabancı Museum | tags: art_museum, collections, cultural, gardens, heritage | excellence: 0.89  
+•	[culture] Chora Church (Kariye Mosque) | tags: byzantine_mosaics, history, art, spiritual, heritage | excellence: 0.91  
+•	[culture] Istanbul Maritime Museum | tags: maritime_history, museum, cultural, exhibits, naval | excellence: 0.88
+•	[culture] Fener & Balat Historic District | tags: historic_neighborhood, colorful, heritage, urban, cultural | excellence: 0.90  
+•	[culture] Princes’ Islands Trip | tags: islands, ferry, scenic, leisure, historic | excellence: 0.90  
+•	[culture] Taksim Square | tags: square, urban, social, iconic, cultural | excellence: 0.89
+•	[walk] Bosphorus Riverside Promenade | tags: walk, sea_views, scenic, sunset, relaxed | excellence: 0.94
+•	[walk] Sultanahmet Historic Loop | tags: walk, historic, architecture, heritage, daytime | excellence: 0.95
+•	[walk] Galata Bridge Stroll | tags: walk, bridge, urban, photography, daytime | excellence: 0.92
+•	[walk] Istiklal Avenue Walk | tags: walk, boulevard, shopping, urban, lively | excellence: 0.93
+•	[walk] Kadıköy Street Food Walk | tags: walk, local_life, market_food, casual, daytime | excellence: 0.91  
+•	[walk] Balat Neighborhood Stroll | tags: walk, colorful, heritage, urban, daytime | excellence: 0.90  
+•	[walk] Spice Bazaar to Eminönü Path | tags: walk, market, heritage, sea_breeze, daytime | excellence: 0.92
+•	[walk] Ortaköy Waterfront Walk | tags: walk, boats, coffee, scenic, sunset | excellence: 0.90
+•	[walk] Princes’ Islands Walk | tags: walk, ferry_access, scenic, seaside, daytime | excellence: 0.93  
+•	[walk] Tünel to Karaköy Path | tags: walk, historic, funicular, urban, daytime | excellence: 0.89
+•	[walk] Çukurcuma Antique Lane | tags: walk, antiques, vintage, quirky, daytime | excellence: 0.88
+•	[walk] Moda Promenade | tags: walk, sea_breeze, cafes, relaxed, sunset | excellence: 0.90  
+
+
+
+City: singapore
+•	[food] Hawker Chan Soya Sauce Chicken Rice | tags: hawker_food, chicken_rice, local, street_food, casual | excellence: 0.92
+•	[food] Tian Tian Hainanese Chicken Rice | tags: hawker_food, chicken_rice, iconic, local, casual | excellence: 0.91
+•	[food] Maxwell Food Centre Stalls | tags: hawker_centre, street_food, local_variety, casual, lunch | excellence: 0.90
+•	[food] Old Airport Road Hawker Centre | tags: hawker_centre, local_specialties, casual, varied, lunch | excellence: 0.89
+•	[food] Geylang Serai Market Stalls | tags: malay_food, hawker_food, spicy, local, casual | excellence: 0.88
+•	[food] Chinatown Complex Food Centre | tags: street_food, diverse, local, casual, lunch | excellence: 0.90
+•	[food] Newton Food Centre | tags: satay, seafood, hawker_food, casual, night | excellence: 0.89
+•	[food] Jumbo Seafood | tags: chilli_crab, seafood, dinner, local, refined | excellence: 0.94
+•	[food] Long Beach Seafood | tags: black_pepper_crab, seafood, dinner, local, classic | excellence: 0.92
+•	[food] Candlenut | tags: peranakan, michelin, refined, dinner, culinary | excellence: 0.95
+•	[food] Odette | tags: fine_dining, michelin_three_star, contemporary, dinner, elegant | excellence: 0.98
+•	[food] Burnt Ends | tags: modern_bbq, refined, dinner, creative, popular | excellence: 0.96
+•	[food] Labyrinth | tags: modern_singaporean, creative, tasting_menu, dinner, refined | excellence: 0.94
+•	[food] Din Tai Fung | tags: taiwanese, dumplings, international, casual, lunch | excellence: 0.88
+•	[food] Lady M Orchard | tags: desserts, mille_crepe, pastry, contemporary, casual | excellence: 0.85
+•	[food] Ya Kun Kaya Toast | tags: kopitiam, breakfast, kaya_toast, coffee, casual | excellence: 0.87
+•	[food] Killiney Kopitiam | tags: kopitiam, kaya_toast, coffee, heritage, casual | excellence: 0.86
+•	[food] PS.Cafe Ann Siang Hill | tags: cafe, brunch, greenery, stylish, casual | excellence: 0.88
+•	[food] Jollibean Soy Beancurd | tags: dessert, tofu, local, casual, sweet | excellence: 0.82
+•	[food] Potato Head Singapore | tags: all_day_dining, bar, social, modern, casual | excellence: 0.84
+•	[food] Little India Arcade Bites | tags: indian_food, snacks, local, vibrant, casual | excellence: 0.83
+•	[food] Arab Street Cafés | tags: middle_eastern, casual, vibrant, local, lunch | excellence: 0.82
+•	[culture] Gardens by the Bay | tags: botanic_gardens, futuristic, greenery, cultural, iconic | excellence: 0.97
+•	[culture] Marina Bay Sands SkyPark | tags: observation_deck, skyline, modern, landmark, view | excellence: 0.95
+•	[culture] Merlion Park | tags: waterfront, landmark, photo_spot, heritage, iconic | excellence: 0.93
+•	[culture] ArtScience Museum | tags: modern_art, architecture, exhibits, cultural, innovation | excellence: 0.91
+•	[culture] National Gallery Singapore | tags: art_museum, southeast_asian_art, cultural, heritage, exhibits | excellence: 0.94
+•	[culture] Singapore Botanic Gardens | tags: unesco, botanic_garden, orchids, greenery, calm | excellence: 0.96
+•	[culture] Chinatown Heritage Centre | tags: museum, history, culture, local_life, exhibits | excellence: 0.90
+•	[culture] Little India District | tags: historic_neighbourhood, culture, indian_influence, vibrant, food | excellence: 0.91
+•	[culture] Kampong Glam & Sultan Mosque | tags: heritage, muslim_quarter, architecture, cultural, vibrant | excellence: 0.90
+•	[culture] National Museum of Singapore | tags: museum, history, interactive, cultural, educational | excellence: 0.92
+•	[culture] Asian Civilisations Museum | tags: asian_art, history, cultural, exhibits, educational | excellence: 0.91
+•	[culture] Fort Canning Park | tags: heritage_park, history, greenery, ruins, outdoor | excellence: 0.89
+•	[culture] Buddha Tooth Relic Temple | tags: temple, buddhist, heritage, spiritual, cultural | excellence: 0.90
+•	[culture] Haw Par Villa | tags: theme_park, folklore, cultural_art, quirky, heritage | excellence: 0.88
+•	[culture] Sentosa Island | tags: island, beach, entertainment, leisure, attractions | excellence: 0.93
+•	[culture] Universal Studios Singapore | tags: theme_park, rides, family_fun, entertainment, modern | excellence: 0.92  
+•	[culture] Singapore Flyer | tags: observation_wheel, views, skyline, modern, attraction | excellence: 0.92
+•	[culture] Esplanade – Theatres on the Bay | tags: performing_arts, architecture, cultural, shows, urban | excellence: 0.90
+•	[walk] Marina Bay Waterfront Walk | tags: walk, skyline, riverfront, scenic, daytime | excellence: 0.95
+•	[walk] Helix Bridge Path | tags: walk, architecture, river, modern, scenic | excellence: 0.93
+•	[walk] Orchard Road Stroll | tags: walk, shopping, urban, vibrant, daytime | excellence: 0.90
+•	[walk] Chinatown & Telok Ayer Walk | tags: walk, heritage, food, urban, cultural | excellence: 0.92
+•	[walk] Little India Food Walk | tags: walk, indian_flavours, market, vibrant, daytime | excellence: 0.91
+•	[walk] Kampong Glam Heritage Walk | tags: walk, heritage, murals, culture, urban | excellence: 0.90
+•	[walk] Southern Ridges Trail | tags: walk, green_trail, nature, hill_views, outdoor | excellence: 0.89  
+•	[walk] East Coast Parkway Path | tags: walk, seaside, cycling, scenic, sunset | excellence: 0.90 ] Sentosa Boardwalk | tags: walk, beach, leisure, scenic, daytime | excellence: 0.93
+•	[walk] Gardens by the Bay Supertree Grove Walk | tags: walk, vertical_gardens, lights, evening, scenic | excellence: 0.94
+•	[walk] Fort Canning Heritage Loop | tags: walk, history, garden, outdoor, relaxed | excellence: 0.89
+•	[walk] Punggol Waterway Walk | tags: walk, water, greenery, cycling, relaxed | excellence: 0.88
+•	[walk] Southern Waterfront Promenade | tags: walk, marina, modern, sunset, casual | excellence: 0.91
+
+
+
+City: new_york
+	•	[food] Joe’s Pizza | tags: pizza, slice, italian_american, casual, local | excellence: 0.89
+	•	[food] Prince Street Pizza | tags: pizza, square_slice, casual, iconic, lunch | excellence: 0.88
+	•	[food] Katz’s Delicatessen | tags: deli, pastrami, jewish_cuisine, casual, heritage | excellence: 0.93
+	•	[food] Russ & Daughters | tags: bagel, smoked_fish, jewish_cuisine, brunch, heritage | excellence: 0.90
+	•	[food] Ess-a-Bagel | tags: bagel, breakfast, classic, casual, local | excellence: 0.88
+	•	[food] Peter Luger Steak House | tags: steakhouse, porterhouse, classic, refined, dinner | excellence: 0.94
+	•	[food] Le Bernardin | tags: french_seafood, fine_dining, michelin, refined, dinner | excellence: 0.97
+	•	[food] Atomix | tags: korean_fine_dining, tasting_menu, modern, refined, dinner | excellence: 0.96
+	•	[food] Carbone | tags: italian_american, classic, refined, dinner, heritage | excellence: 0.91
+	•	[food] Momofuku Noodle Bar | tags: asian_fusion, noodles, casual, creative, lunch | excellence: 0.89
+	•	[food] Xi’an Famous Foods | tags: chinese, noodles, spicy, casual, local | excellence: 0.86
+	•	[food] The Halal Guys | tags: street_food, halal_platter, casual, iconic, local | excellence: 0.87
+	•	[food] Gray’s Papaya | tags: hot_dog, street_food, casual, quick_bite, local | excellence: 0.85
+	•	[food] Sarge’s Deli & Diner | tags: deli, classic_american, sandwich, breakfast, casual | excellence: 0.87
+	•	[food] Chelsea Market Food Hall | tags: market_food, varied_cuisine, casual, local, lunch | excellence: 0.89
+	•	[food] Amy’s Bread | tags: bakery, artisan_bread, pastry, casual, local | excellence: 0.86
+	•	[food] Uncle Boons | tags: thai, casual, creative, dinner, lively | excellence: 0.87
+	•	[food] Dominique Ansel Bakery | tags: bakery, desserts, creative, casual, iconic | excellence: 0.88
+	•	[food] Magnolia Bakery | tags: dessert, cupcakes, sweets, casual, classic | excellence: 0.84
+	•	[food] Shake Shack Madison Square | tags: burger, fast_casual, local, casual, lunch | excellence: 0.85
+	•	[food] Los Tacos No.1 | tags: mexican, tacos, street_food, casual, local | excellence: 0.88
+	•	[food] Blue Hill | tags: farm_to_table, american, refined, seasonal, dinner | excellence: 0.92
+	•	[culture] Statue of Liberty | tags: landmark, historic, immigration, iconic, unesco | excellence: 0.98
+	•	[culture] Ellis Island Immigration Museum | tags: museum, immigration, history, cultural, heritage | excellence: 0.95
+	•	[culture] Central Park | tags: urban_park, greenery, recreation, iconic, cultural | excellence: 0.96
+	•	[culture] Times Square | tags: public_square, neon, entertainment, urban, iconic | excellence: 0.93
+	•	[culture] Empire State Building | tags: skyscraper, observation_deck, skyline, historic, iconic | excellence: 0.94
+	•	[culture] The Metropolitan Museum of Art | tags: art_museum, classics, exhibits, cultural, heritage | excellence: 0.95
+	•	[culture] Museum of Modern Art | tags: modern_art, museum, iconic, cultural, exhibits | excellence: 0.93
+	•	[culture] Brooklyn Bridge | tags: bridge, historic, landmark, architecture, iconic | excellence: 0.92
+	•	[culture] 9/11 Memorial & Museum | tags: memorial, history, reflection, cultural, solemn | excellence: 0.94
+	•	[culture] Broadway Theatre District | tags: theatre, performance, entertainment, cultural, iconic | excellence: 0.93
+	•	[culture] The High Line | tags: elevated_park, urban_design, modern, cultural, scenic | excellence: 0.91
+	•	[culture] One World Observatory | tags: observation_deck, skyline, modern, landmark, view | excellence: 0.92
+	•	[culture] Solomon R. Guggenheim Museum | tags: art_museum, architecture, modern, cultural, iconic | excellence: 0.90
+	•	[culture] Whitney Museum of American Art | tags: american_art, contemporary, cultural, exhibits, modern | excellence: 0.89
+	•	[culture] Lincoln Center | tags: performing_arts, opera, music, cultural, landmark | excellence: 0.91
+	•	[culture] Coney Island | tags: seaside, amusement, historic, leisure, cultural | excellence: 0.88
+	•	[culture] Tenement Museum | tags: social_history, immigration, museum, cultural, educational | excellence: 0.90
+	•	[culture] Wall Street | tags: financial_district, history, urban, landmark, iconic | excellence: 0.87
+	•	[walk] Central Park Loop Walk | tags: walk, park, greenery, relaxed, daytime | excellence: 0.96
+	•	[walk] Brooklyn Bridge Promenade | tags: walk, bridge, skyline, photography, daytime | excellence: 0.94
+	•	[walk] High Line Stroll | tags: walk, elevated_park, urban, scenic, daytime | excellence: 0.93
+	•	[walk] Times Square Night Walk | tags: walk, lights, urban, iconic, night | excellence: 0.92
+	•	[walk] Hudson River Greenway | tags: walk, river, scenic, leisure, daytime | excellence: 0.91
+	•	[walk] Riverside Park Path | tags: walk, park, river, calm, daytime | excellence: 0.89
+	•	[walk] Soho & West Village Lanes | tags: walk, boutiques, cafes, urban, daytime | excellence: 0.90
+	•	[walk] DUMBO Waterfront Walk | tags: walk, waterfront, skyline, photography, daytime | excellence: 0.92
+	•	[walk] Battery Park Promenade | tags: walk, harbor, views, sunset, relaxed | excellence: 0.91
+	•	[walk] Harlem Neighborhood Walk | tags: walk, cultural_history, streets, local_life, daytime | excellence: 0.88
