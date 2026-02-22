@@ -20,11 +20,19 @@ import { RECOMMENDATION_GRAPH } from "./graph_definition";
 import { ToolClient } from "../tools/toolClient";
 import {
     extractIntentSkill,
+    decideTagBudgetSkill,
+    createTagExpandSkill,
+    createTagNormalizeSkill,
+    createMemorySignalSkill,
+    createMemoryWeightAdjustSkill,
+    createTesBuilderSkill,
     createFetchRecommendationSkill,
-    rerankSkill,
+    createRerankSkill,
     mixPolicySkill,
     createBuildCardsSkill,
+    createExplainFromTraceSkill,
 } from "../skills";
+import { createLLMAdapterFromEnv } from "../llm";
 
 export interface OrchestratorConfig {
     /** Gateway base URL (default: http://localhost:8080) */
@@ -53,12 +61,25 @@ export function createOrchestrator(config: OrchestratorConfig = {}): Orchestrato
     // 2. Create and populate registry
     const registry = new SkillRegistry();
 
+    // 2a. Create LLM adapter
+    const llmAdapter = createLLMAdapterFromEnv();
+    console.log(`[bootstrap] LLM adapter: ${llmAdapter.modelInfo.provider}/${llmAdapter.modelInfo.model_name}`);
+
     // Register deterministic skills
     registry.register(extractIntentSkill);
+    registry.register(decideTagBudgetSkill);
+    registry.register(createTagExpandSkill(llmAdapter));
+    registry.register(createTagNormalizeSkill());
+    registry.register(createMemorySignalSkill(toolClient));
+    registry.register(createMemoryWeightAdjustSkill(toolClient));
+    registry.register(createTesBuilderSkill(toolClient));
     registry.register(createFetchRecommendationSkill(toolClient));
-    registry.register(rerankSkill);
+    registry.register(createRerankSkill(toolClient));
     registry.register(mixPolicySkill);
     registry.register(createBuildCardsSkill(toolClient));
+
+    // Register LLM-backed skills
+    registry.register(createExplainFromTraceSkill(llmAdapter));
 
     console.log(
         `[bootstrap] Registered ${registry.size} skills: [${registry.list().join(", ")}]`

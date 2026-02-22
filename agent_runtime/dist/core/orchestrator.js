@@ -18,6 +18,9 @@ exports.Orchestrator = void 0;
 const execution_context_1 = require("./execution_context");
 const trace_manager_1 = require("./trace_manager");
 const graph_definition_1 = require("./graph_definition");
+function isTraceBundleCandidate(value) {
+    return typeof value === "object" && value !== null && !Array.isArray(value);
+}
 class Orchestrator {
     constructor(registry, graph) {
         this.registry = registry;
@@ -41,6 +44,21 @@ class Orchestrator {
      * Execute the full pipeline for a user request.
      */
     async run(input) {
+        const { output } = await this.executeInternal(input);
+        return output;
+    }
+    /**
+     * Execute pipeline and always return the FULL aggregated decision_trace
+     * from ExecutionContext (including merged service bundles).
+     */
+    async runWithTrace(input) {
+        const { output, ctx } = await this.executeInternal(input);
+        return {
+            ...output,
+            decision_trace: ctx.decision_trace,
+        };
+    }
+    async executeInternal(input) {
         const ctx = (0, execution_context_1.createExecutionContext)(input);
         const pipelineStart = Date.now();
         let lastExecutedNodeId = null;
@@ -62,6 +80,7 @@ class Orchestrator {
                 if (result.trace && Object.keys(result.trace).length > 0) {
                     (0, trace_manager_1.mergeTrace)(ctx, node.skill, result.trace);
                 }
+                this.mergeResultTraceBundles(ctx, result);
                 // 5. Record timing
                 const durationMs = Date.now() - nodeStart;
                 (0, execution_context_1.recordTiming)(ctx, node.id, durationMs);
@@ -71,7 +90,10 @@ class Orchestrator {
                     console.log(`[Orchestrator] Skill "${node.skill}" signaled terminal` +
                         (result.terminalReason ? `: ${result.terminalReason}` : ""));
                     (0, execution_context_1.recordTiming)(ctx, "_total", Date.now() - pipelineStart);
-                    return this.buildOutput(ctx, lastExecutedNodeId, false, result.terminalReason);
+                    return {
+                        output: this.buildOutput(ctx, lastExecutedNodeId, false, result.terminalReason),
+                        ctx,
+                    };
                 }
             }
             catch (err) {
@@ -82,12 +104,18 @@ class Orchestrator {
                 (0, execution_context_1.addError)(ctx, node.id, node.skill, "skill_execution_error", message);
                 // Fail-fast: all nodes in the linear pipeline are critical
                 (0, execution_context_1.recordTiming)(ctx, "_total", Date.now() - pipelineStart);
-                return this.buildOutput(ctx, lastExecutedNodeId, false);
+                return {
+                    output: this.buildOutput(ctx, lastExecutedNodeId, false),
+                    ctx,
+                };
             }
         }
         // Pipeline complete — build final output from last node
         (0, execution_context_1.recordTiming)(ctx, "_total", Date.now() - pipelineStart);
-        return this.buildOutput(ctx, lastExecutedNodeId, true);
+        return {
+            output: this.buildOutput(ctx, lastExecutedNodeId, true),
+            ctx,
+        };
     }
     /**
      * Build OrchestratorOutput from the execution context.
@@ -97,24 +125,17 @@ class Orchestrator {
      * falls back to extracting common fields from the last node's output.
      */
     buildOutput(ctx, lastNodeId, pipelineComplete, terminalReason) {
-        const lastOutput = lastNodeId
-            ? ctx.intermediate_results[lastNodeId]
-            : undefined;
-        // If the last node returned a decision_trace bundle from a
-        // downstream service, deep-merge it into the context trace.
-        if (lastOutput) {
-            const downstreamTrace = lastOutput.decision_trace;
-            if (downstreamTrace &&
-                typeof downstreamTrace === "object" &&
-                !Array.isArray(downstreamTrace)) {
-                (0, trace_manager_1.mergeTraceBundle)(ctx, downstreamTrace);
-            }
-        }
-        // Extract structured fields from intermediate results.
-        // Walk all stored results to find city/type (from whichever node
-        // produced them) and cards/mix_policy (from the final node).
+        // Extract structured fields from ALL intermediate results.
+        // Walk every node output to find city, type, cards, mix_policy,
+        // explanation, and bullets — first occurrence wins for each.
+        // This keeps the orchestrator generic: it does not know which
+        // node produces which field.
         let city = null;
         let type = "unknown";
+        let cards = null;
+        let mix_policy = null;
+        let explanation;
+        let bullets;
         for (const nodeOutput of Object.values(ctx.intermediate_results)) {
             const obj = nodeOutput;
             if (!obj)
@@ -125,16 +146,26 @@ class Orchestrator {
             if (typeof obj.type === "string" && type === "unknown") {
                 type = obj.type;
             }
+            if (obj.cards != null && cards === null) {
+                cards = obj.cards;
+            }
+            if (obj.mix_policy != null && mix_policy === null) {
+                mix_policy = obj.mix_policy;
+            }
+            if (typeof obj.explanation === "string" && explanation === undefined) {
+                explanation = obj.explanation;
+            }
+            if (Array.isArray(obj.bullets) && bullets === undefined) {
+                bullets = obj.bullets;
+            }
         }
-        const cards = lastOutput?.cards ?? null;
-        const mix_policy = lastOutput?.mix_policy ?? null;
         // If pipeline didn't complete and there were errors, ok = false
         const ok = pipelineComplete && ctx.errors.length === 0;
         // If terminal reason, add it to errors for visibility
         if (terminalReason && !pipelineComplete) {
             (0, execution_context_1.addError)(ctx, lastNodeId ?? "unknown", "orchestrator", "pipeline_terminated", terminalReason);
         }
-        return {
+        const output = {
             ok,
             city,
             type,
@@ -144,6 +175,47 @@ class Orchestrator {
             errors: ctx.errors,
             timing: ctx.timing,
         };
+        if (explanation !== undefined) {
+            output.explanation = explanation;
+        }
+        if (bullets !== undefined) {
+            output.bullets = bullets;
+        }
+        return output;
+    }
+    /**
+     * Merge any trace bundle emitted in skill output.
+     *
+     * Supported bundle keys:
+     * - output.decision_trace
+     * - output.decision_trace_bundle
+     * - output.trace_bundle
+     *
+     * Also supports legacy top-level keys returned directly on SkillResult
+     * (outside `output`) for backward compatibility.
+     */
+    mergeResultTraceBundles(ctx, result) {
+        if (!isTraceBundleCandidate(result)) {
+            return;
+        }
+        const resultObj = result;
+        const outputObj = isTraceBundleCandidate(resultObj.output)
+            ? resultObj.output
+            : null;
+        const bundles = [
+            outputObj?.decision_trace,
+            outputObj?.decision_trace_bundle,
+            outputObj?.trace_bundle,
+            resultObj.decision_trace,
+            resultObj.decision_trace_bundle,
+            resultObj.trace_bundle,
+        ];
+        for (const candidate of bundles) {
+            if (!isTraceBundleCandidate(candidate)) {
+                continue;
+            }
+            (0, trace_manager_1.mergeTraceBundle)(ctx, candidate);
+        }
     }
 }
 exports.Orchestrator = Orchestrator;

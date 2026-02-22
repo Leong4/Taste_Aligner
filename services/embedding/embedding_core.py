@@ -5,10 +5,12 @@ Orchestrates the generation of deterministic, component-based embeddings
 for the Taste Aligner system.
 """
 
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 import logging
+import math
 from ..common.helpers import ensure_dict
 from .vector_utils import (
+    hash_to_float,
     tags_to_vector,
     scalar_to_vector,
     l2_normalize,
@@ -25,6 +27,8 @@ TOTAL_DIM = VISION_DIM + TAG_DIM + SCALAR_DIM  # 512
 
 MODEL_NAME = "tes-v1-hash"
 VERSION = "v1"
+TES_V2_VERSION = "2.0"
+TES_V2_BACKEND = "hash_v2"
 
 
 def generate_embedding(payload: Any, normalize: bool = True) -> Dict[str, Any]:
@@ -140,3 +144,137 @@ def generate_embedding(payload: Any, normalize: bool = True) -> Dict[str, Any]:
     }
 
     return response
+
+
+def _is_finite_vector(vector: List[float]) -> bool:
+    return all(isinstance(v, (int, float)) and math.isfinite(v) for v in vector)
+
+
+def _is_l2_normalized(vector: List[float], tolerance: float = 1e-3) -> bool:
+    if not vector:
+        return False
+    norm = math.sqrt(sum(float(v) * float(v) for v in vector))
+    return abs(norm - 1.0) <= tolerance
+
+
+def _normalize_string_list(values: Optional[List[str]]) -> List[str]:
+    if not values:
+        return []
+    return [str(v).strip() for v in values if str(v).strip()]
+
+
+def _build_scalar_vector_v2(
+    sentiment: Optional[float],
+    recency_days: Optional[float],
+    location: Optional[str],
+    dim: int = SCALAR_DIM
+) -> List[float]:
+    """
+    Build TES v2 scalar component:
+      - sentiment (0..31)
+      - recency (32..63)
+      - location (64..127)
+    """
+    vec = [0.0] * dim
+
+    # sentiment contribution [-1, 1]
+    if sentiment is not None:
+        sentiment_clamped = max(-1.0, min(1.0, float(sentiment)))
+        for i in range(min(32, dim)):
+            vec[i] = sentiment_clamped * hash_to_float("sentiment", i, "tes_v2")
+
+    # recency contribution exp(-days / 30)
+    if recency_days is not None:
+        days = max(0.0, float(recency_days))
+        recency_weight = math.exp(-days / 30.0)
+        for i in range(32, min(64, dim)):
+            vec[i] = recency_weight * hash_to_float(f"recency:{days}", i - 32, "tes_v2")
+
+    # location contribution hash embedding
+    location_clean = (location or "").strip().lower()
+    if location_clean:
+        location_dim = max(0, dim - 64)
+        if location_dim > 0:
+            location_vec = tags_to_vector([location_clean], location_dim, seed="location_v2")
+            for idx, value in enumerate(location_vec):
+                target_idx = 64 + idx
+                if target_idx < dim:
+                    vec[target_idx] = value
+
+    return vec
+
+
+def build_tes_vector_v2(
+    vision_features: Optional[List[str]],
+    tags: Optional[List[str]],
+    sentiment: Optional[float],
+    recency_days: Optional[float],
+    location: Optional[str],
+    normalize: bool = True
+) -> Dict[str, Any]:
+    """
+    Build TES v2 vector with strict contract validation.
+    """
+    vision_list = _normalize_string_list(vision_features)
+    tag_list = _normalize_string_list(tags)
+    location_clean = (location or "").strip().lower() or None
+
+    vision_vector = tags_to_vector(vision_list, VISION_DIM, seed="vision_v2")
+    tag_vector = tags_to_vector(tag_list, TAG_DIM, seed="tags_v2")
+    scalar_vector = _build_scalar_vector_v2(
+        sentiment=sentiment,
+        recency_days=recency_days,
+        location=location_clean,
+        dim=SCALAR_DIM
+    )
+
+    full_vector = concatenate_components(vision_vector, tag_vector, scalar_vector)
+    if len(full_vector) != TOTAL_DIM:
+        raise ValueError(f"TES v2 dimension mismatch: expected {TOTAL_DIM}, got {len(full_vector)}")
+    if not _is_finite_vector(full_vector):
+        raise ValueError("TES v2 vector contains non-finite values before normalization")
+
+    normalized_flag = False
+    if normalize:
+        norm = math.sqrt(sum(float(v) * float(v) for v in full_vector))
+        if norm >= 1e-10:
+            full_vector = l2_normalize(full_vector)
+            normalized_flag = True
+        else:
+            normalized_flag = False
+
+    full_vector = [round(float(v), 6) for v in full_vector]
+    if len(full_vector) != TOTAL_DIM:
+        raise ValueError(f"TES v2 output dimension mismatch: expected {TOTAL_DIM}, got {len(full_vector)}")
+    if not _is_finite_vector(full_vector):
+        raise ValueError("TES v2 vector contains non-finite values after normalization")
+
+    # normalized flag must be consistent with actual vector norm
+    is_unit = _is_l2_normalized(full_vector)
+    if normalized_flag and not is_unit:
+        raise ValueError("TES v2 normalized flag inconsistent with vector norm")
+    if not normalized_flag and is_unit and normalize:
+        # normalize=True but vector still unit with normalized=False would violate contract
+        raise ValueError("TES v2 normalized flag inconsistent (unit vector marked non-normalized)")
+
+    return {
+        "vector": full_vector,
+        "dim": TOTAL_DIM,
+        "normalized": normalized_flag,
+        "components": {
+            "vision_dim": VISION_DIM,
+            "tag_dim": TAG_DIM,
+            "scalar_dim": SCALAR_DIM
+        },
+        "meta": {
+            "tes_version": TES_V2_VERSION,
+            "backend": TES_V2_BACKEND,
+            "inputs_summary": {
+                "vision_count": len(vision_list),
+                "tag_count": len(tag_list),
+                "has_sentiment": sentiment is not None,
+                "has_recency": recency_days is not None,
+                "has_location": location_clean is not None
+            }
+        }
+    }

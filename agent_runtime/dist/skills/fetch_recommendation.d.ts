@@ -1,18 +1,14 @@
 /**
- * FetchRecommendation skill — calls the recommendation service's /score
- * endpoint via the gateway.
+ * FetchRecommendation skill — calls recommendation.score via gateway ToolClient.
  *
- * The recommendation service runs the full pipeline (recall → rerank →
- * mix_policy) in a single /score call. This skill honestly exposes
- * the full response shape so downstream nodes consume correct semantics:
+ * This skill is responsible for:
+ *   1) building a stable request payload from graph inputs
+ *   2) extracting ranked results + service decision_trace
+ *   3) returning deterministic fallback output on any tool/output failure
  *
- *   - cz_ranked:   already-scored CZ items (not raw recall candidates)
- *   - ez_ranked:   already-scored EZ items
- *   - mix_policy:  the computed CZ:EZ ratio
- *   - recall_summary: counts/rules from the recall stage
- *   - decision_trace: { recall, rerank, mix_policy } from the service
+ * It does NOT perform rerank or mix-policy computation itself.
  */
-import { Skill, FetchRecommendationInput } from "../core/types";
+import { Skill, FetchRecommendationInput, FetchRecommendationOutput } from "../core/types";
 import { ToolClient } from "../tools/toolClient";
-export declare function createFetchRecommendationSkill(toolClient: ToolClient): Skill<FetchRecommendationInput, unknown>;
+export declare function createFetchRecommendationSkill(toolClient: ToolClient): Skill<FetchRecommendationInput, FetchRecommendationOutput>;
 //# sourceMappingURL=fetch_recommendation.d.ts.map

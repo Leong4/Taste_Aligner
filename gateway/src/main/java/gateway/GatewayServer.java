@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -143,8 +144,10 @@ public class GatewayServer {
         routes.put("planner.compose", new ToolRoute("planner.compose", "planner", "/compose", 3000, false, true, 10));
         routes.put("ontology.normalize", new ToolRoute("ontology.normalize", "ontology", "/normalize", 3000, true, false, 20));
         routes.put("embedding.generate", new ToolRoute("embedding.generate", "embedding", "/generate", 3000, true, false, 20));
+        routes.put("embedding.tes_build", new ToolRoute("embedding.tes_build", "embedding", "/tes/build", 3000, true, false, 20));
         routes.put("vision.describe", new ToolRoute("vision.describe", "vision", "/describe", 5000, true, false, 10));
         routes.put("recommendation.score", new ToolRoute("recommendation.score", "recommendation", "/score", 3000, true, false, 20));
+        routes.put("memory.search", new ToolRoute("memory.search", "memory", "/search", 3000, true, true, 30));
         routes.put("memory.read", new ToolRoute("memory.read", "memory", "/read", 2000, true, true, 30));
         return routes;
     }
@@ -206,7 +209,8 @@ public class GatewayServer {
             }
 
             byte[] incoming = exchange.getRequestBody().readAllBytes();
-            ResponseData validationError = validateToolInput(toolName, incoming);
+            Map<String, Object> payload = parsePayloadMap(incoming);
+            ResponseData validationError = validateToolInput(toolName, payload);
             if (validationError != null) {
                 return validationError;
             }
@@ -259,6 +263,16 @@ public class GatewayServer {
                 }
 
                 String serviceUrl = joinUrl(baseUrl, route.path);
+                String httpMethod = "POST";
+                byte[] forwardedBody = incoming;
+                if ("memory.read".equals(toolName)) {
+                    String memoryId = extractMemoryId(payload);
+                    serviceUrl = joinUrl(baseUrl, "/read/" + urlEncode(memoryId));
+                    httpMethod = "GET";
+                    forwardedBody = new byte[0];
+                } else if ("embedding.tes_build".equals(toolName)) {
+                    forwardedBody = buildTesBuildForwardBody(payload);
+                }
 
                 // Forward request body to remote microservice
                 int attempts = route.retryable ? 3 : 1;
@@ -269,13 +283,16 @@ public class GatewayServer {
                     try {
                         java.net.URL url = new java.net.URL(serviceUrl);
                         java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
-                        conn.setRequestMethod("POST");
-                        conn.setDoOutput(true);
+                        conn.setRequestMethod(httpMethod);
+                        boolean withBody = !"GET".equalsIgnoreCase(httpMethod);
+                        conn.setDoOutput(withBody);
                         conn.setRequestProperty("Content-Type", "application/json");
                         conn.setRequestProperty("X-Trace-Id", traceId);
 
-                        try (OutputStream os = conn.getOutputStream()) {
-                            os.write(incoming);
+                        if (withBody) {
+                            try (OutputStream os = conn.getOutputStream()) {
+                                os.write(forwardedBody);
+                            }
                         }
 
                         int code = conn.getResponseCode();
@@ -326,8 +343,7 @@ public class GatewayServer {
             );
         }
 
-        private ResponseData validateToolInput(String toolName, byte[] incoming) {
-            Map<String, Object> payload = parsePayloadMap(incoming);
+        private ResponseData validateToolInput(String toolName, Map<String, Object> payload) {
             if (payload == null) {
                 return invalidToolInput(
                         toolName,
@@ -339,8 +355,8 @@ public class GatewayServer {
             List<String> missing = new ArrayList<>();
             switch (toolName) {
                 case "planner.compose":
-                    if (!hasAnyPath(payload, List.of("city", "data.city"))) {
-                        missing.add("city|data.city");
+                    if (!hasPath(payload, "data")) {
+                        missing.add("data");
                     }
                     break;
                 case "ontology.normalize":
@@ -351,6 +367,15 @@ public class GatewayServer {
                 case "embedding.generate":
                     if (!hasPath(payload, "data")) {
                         missing.add("data");
+                    }
+                    break;
+                case "embedding.tes_build":
+                    if (!validateTesBuildPayload(payload, missing)) {
+                        return invalidToolInput(
+                                toolName,
+                                missing,
+                                "Provide TES build fields: tags/vision_features/sentiment/recency_days/location (or legacy data.normalized_tags/data.vision_tags)"
+                        );
                     }
                     break;
                 case "vision.describe":
@@ -369,6 +394,15 @@ public class GatewayServer {
                 case "memory.read":
                     if (!hasAnyPath(payload, List.of("memory_id", "data.memory_id"))) {
                         missing.add("memory_id|data.memory_id");
+                    }
+                    break;
+                case "memory.search":
+                    if (!validateMemorySearchPayload(payload, missing)) {
+                        return invalidToolInput(
+                                toolName,
+                                missing,
+                                "Provide data.user_id and one of data.query_tags/data.query_embedding"
+                        );
                     }
                     break;
                 default:
@@ -438,12 +472,149 @@ public class GatewayServer {
 
         private ResponseData invalidToolInput(String toolName, List<String> missing, String hint) {
             String body = String.format(
-                    "{\"error\":\"INVALID_TOOL_INPUT\",\"tool\":\"%s\",\"missing\":%s,\"hint\":\"%s\"}",
-                    escapeJson(toolName),
+                    "{\"error\":{\"code\":\"INVALID_TOOL_INPUT\",\"message\":\"invalid input for tool\",\"details\":{\"missing\":%s,\"hint\":\"%s\"}},\"tool\":\"%s\"}",
                     toJsonStringArray(missing),
-                    escapeJson(hint)
+                    escapeJson(hint),
+                    escapeJson(toolName)
             );
             return new ResponseData(400, body, "application/json");
+        }
+
+        private boolean validateMemorySearchPayload(Map<String, Object> payload, List<String> missing) {
+            Object dataObj = payload.get("data");
+            if (!(dataObj instanceof Map<?, ?>)) {
+                missing.add("data");
+                return false;
+            }
+            @SuppressWarnings("unchecked")
+            Map<String, Object> data = (Map<String, Object>) dataObj;
+            if (!hasPath(payload, "data.user_id")) {
+                missing.add("data.user_id");
+            }
+            if (!hasAnyPath(payload, List.of("data.query_tags", "data.query_embedding"))) {
+                missing.add("data.query_tags|data.query_embedding");
+            }
+            List<String> allowed = List.of(
+                    "user_id", "query_tags", "query_embedding", "city", "top_k", "now_ts"
+            );
+            List<String> invalid = findUnknownKeys(data, allowed, "data");
+            missing.addAll(invalid);
+            return missing.isEmpty();
+        }
+
+        private boolean validateTesBuildPayload(Map<String, Object> payload, List<String> missing) {
+            List<String> allowedRoot = List.of(
+                    "vision_features", "tags", "sentiment", "recency_days", "location", "normalize", "data"
+            );
+            missing.addAll(findUnknownKeys(payload, allowedRoot, "root"));
+
+            boolean hasRootCandidate = hasAnyPath(payload, List.of(
+                    "vision_features", "tags", "sentiment", "recency_days", "location"
+            ));
+            boolean hasLegacyCandidate = hasAnyPath(payload, List.of(
+                    "data.vision_tags", "data.normalized_tags", "data.emotion", "data.recency_days"
+            ));
+            if (!hasRootCandidate && !hasLegacyCandidate) {
+                missing.add("tags|vision_features|sentiment|recency_days|location");
+            }
+
+            Object dataObj = payload.get("data");
+            if (dataObj instanceof Map<?, ?>) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> data = (Map<String, Object>) dataObj;
+                List<String> allowedData = List.of("vision_tags", "normalized_tags", "emotion", "recency_days");
+                missing.addAll(findUnknownKeys(data, allowedData, "data"));
+            }
+            return missing.isEmpty();
+        }
+
+        private List<String> findUnknownKeys(Map<String, Object> payload, List<String> allowed, String prefix) {
+            List<String> invalid = new ArrayList<>();
+            if (payload == null) return invalid;
+            for (String key : payload.keySet()) {
+                if (!allowed.contains(key)) {
+                    invalid.add(prefix + "." + key);
+                }
+            }
+            return invalid;
+        }
+
+        private String extractMemoryId(Map<String, Object> payload) {
+            if (payload == null) return "";
+            Object direct = payload.get("memory_id");
+            if (direct instanceof String && !((String) direct).trim().isEmpty()) {
+                return ((String) direct).trim();
+            }
+            Object dataObj = payload.get("data");
+            if (dataObj instanceof Map<?, ?>) {
+                Object nested = ((Map<?, ?>) dataObj).get("memory_id");
+                if (nested instanceof String && !((String) nested).trim().isEmpty()) {
+                    return ((String) nested).trim();
+                }
+            }
+            return "";
+        }
+
+        private byte[] buildTesBuildForwardBody(Map<String, Object> payload) {
+            Map<String, Object> outgoing = new HashMap<>();
+            if (payload != null) {
+                copyIfPresent(payload, outgoing, "vision_features");
+                copyIfPresent(payload, outgoing, "tags");
+                copyIfPresent(payload, outgoing, "sentiment");
+                copyIfPresent(payload, outgoing, "recency_days");
+                copyIfPresent(payload, outgoing, "location");
+                copyIfPresent(payload, outgoing, "normalize");
+
+                Object dataObj = payload.get("data");
+                if (dataObj instanceof Map<?, ?>) {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> data = (Map<String, Object>) dataObj;
+                    if (!outgoing.containsKey("vision_features") && data.get("vision_tags") != null) {
+                        outgoing.put("vision_features", data.get("vision_tags"));
+                    }
+                    if (!outgoing.containsKey("tags") && data.get("normalized_tags") != null) {
+                        outgoing.put("tags", data.get("normalized_tags"));
+                    }
+                    if (!outgoing.containsKey("recency_days") && data.get("recency_days") != null) {
+                        outgoing.put("recency_days", data.get("recency_days"));
+                    }
+                }
+            }
+
+            String json = toJson(outgoing);
+            return json.getBytes(StandardCharsets.UTF_8);
+        }
+
+        private void copyIfPresent(Map<String, Object> from, Map<String, Object> to, String key) {
+            if (from.containsKey(key) && from.get(key) != null) {
+                to.put(key, from.get(key));
+            }
+        }
+
+        private String urlEncode(String input) {
+            return URLEncoder.encode(Objects.toString(input, ""), StandardCharsets.UTF_8);
+        }
+
+        private String toJson(Object value) {
+            if (value == null) return "null";
+            if (value instanceof String) return "\"" + escapeJson((String) value) + "\"";
+            if (value instanceof Number || value instanceof Boolean) return value.toString();
+            if (value instanceof List<?>) {
+                List<String> parts = new ArrayList<>();
+                for (Object item : (List<?>) value) {
+                    parts.add(toJson(item));
+                }
+                return "[" + String.join(",", parts) + "]";
+            }
+            if (value instanceof Map<?, ?>) {
+                List<String> entries = new ArrayList<>();
+                for (Map.Entry<?, ?> entry : ((Map<?, ?>) value).entrySet()) {
+                    String key = Objects.toString(entry.getKey(), "");
+                    entries.add("\"" + escapeJson(key) + "\":" + toJson(entry.getValue()));
+                }
+                return "{" + String.join(",", entries) + "}";
+            }
+            return "\"" + escapeJson(value.toString()) + "\"";
         }
 
         private String toJsonStringArray(List<String> values) {

@@ -1,70 +1,167 @@
 "use strict";
 /**
- * FetchRecommendation skill — calls the recommendation service's /score
- * endpoint via the gateway.
+ * FetchRecommendation skill — calls recommendation.score via gateway ToolClient.
  *
- * The recommendation service runs the full pipeline (recall → rerank →
- * mix_policy) in a single /score call. This skill honestly exposes
- * the full response shape so downstream nodes consume correct semantics:
+ * This skill is responsible for:
+ *   1) building a stable request payload from graph inputs
+ *   2) extracting ranked results + service decision_trace
+ *   3) returning deterministic fallback output on any tool/output failure
  *
- *   - cz_ranked:   already-scored CZ items (not raw recall candidates)
- *   - ez_ranked:   already-scored EZ items
- *   - mix_policy:  the computed CZ:EZ ratio
- *   - recall_summary: counts/rules from the recall stage
- *   - decision_trace: { recall, rerank, mix_policy } from the service
+ * It does NOT perform rerank or mix-policy computation itself.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createFetchRecommendationSkill = createFetchRecommendationSkill;
+const RULE_ID = "fetch_recommendation_v1";
+const SCHEMA_VERSION = "1.0";
+const TOOL_NAME = "recommendation.score";
+function normalizeCity(city) {
+    if (typeof city !== "string") {
+        return "";
+    }
+    return city.trim().toLowerCase();
+}
+function normalizeUserId(userId) {
+    if (typeof userId === "string" && userId.trim()) {
+        return { value: userId.trim(), usedDefault: false };
+    }
+    return { value: "u001", usedDefault: true };
+}
+function normalizeTags(primary, fallback) {
+    const source = Array.isArray(primary) && primary.length > 0 ? primary : fallback;
+    if (!Array.isArray(source)) {
+        return [];
+    }
+    const normalized = new Set();
+    for (const value of source) {
+        if (typeof value !== "string") {
+            continue;
+        }
+        const cleaned = value.trim().toLowerCase();
+        if (!cleaned) {
+            continue;
+        }
+        normalized.add(cleaned);
+    }
+    const out = Array.from(normalized);
+    out.sort((a, b) => a.localeCompare(b));
+    return out;
+}
+function emptyOutput() {
+    return {
+        cz_ranked: [],
+        ez_ranked: [],
+        mix_policy: null,
+        decision_trace: {},
+        reco_mix_policy: null,
+        reco_decision_trace: {},
+    };
+}
+function buildNodeTrace(requestSummary, latencyMs, rawCounts, fallbackUsed, fallbackReason, errorMessage, userIdDefaulted) {
+    const trace = {
+        rule_id: RULE_ID,
+        schema_version: SCHEMA_VERSION,
+        tool: TOOL_NAME,
+        provider: "gateway",
+        mode: "unknown",
+        request_summary: requestSummary,
+        latency_ms: latencyMs,
+        raw_counts: rawCounts,
+        fallback_used: fallbackUsed,
+        fallback_reason: fallbackReason,
+        error_message: errorMessage,
+    };
+    if (userIdDefaulted) {
+        trace.reasons = ["user_id_defaulted_to_u001"];
+    }
+    return trace;
+}
+function buildFallback(reason, requestSummary, latencyMs, errorMessage, userIdDefaulted) {
+    const nodeTrace = buildNodeTrace(requestSummary, latencyMs, { cz: 0, ez: 0 }, true, reason, reason === "tool_error" ? errorMessage : "", userIdDefaulted);
+    return {
+        output: emptyOutput(),
+        trace: nodeTrace,
+    };
+}
+function asObject(value) {
+    if (!value || typeof value !== "object" || Array.isArray(value)) {
+        return null;
+    }
+    return value;
+}
 function createFetchRecommendationSkill(toolClient) {
     return {
         name: "fetch_recommendation",
         inputSchema: {
             description: "User context for recommendation scoring",
-            required: ["user_id", "city", "tags"],
-            optional: ["intent", "memory_confidence"],
+            required: ["city"],
+            optional: ["user_id", "tags", "intent_tags", "intent", "meta", "controls", "memory_confidence"],
         },
         outputSchema: {
-            description: "Full recommendation result: ranked lists, mix policy, traces",
+            description: "Ranked CZ/EZ items + recommendation service decision trace",
             required: ["cz_ranked", "ez_ranked", "mix_policy", "decision_trace"],
+            optional: ["reco_mix_policy", "reco_decision_trace"],
         },
         async execute(input, _context) {
-            const observation = await toolClient.call({
-                tool: "recommendation.score",
-                input: {
-                    data: {
-                        user_id: input.user_id,
-                        city: input.city,
-                        tags: input.tags,
-                        intent: input.intent ?? "balanced",
-                        memory_confidence: input.memory_confidence ?? 0.6,
-                    },
-                },
-            });
-            if (!observation.ok) {
-                throw new Error(`[fetch_recommendation] Gateway call failed: ` +
-                    `${observation.error?.code ?? "unknown"} — ${observation.error?.message ?? ""}`);
+            const city = normalizeCity(input.city);
+            const userIdInfo = normalizeUserId(input.user_id);
+            const tags = normalizeTags(input.tags, input.intent_tags);
+            const requestSummary = {
+                city,
+                user_id: userIdInfo.value,
+                user_id_defaulted: userIdInfo.usedDefault,
+                tags_count: tags.length,
+                intent_present: input.intent !== undefined && input.intent !== null,
+            };
+            if (!city) {
+                return buildFallback("invalid_output", requestSummary, 0, "missing_city", userIdInfo.usedDefault);
             }
-            const reco = observation.output;
-            // Expose the actual semantics of what the service returns
+            const startedAt = Date.now();
+            let observation;
+            try {
+                observation = await toolClient.call({
+                    tool: TOOL_NAME,
+                    input: {
+                        data: {
+                            user_id: userIdInfo.value,
+                            city,
+                            tags,
+                            intent: input.intent ?? "balanced",
+                            memory_confidence: input.memory_confidence ?? 0.6,
+                        },
+                    },
+                });
+            }
+            catch (error) {
+                const message = error instanceof Error ? error.message : String(error);
+                return buildFallback("tool_error", requestSummary, Date.now() - startedAt, message, userIdInfo.usedDefault);
+            }
+            if (!observation.ok) {
+                return buildFallback("tool_error", requestSummary, observation.latency_ms ?? (Date.now() - startedAt), observation.error?.message ?? "gateway_call_failed", userIdInfo.usedDefault);
+            }
+            const payload = asObject(observation.output);
+            if (!payload) {
+                return buildFallback("invalid_output", requestSummary, observation.latency_ms ?? (Date.now() - startedAt), "response_not_object", userIdInfo.usedDefault);
+            }
+            const czRanked = payload.cz_ranked;
+            const ezRanked = payload.ez_ranked;
+            if (!Array.isArray(czRanked) || !Array.isArray(ezRanked)) {
+                return buildFallback("invalid_output", requestSummary, observation.latency_ms ?? (Date.now() - startedAt), "missing_ranked_lists", userIdInfo.usedDefault);
+            }
+            if (czRanked.length === 0 && ezRanked.length === 0) {
+                return buildFallback("empty_result", requestSummary, observation.latency_ms ?? (Date.now() - startedAt), "both_ranked_lists_empty", userIdInfo.usedDefault);
+            }
+            const mixPolicy = asObject(payload.mix_policy);
+            const recoDecisionTrace = asObject(payload.decision_trace) ?? {};
             const output = {
-                cz_ranked: reco.cz_ranked ?? [],
-                ez_ranked: reco.ez_ranked ?? [],
-                mix_policy: reco.mix_policy ?? {},
-                recall_summary: reco.recall ?? {},
-                decision_trace: reco.decision_trace ?? {},
-                debug: reco.debug ?? {},
-                trace_id: reco.trace_id ?? observation.trace_id,
-                version: reco.version,
+                cz_ranked: czRanked,
+                ez_ranked: ezRanked,
+                mix_policy: mixPolicy,
+                decision_trace: recoDecisionTrace,
+                reco_mix_policy: mixPolicy,
+                reco_decision_trace: recoDecisionTrace,
             };
-            // The skill-level trace for the orchestrator's decision_trace
-            const recoTrace = reco.decision_trace;
-            const trace = {
-                source: "recommendation.score",
-                trace_id: observation.trace_id,
-                latency_ms: observation.latency_ms,
-                recall: recoTrace?.recall ?? {},
-            };
-            return { output, trace };
+            const nodeTrace = buildNodeTrace(requestSummary, observation.latency_ms ?? (Date.now() - startedAt), { cz: czRanked.length, ez: ezRanked.length }, false, "", "", userIdInfo.usedDefault);
+            return { output, trace: nodeTrace };
         },
     };
 }

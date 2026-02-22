@@ -16,6 +16,31 @@
  *             │
  *             ▼
  *   ┌─────────────────────┐
+ *   │  decide_tag_budget   │  → budget, hard/soft allocation
+ *   └─────────┬────────────┘
+ *             │
+ *             ▼
+ *   ┌─────────────────────┐
+ *   │    tag_expand        │
+ *   └─────────┬────────────┘
+ *             │
+ *             ▼
+ *   ┌─────────────────────┐
+ *   │   tag_normalize      │
+ *   └─────────┬────────────┘
+ *             │
+ *             ▼
+ *   ┌─────────────────────┐
+ *   │   memory_signal      │  → anchor_tags, memory_confidence
+ *   └─────────┬────────────┘
+ *             │
+ *             ▼
+ *   ┌─────────────────────┐
+ *   │    tes_builder       │  → tes_vector (512)
+ *   └─────────┬────────────┘
+ *             │
+ *             ▼
+ *   ┌─────────────────────┐
  *   │ fetch_recommendation │  → cz_ranked, ez_ranked, mix_policy, decision_trace
  *   └─────────┬────────────┘
  *             │
@@ -31,8 +56,13 @@
  *         │
  *         ▼
  *   ┌──────────────┐
- *   │ build_cards   │  → cards (final output)
- *   └──────────────┘
+ *   │ build_cards   │  → cards (core output)
+ *   └──────┬───────┘
+ *          │
+ *          ▼
+ *   ┌────────────────────┐
+ *   │ explain_from_trace  │  → explanation, bullets (LLM-generated)
+ *   └────────────────────┘
  *
  * To add a new skill:
  *   1. Implement the Skill interface (see skills/ directory)
@@ -41,7 +71,43 @@
  */
 import { GraphDefinition } from "./types";
 /**
- * The default recommendation pipeline graph (v2.0).
+ * The default recommendation pipeline graph (v8.0).
+ *
+ * v10.0 changes from v9.0:
+ *   - rerank node now receives tes_vector, tes_dim, tes_normalized,
+ *     tes_fallback_used from tes_builder for TES-driven reranking
+ *   - rerank skill upgraded to v2 with TES similarity fusion
+ *
+ * v9.0 changes from v8.0:
+ *   - Added memory_weight_adjust node after tag_normalize
+ *   - tes_builder.anchor_tags now reads from memory_weight_adjust
+ *   - fetch_recommendation.memory_confidence now reads from memory_weight_adjust
+ *   - memory_signal node retained for backward compatibility
+ *
+ * v8.0 changes from v7.0:
+ *   - Added tes_builder node after memory_signal
+ *   - tes_builder builds validated TES vector from anchor_tags
+ *
+ * v7.0 changes from v6.0:
+ *   - Added memory_signal node after tag_normalize
+ *   - fetch_recommendation now accepts memory_confidence
+ *   - mix_policy memory_confidence now comes from memory_signal
+ *
+ * v6.0 changes from v5.0:
+ *   - Added tag_normalize node after tag_expand
+ *   - fetch_recommendation now consumes normalized_tags first
+ *
+ * v5.0 changes from v4.0:
+ *   - Added tag_expand node after decide_tag_budget
+ *   - fetch_recommendation now reads expanded tags first with intent fallback
+ *
+ * v4.0 changes from v3.0:
+ *   - Added decide_tag_budget node after extract_intent
+ *     (deterministic budget computation for future tag_expand)
+ *
+ * v3.0 changes from v2.0:
+ *   - Added explain_from_trace node (LLM-backed) after build_cards
+ *   - Orchestrator buildOutput scans all nodes for output fields
  *
  * v2.0 changes from v1.0:
  *   - recall_candidates renamed to fetch_recommendation (honest semantics)

@@ -79,7 +79,7 @@ const server = node_http_1.default.createServer(async (req, res) => {
         if (typeof body.user_id === "string") {
             orchInput.user_id = body.user_id;
         }
-        const result = await orchestrator.run(orchInput);
+        const result = await orchestrator.runWithTrace(orchInput);
         // Build response maintaining backward compatibility with the
         // existing frontend contract. The old response shape:
         //   { ok, city, type, tool, observation, output, history }
@@ -111,6 +111,8 @@ const server = node_http_1.default.createServer(async (req, res) => {
                     decision_trace: result.decision_trace,
                 }
                 : null,
+            explanation: result.explanation ?? null,
+            bullets: result.bullets ?? null,
             decision_trace: result.decision_trace,
             timing: result.timing,
             errors: result.errors,

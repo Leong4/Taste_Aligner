@@ -23,6 +23,12 @@ export declare class Orchestrator {
      */
     run(input: OrchestratorInput): Promise<OrchestratorOutput>;
     /**
+     * Execute pipeline and always return the FULL aggregated decision_trace
+     * from ExecutionContext (including merged service bundles).
+     */
+    runWithTrace(input: OrchestratorInput): Promise<OrchestratorOutput>;
+    private executeInternal;
+    /**
      * Build OrchestratorOutput from the execution context.
      *
      * This method is generic — it does NOT reference any specific
@@ -30,5 +36,17 @@ export declare class Orchestrator {
      * falls back to extracting common fields from the last node's output.
      */
     private buildOutput;
+    /**
+     * Merge any trace bundle emitted in skill output.
+     *
+     * Supported bundle keys:
+     * - output.decision_trace
+     * - output.decision_trace_bundle
+     * - output.trace_bundle
+     *
+     * Also supports legacy top-level keys returned directly on SkillResult
+     * (outside `output`) for backward compatibility.
+     */
+    private mergeResultTraceBundles;
 }
 //# sourceMappingURL=orchestrator.d.ts.map

@@ -5,9 +5,10 @@
 The Taste Aligner agent runtime uses a **SkillRegistry + Graph + Orchestrator** architecture to execute a deterministic recommendation pipeline. This replaces the previous ReAct loop + IntentAgent pattern with a structured, extensible, and fully traceable execution model.
 
 **Key principles:**
-- No multi-agent reasoning — purely deterministic skill execution
+- No multi-agent reasoning — deterministic skill execution + optional LLM post-processing
 - Graph defines execution order — skills do not know about each other
-- Decision trace is preserved and merged across all skills
+- Decision trace is preserved and deep-merged across all skills (incoming wins)
+- LLM integration via pluggable adapter — mock for dev, API adapters for production
 - Existing Python services are unchanged — skills wrap gateway calls
 
 ---
@@ -39,13 +40,13 @@ The Taste Aligner agent runtime uses a **SkillRegistry + Graph + Orchestrator** 
     ┌─────────────┐  ┌──────────────┐   ┌──────────────┐
     │ SkillRegistry│  │    Graph     │   │ ExecutionCtx │
     │              │  │  Definition  │   │              │
-    │ • 5 skills   │  │  • 5 nodes   │   │ • input      │
+    │ • 6 skills   │  │  • 6 nodes   │   │ • input      │
     │ • get/list   │  │  • inputFrom │   │ • results    │
     │              │  │  • linear    │   │ • trace      │
     └──────────────┘  └──────────────┘   │ • errors     │
                                          └──────────────┘
 
-    ═══════════════ Execution Graph ═══════════════
+    ═══════════════ Execution Graph (v3.0) ═══════════════
 
     ┌─────────────────┐
     │  extract_intent  │  (local, no HTTP)
@@ -53,20 +54,20 @@ The Taste Aligner agent runtime uses a **SkillRegistry + Graph + Orchestrator** 
     └────────┬─────────┘
              │
              ▼
-    ┌──────────────────┐     ┌─────────────────────┐
-    │ recall_candidates │────▶│  recommendation.score│
-    │  cz/ez lists     │     │  (gateway → :5005)   │
-    └────────┬─────────┘     └─────────────────────┘
+    ┌────────────────────┐     ┌─────────────────────┐
+    │ fetch_recommendation│────▶│  recommendation.score│
+    │  cz/ez ranked      │     │  (gateway → :5005)   │
+    └────────┬───────────┘     └─────────────────────┘
              │
              ▼
     ┌─────────┐
-    │  rerank  │  (reads cached reco response)
+    │  rerank  │  (graph input from fetch_recommendation)
     │  scored  │
     └────┬────┘
          │
          ▼
     ┌────────────┐
-    │ mix_policy  │  (reads cached reco response)
+    │ mix_policy  │  (graph input from fetch_recommendation)
     │ CZ:EZ ratio│
     └─────┬──────┘
           │
@@ -74,7 +75,13 @@ The Taste Aligner agent runtime uses a **SkillRegistry + Graph + Orchestrator** 
     ┌──────────────┐     ┌─────────────────────┐
     │  build_cards  │────▶│  planner.compose     │
     │  final cards  │     │  (gateway → :5006)   │
-    └──────────────┘     └─────────────────────┘
+    └──────┬───────┘     └─────────────────────┘
+           │
+           ▼
+    ┌────────────────────┐     ┌──────────────────┐
+    │ explain_from_trace  │────▶│  LLMAdapter      │
+    │  explanation + tips │     │  (mock / API)    │
+    └────────────────────┘     └──────────────────┘
 ```
 
 ---
@@ -87,32 +94,28 @@ agent_runtime/src/
 │   ├── types.ts                   # All TypeScript interfaces
 │   ├── skill_registry.ts          # Skill registration + lookup
 │   ├── execution_context.ts       # Shared context + path resolution
-│   ├── trace_manager.ts           # Decision trace merge logic
+│   ├── trace_manager.ts           # Decision trace deep merge logic
 │   ├── graph_definition.ts        # Graph DAG + validation
 │   ├── orchestrator.ts            # Main execution engine
 │   ├── bootstrap.ts               # Factory: wires registry + graph + orchestrator
 │   └── index.ts                   # Barrel export
 │
+├── llm/                           # LLM adapter abstraction
+│   ├── llm_adapter.ts             # Interface: LLMAdapter, LLMCallTrace, etc.
+│   ├── mock_adapter.ts            # MockLLMAdapter (deterministic, no network)
+│   └── index.ts                   # Factory: createLLMAdapterFromEnv()
+│
 ├── skills/                        # Skill implementations
 │   ├── extract_intent.ts          # Rule-based intent extraction
-│   ├── recall_candidates.ts       # Gateway call to recommendation.score
-│   ├── rerank.ts                  # Extract rerank from cached response
-│   ├── mix_policy.ts              # Extract mix policy from cached response
+│   ├── fetch_recommendation.ts    # Gateway call to recommendation.score
+│   ├── rerank.ts                  # Rerank via graph input (+ fallback)
+│   ├── mix_policy.ts              # Mix policy via graph input (+ fallback)
 │   ├── build_cards.ts             # Gateway call to planner.compose
+│   ├── explain_from_trace.ts      # LLM-backed explanation generation
 │   └── index.ts                   # Barrel export
-│
-├── agents/                        # (Legacy — preserved for reference)
-│   └── intentAgent.ts
-│
-├── runtime/                       # (Legacy — preserved for reference)
-│   ├── agent.ts
-│   └── reactRuntime.ts
 │
 ├── tools/
 │   └── toolClient.ts              # Gateway HTTP client (shared)
-│
-├── types/
-│   └── react.ts                   # Legacy types (Action, Observation, Thought)
 │
 ├── index.ts                       # CLI entry point
 └── server.ts                      # HTTP server entry point
@@ -146,14 +149,20 @@ Skills are registered at startup in `bootstrap.ts`:
 
 ```typescript
 const registry = new SkillRegistry();
+const llmAdapter = createLLMAdapterFromEnv();
+
+// Deterministic skills
 registry.register(extractIntentSkill);
-registry.register(createRecallCandidatesSkill(toolClient));
+registry.register(createFetchRecommendationSkill(toolClient));
 registry.register(rerankSkill);
 registry.register(mixPolicySkill);
 registry.register(createBuildCardsSkill(toolClient));
+
+// LLM-backed skills
+registry.register(createExplainFromTraceSkill(llmAdapter));
 ```
 
-Skills that need HTTP access (recall_candidates, build_cards) are created via factory functions that receive the shared `ToolClient`.
+Skills that need HTTP access are created via factory functions that receive the shared `ToolClient`. LLM-backed skills receive an `LLMAdapter` instance.
 
 ### 3. Graph Binding
 
@@ -219,6 +228,12 @@ mix_policy (reads cached full_reco_response)
 build_cards (HTTP → planner.compose)
     → { cards: [ { zone: "CZ", items: [...] }, { zone: "EZ", items: [...] } ],
         decision_trace: { recall: {...}, rerank: {...}, planner: {...} } }
+    │
+    ▼
+explain_from_trace (LLM → MockAdapter / API)
+    → { explanation: "Based on your preferences, we selected...",
+        bullets: ["City matched", "Comfort-zone ranked", "Exploration added"],
+        meta: { locale: "en", style: "concise" } }
 ```
 
 ### ExecutionContext Resolution
@@ -276,6 +291,21 @@ The final merged `decision_trace` contains one entry per skill:
         "cards_count": 2,
         "selected_cz_ids": [...],
         "selected_ez_ids": [...]
+    },
+    "explain_from_trace": {
+        "schema_version": "explain_v1",
+        "inputs_used": ["intent", "recall", "rerank", "mix_policy", "planner"],
+        "locale": "en",
+        "style": "concise",
+        "fallback_used": false,
+        "llm_call": {
+            "provider": "mock",
+            "model_name": "mock-v1",
+            "temperature": 0.3,
+            "prompt_version": "explain_v1",
+            "latency_ms": 1,
+            "fallback_used": false
+        }
     }
 }
 ```
@@ -347,41 +377,76 @@ export { myNewSkill } from "./my_new_skill";
 
 ---
 
-## How to Add an LLM-Based Skill
+## LLM Adapter Abstraction
 
-LLM-based skills follow the same pattern but call an LLM endpoint:
+### Why an Adapter?
+
+LLM-backed skills (like `explain_from_trace`) need to call language models for structured text generation. The `LLMAdapter` interface decouples skills from specific API providers:
+
+- **Development/testing:** `MockLLMAdapter` returns deterministic canned responses — no API keys, no network, fully reproducible.
+- **Production:** Swap in an `OpenAIAdapter` or `AnthropicAdapter` by setting `LLM_PROVIDER=openai` — zero changes to skill code or graph wiring.
+
+### Interface
 
 ```typescript
-export function createLlmSummarySkill(toolClient: ToolClient): Skill {
-    return {
-        name: "llm_summary",
-        inputSchema: { description: "Cards to summarize", required: ["cards"] },
-        outputSchema: { description: "Natural language summary", required: ["summary"] },
-        async execute(input, context) {
-            // Call an LLM service via gateway
-            const observation = await toolClient.call({
-                tool: "llm.summarize",
-                input: { cards: input.cards, prompt: "Summarize these recommendations" },
-            });
-
-            if (!observation.ok) {
-                throw new Error(`LLM call failed: ${observation.error?.message}`);
-            }
-
-            return {
-                output: { summary: observation.output.text },
-                trace: {
-                    rule_id: "llm_summary_v1",
-                    model: observation.output.model,
-                    latency_ms: observation.latency_ms,
-                },
-            };
-        },
-    };
+interface LLMAdapter {
+    readonly modelInfo: LLMModelInfo;
+    generateStructuredJSON<T>(input: LLMGenerateInput): Promise<LLMGenerateOutput<T>>;
 }
 ```
 
-Then add it to the graph after `build_cards`. The deterministic pipeline remains unchanged — the LLM skill is an additive post-processing step.
+Every call returns:
+- `data: T` — parsed structured response
+- `callTrace: LLMCallTrace` — model, temperature, prompt_version, latency, usage (for decision_trace)
+
+### MockLLMAdapter
+
+The default adapter. Returns canned explanations based on `LLM_MOCK_MODE`:
+
+| Mode | Behavior |
+|------|----------|
+| `short` (default) | Concise explanation, 3 bullets |
+| `long` | Detailed explanation, 6 bullets |
+| `error` | Throws to test fallback handling |
+
+### How to Add an API Adapter
+
+Create `agent_runtime/src/llm/openai_adapter.ts`:
+
+```typescript
+import { LLMAdapter, LLMGenerateInput, LLMGenerateOutput, LLMModelInfo } from "./llm_adapter";
+
+export class OpenAIAdapter implements LLMAdapter {
+    readonly modelInfo: LLMModelInfo = {
+        provider: "openai",
+        model_name: "gpt-4o",
+        version: "2024-08-06",
+    };
+
+    async generateStructuredJSON<T>(input: LLMGenerateInput): Promise<LLMGenerateOutput<T>> {
+        // Call OpenAI API with structured output schema
+        // Return parsed data + callTrace
+    }
+}
+```
+
+Then add a case in `createLLMAdapterFromEnv()`:
+
+```typescript
+case "openai":
+    return new OpenAIAdapter(process.env.OPENAI_API_KEY!);
+```
+
+No changes needed in skills, graph, or orchestrator.
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `LLM_PROVIDER` | `mock` | Adapter to use (`mock`, future: `openai`, `anthropic`) |
+| `LLM_MOCK_MODE` | `short` | Mock response mode (`short`, `long`, `error`) |
+| `EXPLAIN_LOCALE` | `en` | Default locale for explanations (`en`, `zh`) |
+| `EXPLAIN_STYLE` | `concise` | Default style (`concise`, `detailed`) |
 
 ---
 
@@ -398,7 +463,7 @@ The `/run` endpoint response maintains the same shape as before:
 | `observation` | Raw observation | Synthetic wrapper |
 | `output` | `observation.output` | Cards + trace payload |
 
-New fields added: `decision_trace`, `timing`, `errors`.
+New fields added: `decision_trace`, `timing`, `errors`, `explanation`, `bullets`.
 
 ---
 

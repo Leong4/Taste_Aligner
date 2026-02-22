@@ -21,6 +21,7 @@ const orchestrator_1 = require("./orchestrator");
 const graph_definition_1 = require("./graph_definition");
 const toolClient_1 = require("../tools/toolClient");
 const skills_1 = require("../skills");
+const llm_1 = require("../llm");
 /**
  * Create a fully wired Orchestrator ready for production use.
  */
@@ -36,12 +37,23 @@ function createOrchestrator(config = {}) {
     });
     // 2. Create and populate registry
     const registry = new skill_registry_1.SkillRegistry();
+    // 2a. Create LLM adapter
+    const llmAdapter = (0, llm_1.createLLMAdapterFromEnv)();
+    console.log(`[bootstrap] LLM adapter: ${llmAdapter.modelInfo.provider}/${llmAdapter.modelInfo.model_name}`);
     // Register deterministic skills
     registry.register(skills_1.extractIntentSkill);
+    registry.register(skills_1.decideTagBudgetSkill);
+    registry.register((0, skills_1.createTagExpandSkill)(llmAdapter));
+    registry.register((0, skills_1.createTagNormalizeSkill)());
+    registry.register((0, skills_1.createMemorySignalSkill)(toolClient));
+    registry.register((0, skills_1.createMemoryWeightAdjustSkill)(toolClient));
+    registry.register((0, skills_1.createTesBuilderSkill)(toolClient));
     registry.register((0, skills_1.createFetchRecommendationSkill)(toolClient));
-    registry.register(skills_1.rerankSkill);
+    registry.register((0, skills_1.createRerankSkill)(toolClient));
     registry.register(skills_1.mixPolicySkill);
     registry.register((0, skills_1.createBuildCardsSkill)(toolClient));
+    // Register LLM-backed skills
+    registry.register((0, skills_1.createExplainFromTraceSkill)(llmAdapter));
     console.log(`[bootstrap] Registered ${registry.size} skills: [${registry.list().join(", ")}]`);
     // 3. Create orchestrator with the default graph
     const orchestrator = new orchestrator_1.Orchestrator(registry, graph_definition_1.RECOMMENDATION_GRAPH);

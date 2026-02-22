@@ -22,8 +22,13 @@ import {
  * Create a fresh ExecutionContext for a new orchestrator run.
  */
 export function createExecutionContext(input: OrchestratorInput): ExecutionContext {
+    const providedTs =
+        typeof input.request_ts === "number" && Number.isFinite(input.request_ts)
+            ? Math.trunc(input.request_ts)
+            : undefined;
     return {
         input,
+        request_ts: providedTs ?? Date.now(),
         intermediate_results: {},
         final_result: null,
         decision_trace: {},
