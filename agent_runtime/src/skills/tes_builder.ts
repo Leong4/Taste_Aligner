@@ -25,6 +25,7 @@ const NORM_LOWER = 0.99;
 const NORM_UPPER = 1.01;
 
 type FallbackReason = "no_tags" | "tool_error" | "invalid_output" | "invalid_vector";
+type TagSource = "anchor_tags" | "normalized_tags_fallback" | "none";
 
 function asObject(value: unknown): Record<string, unknown> | null {
     if (!value || typeof value !== "object" || Array.isArray(value)) {
@@ -92,23 +93,30 @@ function computeNorm(vector: number[]): number | null {
 
 function buildTrace(
     requestTs: number,
-    inputTags: string[],
+    usedTags: string[],
+    anchorTagCount: number,
+    normalizedTagCount: number,
+    tagSource: TagSource,
     latencyMs: number,
     vectorChecks: TesBuilderDecisionTrace["vector_checks"],
     fallbackUsed: boolean,
     fallbackReason: FallbackReason | undefined,
     errorMessage: string,
     backend: string,
-    tesVersion: string
+    tesVersion: string,
+    modelId?: string | null,
+    device?: string
 ): TesBuilderDecisionTrace {
     const trace: TesBuilderDecisionTrace = {
         rule_id: RULE_ID,
         schema_version: SCHEMA_VERSION,
         request_ts: requestTs,
         input_summary: {
-            anchor_tag_count: inputTags.length,
-            first_5_tags: inputTags.slice(0, 5),
+            anchor_tag_count: anchorTagCount,
+            normalized_tag_count: normalizedTagCount,
+            first_5_tags: usedTags.slice(0, 5),
         },
+        tag_source: tagSource,
         tool: {
             name: TOOL_NAME,
             endpoint: TOOL_ENDPOINT,
@@ -122,6 +130,12 @@ function buildTrace(
     if (fallbackReason !== undefined) {
         trace.fallback_reason = fallbackReason;
     }
+    if (modelId !== undefined) {
+        trace.model_id = modelId;
+    }
+    if (device !== undefined) {
+        trace.device = device;
+    }
     if (errorMessage) {
         trace.error_message = errorMessage;
     }
@@ -132,6 +146,9 @@ function buildFallbackOutput(
     reason: FallbackReason,
     requestTs: number,
     inputTags: string[],
+    anchorTagCount: number,
+    normalizedTagCount: number,
+    tagSource: TagSource,
     latencyMs: number,
     errorMessage: string,
     upstreamDecisionTrace?: Record<string, unknown>
@@ -140,6 +157,9 @@ function buildFallbackOutput(
     const traceNode = buildTrace(
         requestTs,
         inputTags,
+        anchorTagCount,
+        normalizedTagCount,
+        tagSource,
         latencyMs,
         {
             dim_expected: DIM_EXPECTED,
@@ -151,6 +171,8 @@ function buildFallbackOutput(
         reason,
         errorMessage,
         "unknown",
+        "unknown",
+        null,
         "unknown"
     );
 
@@ -183,8 +205,8 @@ export function createTesBuilderSkill(
 
         inputSchema: {
             description: "Build TES vector from memory_signal anchor tags",
-            required: ["anchor_tags"],
-            optional: ["request_ts", "user_city", "decision_trace"],
+            required: [],
+            optional: ["anchor_tags", "normalized_tags", "request_ts", "user_city", "decision_trace"],
         },
 
         outputSchema: {
@@ -208,14 +230,22 @@ export function createTesBuilderSkill(
             context: ExecutionContext
         ): Promise<SkillResult<TesBuilderOutput>> {
             const anchorTags = normalizeAnchorTags(input.anchor_tags);
+            const normalizedTags = normalizeAnchorTags(input.normalized_tags);
+            const tagsForTes = anchorTags.length > 0 ? anchorTags : normalizedTags;
+            const tagSource: TagSource = anchorTags.length > 0
+                ? "anchor_tags"
+                : (normalizedTags.length > 0 ? "normalized_tags_fallback" : "none");
             const requestTs = resolveRequestTs(input.request_ts, context);
             const upstreamDecisionTrace = asObject(input.decision_trace) ?? {};
 
-            if (anchorTags.length === 0) {
+            if (tagsForTes.length === 0) {
                 return buildFallbackOutput(
                     "no_tags",
                     requestTs,
-                    anchorTags,
+                    tagsForTes,
+                    anchorTags.length,
+                    normalizedTags.length,
+                    tagSource,
                     0,
                     "",
                     upstreamDecisionTrace
@@ -230,7 +260,7 @@ export function createTesBuilderSkill(
                     input: {
                         data: {
                             vision_tags: [],
-                            normalized_tags: anchorTags,
+                            normalized_tags: tagsForTes,
                             emotion: null,
                             recency_days: null,
                         },
@@ -241,7 +271,10 @@ export function createTesBuilderSkill(
                 return buildFallbackOutput(
                     "tool_error",
                     requestTs,
-                    anchorTags,
+                    tagsForTes,
+                    anchorTags.length,
+                    normalizedTags.length,
+                    tagSource,
                     Date.now() - startedAt,
                     message,
                     upstreamDecisionTrace
@@ -253,7 +286,10 @@ export function createTesBuilderSkill(
                     return buildFallbackOutput(
                         "tool_error",
                         requestTs,
-                        anchorTags,
+                        tagsForTes,
+                        anchorTags.length,
+                        normalizedTags.length,
+                        tagSource,
                         observation.latency_ms ?? (Date.now() - startedAt),
                         observation.error?.message ?? "gateway_call_failed",
                         upstreamDecisionTrace
@@ -265,7 +301,10 @@ export function createTesBuilderSkill(
                     return buildFallbackOutput(
                         "invalid_output",
                         requestTs,
-                        anchorTags,
+                        tagsForTes,
+                        anchorTags.length,
+                        normalizedTags.length,
+                        tagSource,
                         observation.latency_ms ?? (Date.now() - startedAt),
                         "response_not_object",
                         upstreamDecisionTrace
@@ -278,12 +317,19 @@ export function createTesBuilderSkill(
                 const meta = asObject(payload.meta);
                 const backend = typeof meta?.backend === "string" ? meta.backend : "unknown";
                 const tesVersion = typeof meta?.tes_version === "string" ? meta.tes_version : "unknown";
+                const modelId = typeof meta?.model_id === "string" || meta?.model_id === null
+                    ? (meta.model_id as string | null)
+                    : null;
+                const device = typeof meta?.device === "string" ? meta.device : "unknown";
 
                 if (!Array.isArray(vectorRaw) || !Number.isFinite(dimRaw) || typeof normalizedRaw !== "boolean") {
                     return buildFallbackOutput(
                         "invalid_output",
                         requestTs,
-                        anchorTags,
+                        tagsForTes,
+                        anchorTags.length,
+                        normalizedTags.length,
+                        tagSource,
                         observation.latency_ms ?? (Date.now() - startedAt),
                         "missing_or_invalid_vector_fields",
                         upstreamDecisionTrace
@@ -297,7 +343,10 @@ export function createTesBuilderSkill(
                     return buildFallbackOutput(
                         "invalid_vector",
                         requestTs,
-                        anchorTags,
+                        tagsForTes,
+                        anchorTags.length,
+                        normalizedTags.length,
+                        tagSource,
                         observation.latency_ms ?? (Date.now() - startedAt),
                         "vector_contains_non_finite",
                         upstreamDecisionTrace
@@ -318,7 +367,10 @@ export function createTesBuilderSkill(
                     return buildFallbackOutput(
                         "invalid_vector",
                         requestTs,
-                        anchorTags,
+                        tagsForTes,
+                        anchorTags.length,
+                        normalizedTags.length,
+                        tagSource,
                         observation.latency_ms ?? (Date.now() - startedAt),
                         "vector_validation_failed",
                         upstreamDecisionTrace
@@ -327,7 +379,10 @@ export function createTesBuilderSkill(
 
                 const traceNode = buildTrace(
                     requestTs,
-                    anchorTags,
+                    tagsForTes,
+                    anchorTags.length,
+                    normalizedTags.length,
+                    tagSource,
                     observation.latency_ms ?? (Date.now() - startedAt),
                     {
                         dim_expected: DIM_EXPECTED,
@@ -339,7 +394,9 @@ export function createTesBuilderSkill(
                     undefined,
                     "",
                     backend,
-                    tesVersion
+                    tesVersion,
+                    modelId,
+                    device
                 );
 
                 const mergedDecisionTrace = deepMergeTrace(
@@ -353,8 +410,8 @@ export function createTesBuilderSkill(
                     normalized: true,
                     backend,
                     tes_version: tesVersion,
-                    input_anchor_tags: anchorTags,
-                    used_anchor_tags: anchorTags,
+                    input_anchor_tags: tagsForTes,
+                    used_anchor_tags: tagsForTes,
                     fallback_used: false,
                     decision_trace: mergedDecisionTrace,
                 };
@@ -365,7 +422,10 @@ export function createTesBuilderSkill(
                 return buildFallbackOutput(
                     "invalid_output",
                     requestTs,
-                    anchorTags,
+                    tagsForTes,
+                    anchorTags.length,
+                    normalizedTags.length,
+                    tagSource,
                     observation.latency_ms ?? (Date.now() - startedAt),
                     message,
                     upstreamDecisionTrace

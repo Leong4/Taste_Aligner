@@ -144,7 +144,7 @@ public class GatewayServer {
         routes.put("planner.compose", new ToolRoute("planner.compose", "planner", "/compose", 3000, false, true, 10));
         routes.put("ontology.normalize", new ToolRoute("ontology.normalize", "ontology", "/normalize", 3000, true, false, 20));
         routes.put("embedding.generate", new ToolRoute("embedding.generate", "embedding", "/generate", 3000, true, false, 20));
-        routes.put("embedding.tes_build", new ToolRoute("embedding.tes_build", "embedding", "/tes/build", 3000, true, false, 20));
+        routes.put("embedding.tes_build", new ToolRoute("embedding.tes_build", "embedding", "/tes/build", 15000, true, false, 20));
         routes.put("vision.describe", new ToolRoute("vision.describe", "vision", "/describe", 5000, true, false, 10));
         routes.put("recommendation.score", new ToolRoute("recommendation.score", "recommendation", "/score", 3000, true, false, 20));
         routes.put("memory.search", new ToolRoute("memory.search", "memory", "/search", 3000, true, true, 30));

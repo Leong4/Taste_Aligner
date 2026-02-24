@@ -227,6 +227,7 @@ export const RECOMMENDATION_GRAPH: GraphDefinition = {
             skill: "tes_builder",
             inputFrom: {
                 anchor_tags: "memory_weight_adjust.anchor_tags",
+                normalized_tags: "tag_normalize.normalized_tags",
                 request_ts: "input.request_ts",
                 user_city: "extract_intent.city",
                 decision_trace: "memory_weight_adjust.decision_trace",
@@ -269,6 +270,7 @@ export const RECOMMENDATION_GRAPH: GraphDefinition = {
                 tes_dim: "tes_builder.tes_dim",
                 tes_normalized: "tes_builder.normalized",
                 tes_fallback_used: "tes_builder.fallback_used",
+                tes_backend: "tes_builder.backend",
             },
         },
 

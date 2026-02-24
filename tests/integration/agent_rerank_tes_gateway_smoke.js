@@ -134,8 +134,16 @@ async function main() {
             status: tesResp.status,
         });
     }
+    const meta1 = tesResp.body.meta;
+    if (!meta1 || typeof meta1 !== "object" || meta1.backend !== "st_v1") {
+        fail("response.meta.backend must be st_v1", {
+            url: tesBuildUrl,
+            status: tesResp.status,
+            bodyPreview: String(tesResp.raw || "").slice(0, 500),
+        });
+    }
 
-    console.log(`  HTTP ${tesResp.status} OK — vector dim=${vector.length}`);
+    console.log(`  HTTP ${tesResp.status} OK — vector dim=${vector.length}, backend=${meta1.backend}`);
 
     // =====================================================================
     // Step 2: Call embedding.tes_build for an item (sanity)
@@ -174,8 +182,16 @@ async function main() {
             bodyPreview: String(itemResp.raw || "").slice(0, 500),
         });
     }
+    const meta2 = itemResp.body && itemResp.body.meta;
+    if (!meta2 || typeof meta2 !== "object" || meta2.backend !== "st_v1") {
+        fail("item response.meta.backend must be st_v1", {
+            url: itemTesBuildUrl,
+            status: itemResp.status,
+            bodyPreview: String(itemResp.raw || "").slice(0, 500),
+        });
+    }
 
-    console.log(`  HTTP ${itemResp.status} OK — item vector dim=${itemVector.length}`);
+    console.log(`  HTTP ${itemResp.status} OK — item vector dim=${itemVector.length}, backend=${meta2.backend}`);
 
     // =====================================================================
     // Summary

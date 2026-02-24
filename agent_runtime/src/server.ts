@@ -11,7 +11,7 @@
 import http from "node:http";
 import { createOrchestrator } from "./core/bootstrap";
 
-const PORT = Number(process.env.AGENT_SERVER_PORT ?? 8787);
+const PORT = Number(process.env.PORT ?? process.env.AGENT_SERVER_PORT ?? 8787);
 
 const gatewayBaseUrl = process.env.GATEWAY_BASE_URL ?? "http://localhost:8080";
 const timeoutMs = process.env.GATEWAY_TIMEOUT_MS

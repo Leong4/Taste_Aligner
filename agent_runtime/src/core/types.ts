@@ -240,6 +240,7 @@ export interface MemorySignalOutput {
 /** Input to the tes_builder skill. */
 export interface TesBuilderInput {
     anchor_tags?: string[];
+    normalized_tags?: string[];
     request_ts?: number | string;
     user_city?: string;
     decision_trace?: Record<string, unknown>;
@@ -252,14 +253,18 @@ export interface TesBuilderDecisionTrace extends Record<string, unknown> {
     request_ts: number;
     input_summary: {
         anchor_tag_count: number;
+        normalized_tag_count?: number;
         first_5_tags: string[];
     };
+    tag_source?: "anchor_tags" | "normalized_tags_fallback" | "none";
     tool: {
         name: string;
         endpoint: string;
     };
     backend: string;
     tes_version: string;
+    model_id?: string | null;
+    device?: string;
     latency_ms: number;
     vector_checks: {
         dim_expected: 512;
@@ -314,6 +319,8 @@ export interface RerankInput {
     tes_normalized?: boolean;
     /** Whether the tes_builder indicated fallback. */
     tes_fallback_used?: boolean;
+    /** TES backend identity from tes_builder trace/output. */
+    tes_backend?: string;
 }
 
 /** Decision trace for TES-driven rerank. */
@@ -342,6 +349,7 @@ export interface RerankTesDecisionTrace extends Record<string, unknown> {
         cz_count: number;
         ez_count: number;
     };
+    tes_backend?: string;
     fallback_used: boolean;
     fallback_reason?: "no_user_tes" | "zero_budget" | "no_candidates";
     latency_ms?: number;
