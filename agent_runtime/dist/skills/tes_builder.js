@@ -72,15 +72,18 @@ function computeNorm(vector) {
     }
     return Math.sqrt(sum);
 }
-function buildTrace(requestTs, inputTags, latencyMs, vectorChecks, fallbackUsed, fallbackReason, errorMessage, backend, tesVersion) {
+function buildTrace(requestTs, usedTags, anchorTagCount, normalizedTagCount, visionFeaturesCount, tagSource, latencyMs, vectorChecks, fallbackUsed, fallbackReason, errorMessage, backend, tesVersion, modelId, device) {
     const trace = {
         rule_id: RULE_ID,
         schema_version: SCHEMA_VERSION,
         request_ts: requestTs,
         input_summary: {
-            anchor_tag_count: inputTags.length,
-            first_5_tags: inputTags.slice(0, 5),
+            anchor_tag_count: anchorTagCount,
+            normalized_tag_count: normalizedTagCount,
+            vision_features_count: visionFeaturesCount,
+            first_5_tags: usedTags.slice(0, 5),
         },
+        tag_source: tagSource,
         tool: {
             name: TOOL_NAME,
             endpoint: TOOL_ENDPOINT,
@@ -94,19 +97,25 @@ function buildTrace(requestTs, inputTags, latencyMs, vectorChecks, fallbackUsed,
     if (fallbackReason !== undefined) {
         trace.fallback_reason = fallbackReason;
     }
+    if (modelId !== undefined) {
+        trace.model_id = modelId;
+    }
+    if (device !== undefined) {
+        trace.device = device;
+    }
     if (errorMessage) {
         trace.error_message = errorMessage;
     }
     return trace;
 }
-function buildFallbackOutput(reason, requestTs, inputTags, latencyMs, errorMessage, upstreamDecisionTrace) {
+function buildFallbackOutput(reason, requestTs, inputTags, anchorTagCount, normalizedTagCount, visionFeaturesCount, tagSource, latencyMs, errorMessage, upstreamDecisionTrace) {
     const zero = createZeroVector();
-    const traceNode = buildTrace(requestTs, inputTags, latencyMs, {
+    const traceNode = buildTrace(requestTs, inputTags, anchorTagCount, normalizedTagCount, visionFeaturesCount, tagSource, latencyMs, {
         dim_expected: DIM_EXPECTED,
         dim_actual: DIM_EXPECTED,
         finite: true,
         norm: 0,
-    }, true, reason, errorMessage, "unknown", "unknown");
+    }, true, reason, errorMessage, "unknown", "unknown", null, "unknown");
     const mergedDecisionTrace = (0, trace_manager_1.deepMergeTrace)(upstreamDecisionTrace ?? {}, { tes_builder: traceNode });
     const output = {
         tes_vector: zero,
@@ -126,9 +135,9 @@ function createTesBuilderSkill(toolClient) {
     return {
         name: "tes_builder",
         inputSchema: {
-            description: "Build TES vector from memory_signal anchor tags",
-            required: ["anchor_tags"],
-            optional: ["request_ts", "user_city", "decision_trace"],
+            description: "Build TES vector from memory_signal anchor tags and optional vision features",
+            required: [],
+            optional: ["anchor_tags", "normalized_tags", "vision_features", "request_ts", "user_city", "decision_trace"],
         },
         outputSchema: {
             description: "Validated TES vector and trace",
@@ -147,10 +156,16 @@ function createTesBuilderSkill(toolClient) {
         },
         async execute(input, context) {
             const anchorTags = normalizeAnchorTags(input.anchor_tags);
+            const normalizedTags = normalizeAnchorTags(input.normalized_tags);
+            const visionFeatures = normalizeAnchorTags(input.vision_features);
+            const tagsForTes = anchorTags.length > 0 ? anchorTags : normalizedTags;
+            const tagSource = anchorTags.length > 0
+                ? "anchor_tags"
+                : (normalizedTags.length > 0 ? "normalized_tags_fallback" : "none");
             const requestTs = resolveRequestTs(input.request_ts, context);
             const upstreamDecisionTrace = asObject(input.decision_trace) ?? {};
-            if (anchorTags.length === 0) {
-                return buildFallbackOutput("no_tags", requestTs, anchorTags, 0, "", upstreamDecisionTrace);
+            if (tagsForTes.length === 0 && visionFeatures.length === 0) {
+                return buildFallbackOutput("no_tags", requestTs, tagsForTes, anchorTags.length, normalizedTags.length, 0, tagSource, 0, "", upstreamDecisionTrace);
             }
             const startedAt = Date.now();
             let observation;
@@ -158,26 +173,23 @@ function createTesBuilderSkill(toolClient) {
                 observation = await toolClient.call({
                     tool: TOOL_NAME,
                     input: {
-                        data: {
-                            vision_tags: [],
-                            normalized_tags: anchorTags,
-                            emotion: null,
-                            recency_days: null,
-                        },
+                        vision_features: visionFeatures,
+                        tags: tagsForTes,
+                        normalize: true,
                     },
                 });
             }
             catch (error) {
                 const message = error instanceof Error ? error.message : String(error);
-                return buildFallbackOutput("tool_error", requestTs, anchorTags, Date.now() - startedAt, message, upstreamDecisionTrace);
+                return buildFallbackOutput("tool_error", requestTs, tagsForTes, anchorTags.length, normalizedTags.length, visionFeatures.length, tagSource, Date.now() - startedAt, message, upstreamDecisionTrace);
             }
             try {
                 if (!observation.ok) {
-                    return buildFallbackOutput("tool_error", requestTs, anchorTags, observation.latency_ms ?? (Date.now() - startedAt), observation.error?.message ?? "gateway_call_failed", upstreamDecisionTrace);
+                    return buildFallbackOutput("tool_error", requestTs, tagsForTes, anchorTags.length, normalizedTags.length, visionFeatures.length, tagSource, observation.latency_ms ?? (Date.now() - startedAt), observation.error?.message ?? "gateway_call_failed", upstreamDecisionTrace);
                 }
                 const payload = asObject(observation.output);
                 if (!payload) {
-                    return buildFallbackOutput("invalid_output", requestTs, anchorTags, observation.latency_ms ?? (Date.now() - startedAt), "response_not_object", upstreamDecisionTrace);
+                    return buildFallbackOutput("invalid_output", requestTs, tagsForTes, anchorTags.length, normalizedTags.length, visionFeatures.length, tagSource, observation.latency_ms ?? (Date.now() - startedAt), "response_not_object", upstreamDecisionTrace);
                 }
                 const vectorRaw = payload.vector;
                 const dimRaw = Number(payload.dim);
@@ -185,14 +197,18 @@ function createTesBuilderSkill(toolClient) {
                 const meta = asObject(payload.meta);
                 const backend = typeof meta?.backend === "string" ? meta.backend : "unknown";
                 const tesVersion = typeof meta?.tes_version === "string" ? meta.tes_version : "unknown";
+                const modelId = typeof meta?.model_id === "string" || meta?.model_id === null
+                    ? meta.model_id
+                    : null;
+                const device = typeof meta?.device === "string" ? meta.device : "unknown";
                 if (!Array.isArray(vectorRaw) || !Number.isFinite(dimRaw) || typeof normalizedRaw !== "boolean") {
-                    return buildFallbackOutput("invalid_output", requestTs, anchorTags, observation.latency_ms ?? (Date.now() - startedAt), "missing_or_invalid_vector_fields", upstreamDecisionTrace);
+                    return buildFallbackOutput("invalid_output", requestTs, tagsForTes, anchorTags.length, normalizedTags.length, visionFeatures.length, tagSource, observation.latency_ms ?? (Date.now() - startedAt), "missing_or_invalid_vector_fields", upstreamDecisionTrace);
                 }
                 const vector = vectorRaw;
                 const dimActual = vector.length;
                 const finite = vector.every((v) => typeof v === "number" && Number.isFinite(v));
                 if (!finite) {
-                    return buildFallbackOutput("invalid_vector", requestTs, anchorTags, observation.latency_ms ?? (Date.now() - startedAt), "vector_contains_non_finite", upstreamDecisionTrace);
+                    return buildFallbackOutput("invalid_vector", requestTs, tagsForTes, anchorTags.length, normalizedTags.length, visionFeatures.length, tagSource, observation.latency_ms ?? (Date.now() - startedAt), "vector_contains_non_finite", upstreamDecisionTrace);
                 }
                 const numericVector = vector;
                 const norm = computeNorm(numericVector);
@@ -203,14 +219,14 @@ function createTesBuilderSkill(toolClient) {
                     norm < NORM_LOWER ||
                     norm > NORM_UPPER;
                 if (invalidVector) {
-                    return buildFallbackOutput("invalid_vector", requestTs, anchorTags, observation.latency_ms ?? (Date.now() - startedAt), "vector_validation_failed", upstreamDecisionTrace);
+                    return buildFallbackOutput("invalid_vector", requestTs, tagsForTes, anchorTags.length, normalizedTags.length, visionFeatures.length, tagSource, observation.latency_ms ?? (Date.now() - startedAt), "vector_validation_failed", upstreamDecisionTrace);
                 }
-                const traceNode = buildTrace(requestTs, anchorTags, observation.latency_ms ?? (Date.now() - startedAt), {
+                const traceNode = buildTrace(requestTs, tagsForTes, anchorTags.length, normalizedTags.length, visionFeatures.length, tagSource, observation.latency_ms ?? (Date.now() - startedAt), {
                     dim_expected: DIM_EXPECTED,
                     dim_actual: dimActual,
                     finite,
                     norm,
-                }, false, undefined, "", backend, tesVersion);
+                }, false, undefined, "", backend, tesVersion, modelId, device);
                 const mergedDecisionTrace = (0, trace_manager_1.deepMergeTrace)(upstreamDecisionTrace, { tes_builder: traceNode });
                 const output = {
                     tes_vector: numericVector,
@@ -218,8 +234,8 @@ function createTesBuilderSkill(toolClient) {
                     normalized: true,
                     backend,
                     tes_version: tesVersion,
-                    input_anchor_tags: anchorTags,
-                    used_anchor_tags: anchorTags,
+                    input_anchor_tags: tagsForTes,
+                    used_anchor_tags: tagsForTes,
                     fallback_used: false,
                     decision_trace: mergedDecisionTrace,
                 };
@@ -227,7 +243,7 @@ function createTesBuilderSkill(toolClient) {
             }
             catch (error) {
                 const message = error instanceof Error ? error.message : String(error);
-                return buildFallbackOutput("invalid_output", requestTs, anchorTags, observation.latency_ms ?? (Date.now() - startedAt), message, upstreamDecisionTrace);
+                return buildFallbackOutput("invalid_output", requestTs, tagsForTes, anchorTags.length, normalizedTags.length, visionFeatures.length, tagSource, observation.latency_ms ?? (Date.now() - startedAt), message, upstreamDecisionTrace);
             }
         },
     };

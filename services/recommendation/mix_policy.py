@@ -16,10 +16,7 @@ v1.1 Changes:
 from typing import Dict, Any, List, Optional
 import logging
 
-try:
-    from .config import T_HIGH, T_MID
-except ImportError:
-    from config import T_HIGH, T_MID
+from .config import T_HIGH, T_MID
 
 logger = logging.getLogger(__name__)
 

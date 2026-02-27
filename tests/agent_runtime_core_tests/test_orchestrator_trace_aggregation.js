@@ -7,24 +7,9 @@
  */
 
 const assert = require("assert");
-const path = require("path");
+const { loadCore } = require("./_load_src_runtime");
 
-let SkillRegistry;
-let Orchestrator;
-
-try {
-  require("ts-node").register({
-    project: path.join(__dirname, "../../agent_runtime/tsconfig.json"),
-    transpileOnly: true,
-  });
-  const core = require("../../agent_runtime/src/core");
-  SkillRegistry = core.SkillRegistry;
-  Orchestrator = core.Orchestrator;
-} catch (_e) {
-  const core = require("../../agent_runtime/dist/core");
-  SkillRegistry = core.SkillRegistry;
-  Orchestrator = core.Orchestrator;
-}
+const { SkillRegistry, Orchestrator } = loadCore();
 
 let passed = 0;
 let failed = 0;

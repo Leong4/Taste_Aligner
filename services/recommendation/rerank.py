@@ -31,31 +31,21 @@ from typing import List, Dict, Any, Optional, Tuple
 import logging
 import re
 
-try:
-    from .config import (
-        CZ_ALPHA, CZ_BETA, CZ_GAMMA,
-        EZ_MU, EZ_NU, SIM_CAP, EZ_TASTE_DISTANCE_MAX,
-        TOP_K_CZ, TOP_K_EZ,
-        MEMORY_INFLUENCE_BASE_WEIGHT,
-        EZ_DIVERSITY_ENABLED, EZ_DIVERSITY_METHOD, EZ_LAMBDA_DIVERSITY,
-        MEM_INFLUENCE_MODE, MEM_BETA
-    )
-    from .embedding_client import generate_embedding_with_error
-    from .db import get_item_embedding, upsert_item_embedding
-except ImportError:
-    from config import (
-        CZ_ALPHA, CZ_BETA, CZ_GAMMA,
-        EZ_MU, EZ_NU, SIM_CAP, EZ_TASTE_DISTANCE_MAX,
-        TOP_K_CZ, TOP_K_EZ,
-        MEMORY_INFLUENCE_BASE_WEIGHT,
-        EZ_DIVERSITY_ENABLED, EZ_DIVERSITY_METHOD, EZ_LAMBDA_DIVERSITY,
-        MEM_INFLUENCE_MODE, MEM_BETA
-    )
-    from embedding_client import generate_embedding_with_error
-    from db import get_item_embedding, upsert_item_embedding
+from .config import (
+    CZ_ALPHA, CZ_BETA, CZ_GAMMA,
+    EZ_MU, EZ_NU, SIM_CAP, EZ_TASTE_DISTANCE_MAX,
+    TOP_K_CZ, TOP_K_EZ,
+    MEMORY_INFLUENCE_BASE_WEIGHT,
+    EZ_DIVERSITY_ENABLED, EZ_DIVERSITY_METHOD, EZ_LAMBDA_DIVERSITY,
+    MEM_INFLUENCE_MODE, MEM_BETA
+)
+from .embedding_client import generate_embedding_with_error
+from .db import get_item_embedding, upsert_item_embedding
+from .number_safety import ensure_finite_float
 
 logger = logging.getLogger(__name__)
 TRACE_REJECT_SAMPLE_LIMIT = 50
+NON_FINITE_SAMPLE_LIMIT = 20
 
 
 def cosine_similarity(vec1: List[float], vec2: List[float]) -> float:
@@ -309,7 +299,8 @@ def score_cz_item(
     item: Dict[str, Any],
     user_city: str,
     user_tags: List[str],
-    user_id: str
+    user_id: str,
+    finite_guard: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
     """
     Compute Comfort Zone (CZ) score with explainability.
@@ -347,11 +338,45 @@ def score_cz_item(
         {"user_city": user_city, "user_tags": user_tags, "user_id": user_id},
         item
     )
-    score_cz = compute_cz_score(components)
-    tag_sim = components["tag_similarity"]
-    memory_inf = components["memory_influence"]
-    memory_sim = components["memory_similarity"]
-    location_rel = components["location_relevance"]
+    finite_guard = finite_guard or {}
+    finite_guard.setdefault("sample_limit", NON_FINITE_SAMPLE_LIMIT)
+
+    score_cz = ensure_finite_float(
+        compute_cz_score(components),
+        item_id=str(item_id),
+        field="score_CZ",
+        counters=finite_guard
+    )
+    tag_sim = ensure_finite_float(
+        components["tag_similarity"],
+        item_id=str(item_id),
+        field="components.tag_similarity",
+        counters=finite_guard
+    )
+    memory_inf = ensure_finite_float(
+        components["memory_influence"],
+        item_id=str(item_id),
+        field="components.memory_influence",
+        counters=finite_guard
+    )
+    memory_sim = ensure_finite_float(
+        components["memory_similarity"],
+        item_id=str(item_id),
+        field="components.memory_similarity",
+        counters=finite_guard
+    )
+    location_rel = ensure_finite_float(
+        components["location_relevance"],
+        item_id=str(item_id),
+        field="components.location_relevance",
+        counters=finite_guard
+    )
+    excellence = ensure_finite_float(
+        item.get("excellence", 0.0),
+        item_id=str(item_id),
+        field="excellence",
+        counters=finite_guard
+    )
     memory_inf_data = components["memory_influence_detail"]
 
     # Generate reason string
@@ -362,7 +387,7 @@ def score_cz_item(
         "city": item_city,
         "title": item.get("title", ""),
         "tags": item_tags,
-        "excellence": item.get("excellence", 0.0),
+        "excellence": round(excellence, 4),
         "score_CZ": round(score_cz, 4),
         "components": {
             "tag_similarity": round(tag_sim, 4),
@@ -386,7 +411,8 @@ def score_ez_item(
     item: Dict[str, Any],
     user_city: str,
     user_tags: List[str],
-    user_id: str
+    user_id: str,
+    finite_guard: Optional[Dict[str, Any]] = None
 ) -> Tuple[Optional[Dict[str, Any]], Optional[str]]:
     """
     Compute Exploration Zone (EZ) score with explainability.
@@ -414,7 +440,14 @@ def score_ez_item(
     """
     item_id = item.get("id")
     item_tags = item.get("tags", [])
-    excellence = item.get("excellence", 0.0)
+    finite_guard = finite_guard or {}
+    finite_guard.setdefault("sample_limit", NON_FINITE_SAMPLE_LIMIT)
+    excellence = ensure_finite_float(
+        item.get("excellence", 0.0),
+        item_id=str(item_id),
+        field="excellence",
+        counters=finite_guard
+    )
 
     # Check if tags are empty (excellence fallback mode)
     tags_empty = not user_tags or all(not tag.strip() for tag in user_tags)
@@ -431,29 +464,55 @@ def score_ez_item(
             EZ_MU * excellence +
             EZ_NU * taste_distance
         )
+        score_ez = ensure_finite_float(
+            score_ez,
+            item_id=str(item_id),
+            field="score_EZ",
+            counters=finite_guard
+        )
 
         logger.debug(f"EZ excellence fallback for {item_id}: score={score_ez:.4f}")
     else:
         # Normal EZ scoring with taste_distance
         # Compute taste similarity (using tags for now)
-        taste_sim_raw = compute_tag_similarity(item_tags, user_tags)
+        taste_sim_raw = ensure_finite_float(
+            compute_tag_similarity(item_tags, user_tags),
+            item_id=str(item_id),
+            field="components.taste_similarity_raw",
+            counters=finite_guard
+        )
 
         # Apply similarity cap (v1.1)
-        taste_sim_capped = min(taste_sim_raw, SIM_CAP)
+        taste_sim_capped = ensure_finite_float(
+            min(taste_sim_raw, SIM_CAP),
+            item_id=str(item_id),
+            field="components.taste_similarity_capped",
+            counters=finite_guard
+        )
 
         # Compute taste distance
-        taste_distance = 1.0 - taste_sim_capped
+        taste_distance = ensure_finite_float(
+            1.0 - taste_sim_capped,
+            item_id=str(item_id),
+            field="components.taste_distance",
+            counters=finite_guard
+        )
 
         # Filter: taste_distance must be reasonable (skip if tags empty)
         if taste_distance > EZ_TASTE_DISTANCE_MAX:
             return None, "taste_distance_too_high"
 
         # Final EZ score (v1.1: increased ν weight)
-        score_ez = compute_ez_score(
+        score_ez = ensure_finite_float(
+            compute_ez_score(
             {
                 "global_excellence": excellence,
                 "taste_distance": taste_distance
             }
+            ),
+            item_id=str(item_id),
+            field="score_EZ",
+            counters=finite_guard
         )
 
     # Generate reason
@@ -483,7 +542,15 @@ def score_ez_item(
             "taste_similarity_raw": round(taste_sim_raw, 4),
             "taste_similarity_capped": round(taste_sim_capped, 4),
             "taste_distance": round(taste_distance, 4),
-            "distance_contrib": round(EZ_NU * taste_distance, 4)
+            "distance_contrib": round(
+                ensure_finite_float(
+                    EZ_NU * taste_distance,
+                    item_id=str(item_id),
+                    field="components.distance_contrib",
+                    counters=finite_guard
+                ),
+                4
+            )
         },
         "weights": {
             "mu": EZ_MU,
@@ -664,6 +731,11 @@ def rerank_candidates(
 
     cz_scored = []
     ez_scored = []
+    finite_guard: Dict[str, Any] = {
+        "non_finite_count": 0,
+        "sample_fields": [],
+        "sample_limit": NON_FINITE_SAMPLE_LIMIT
+    }
     ez_filter_reasons: Dict[str, int] = {
         "taste_distance_too_high": 0,
         "other": 0
@@ -714,7 +786,7 @@ def rerank_candidates(
 
     # Rerank CZ candidates (using filtered list)
     for item in cz_filtered:
-        cz_result = score_cz_item(item, user_city, user_tags, user_id)
+        cz_result = score_cz_item(item, user_city, user_tags, user_id, finite_guard=finite_guard)
         mem_detail = cz_result.get("memory_influence_detail", {})
         if mem_detail.get("method") == "embedding_cosine":
             embedding_ok_count += 1
@@ -726,7 +798,13 @@ def rerank_candidates(
 
     # Rerank EZ candidates
     for item in ez_candidates:
-        ez_result, filter_reason = score_ez_item(item, user_city, user_tags, user_id)
+        ez_result, filter_reason = score_ez_item(
+            item,
+            user_city,
+            user_tags,
+            user_id,
+            finite_guard=finite_guard
+        )
         if ez_result is not None:  # May be filtered by taste_distance
             ez_scored.append(ez_result)
         else:
@@ -736,7 +814,16 @@ def rerank_candidates(
                 ez_filter_reasons["other"] += 1
 
     # Sort CZ by score_CZ DESC
-    cz_ranked = sorted(cz_scored, key=lambda x: x["score_CZ"], reverse=True)
+    cz_ranked = sorted(
+        cz_scored,
+        key=lambda x: ensure_finite_float(
+            x.get("score_CZ", 0.0),
+            item_id=str(x.get("id", "")),
+            field="sort.score_CZ",
+            counters=finite_guard
+        ),
+        reverse=True
+    )
     cz_ranked = cz_ranked[:TOP_K_CZ]
 
     # Sort EZ by score_EZ DESC or apply diversity rerank when tags=[]
@@ -750,7 +837,16 @@ def rerank_candidates(
     if diversity_enabled:
         ez_ranked, diversity_trace = apply_mmr_diversity(ez_scored, TOP_K_EZ, EZ_LAMBDA_DIVERSITY)
     else:
-        ez_ranked = sorted(ez_scored, key=lambda x: x["score_EZ"], reverse=True)
+        ez_ranked = sorted(
+            ez_scored,
+            key=lambda x: ensure_finite_float(
+                x.get("score_EZ", 0.0),
+                item_id=str(x.get("id", "")),
+                field="sort.score_EZ",
+                counters=finite_guard
+            ),
+            reverse=True
+        )
         ez_ranked = ez_ranked[:TOP_K_EZ]
 
     logger.info(
@@ -804,6 +900,9 @@ def rerank_candidates(
             "embedding_ok_count": embedding_ok_count,
             "embedding_fail_count": embedding_fail_count,
             "embedding_last_error": embedding_last_error
+            ,
+            "non_finite_sanitized_count": finite_guard["non_finite_count"],
+            "non_finite_sanitized_fields": finite_guard["sample_fields"]
         },
         "decision_trace": {
             "rule_id": "rerank_v1_3",
@@ -823,6 +922,10 @@ def rerank_candidates(
                 "ez_taste_distance_max": EZ_TASTE_DISTANCE_MAX,
                 "top_k_cz": TOP_K_CZ,
                 "top_k_ez": TOP_K_EZ
+            },
+            "non_finite_guard": {
+                "sanitized_non_finite_count": finite_guard["non_finite_count"],
+                "sanitized_fields_sample": finite_guard["sample_fields"]
             }
         }
     }

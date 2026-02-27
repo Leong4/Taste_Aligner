@@ -1,0 +1,180 @@
+INFO:     Started server process [56642]
+INFO:     Waiting for application startup.
+2026-02-26 05:54:22,659 - services.recommendation.main - INFO - Recommendation Service v1.3 started on port 5005
+2026-02-26 05:54:22,665 - services.recommendation.db - INFO - Title sanitization: changed=0 (db_update)
+2026-02-26 05:54:22,665 - services.recommendation.db - INFO - Title sanitization verification: PASS, remaining_modena_titles=0
+2026-02-26 05:54:22,667 - services.recommendation.main - INFO - Database: 37 items across 3 cities
+2026-02-26 05:54:22,667 - services.recommendation.main - INFO - City distribution: {'milan': 11, 'paris': 11, 'tokyo': 15}
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:5005 (Press CTRL+C to quit)
+INFO:     127.0.0.1:59516 - "GET /health HTTP/1.1" 200 OK
+2026-02-26 05:54:31,128 - services.recommendation.main - INFO - [t_00823096] POST /score - user_id=u001, city=tokyo, tags=['ramen', 'food'], intent=balanced, memory_confidence=0.7
+2026-02-26 05:54:31,128 - services.recommendation.main - INFO - [t_00823096] Stage 1: Recall (CZ city-only, EZ global)
+2026-02-26 05:54:31,136 - services.recommendation.db - INFO - Loaded 15 items for city: tokyo
+2026-02-26 05:54:31,136 - services.recommendation.db - INFO - Title sanitization: changed=0 (city=tokyo)
+2026-02-26 05:54:31,136 - services.recommendation.recall - INFO - Recall: CZ=15 (city-only), EZ=13 (city-only, excellence >= 0.8)
+2026-02-26 05:54:31,136 - services.recommendation.main - INFO - [t_00823096] Recall: CZ=15 (city-only), EZ=13 (global)
+2026-02-26 05:54:31,136 - services.recommendation.main - INFO - [t_00823096] Stage 2: Rerank (v1.3)
+2026-02-26 05:54:31,175 - services.recommendation.rerank - INFO - Rerank: 10 CZ items (filtered 15 → 15), 0 EZ items
+2026-02-26 05:54:31,175 - services.recommendation.rerank - INFO - Top 5 CZ memory_influence: [1.1741, 1.1693, 1.1648, 1.1633, 1.1936]
+2026-02-26 05:54:31,175 - services.recommendation.main - INFO - [t_00823096] Rerank: 10 CZ, 0 EZ
+2026-02-26 05:54:31,175 - services.recommendation.mix_policy - INFO - Mix policy: 3 CZ + 0 EZ (ratio=3:0, rule=only_cz_available, delta=inf, intent=balanced, mem_conf=0.70)
+2026-02-26 05:54:31,175 - services.recommendation.main - INFO - [t_00823096] Mix policy: only_cz_available (ratio=3:0, conf=1.00)
+2026-02-26 05:54:31,175 - services.recommendation.main - INFO - [t_00823096] Non-finite response fields sanitized count=3 sample=['mix_policy.inputs_used.delta', 'mix_policy.delta', 'decision_trace.mix_policy.components.delta']
+2026-02-26 05:54:31,175 - services.recommendation.main - INFO - [t_00823096] Response ready
+INFO:     127.0.0.1:59546 - "POST /score HTTP/1.1" 200 OK
+2026-02-26 05:54:31,254 - services.recommendation.main - INFO - [t_612bba20] POST /score - user_id=u001, city=tokyo, tags=['ramen'], intent=None, memory_confidence=None
+2026-02-26 05:54:31,254 - services.recommendation.main - INFO - [t_612bba20] Stage 1: Recall (CZ city-only, EZ global)
+2026-02-26 05:54:31,256 - services.recommendation.db - INFO - Loaded 15 items for city: tokyo
+2026-02-26 05:54:31,256 - services.recommendation.db - INFO - Title sanitization: changed=0 (city=tokyo)
+2026-02-26 05:54:31,256 - services.recommendation.recall - INFO - Recall: CZ=15 (city-only), EZ=13 (city-only, excellence >= 0.8)
+2026-02-26 05:54:31,256 - services.recommendation.main - INFO - [t_612bba20] Recall: CZ=15 (city-only), EZ=13 (global)
+2026-02-26 05:54:31,256 - services.recommendation.main - INFO - [t_612bba20] Stage 2: Rerank (v1.3)
+2026-02-26 05:54:31,290 - services.recommendation.rerank - INFO - Rerank: 10 CZ items (filtered 15 → 15), 0 EZ items
+2026-02-26 05:54:31,290 - services.recommendation.rerank - INFO - Top 5 CZ memory_influence: [1.1871, 1.1859, 1.1851, 1.1933, 1.1693]
+2026-02-26 05:54:31,290 - services.recommendation.main - INFO - [t_612bba20] Rerank: 10 CZ, 0 EZ
+2026-02-26 05:54:31,290 - services.recommendation.mix_policy - INFO - Mix policy: 3 CZ + 0 EZ (ratio=3:0, rule=only_cz_available, delta=inf, intent=balanced, mem_conf=0.50)
+2026-02-26 05:54:31,290 - services.recommendation.main - INFO - [t_612bba20] Mix policy: only_cz_available (ratio=3:0, conf=1.00)
+2026-02-26 05:54:31,290 - services.recommendation.main - INFO - [t_612bba20] Non-finite response fields sanitized count=3 sample=['mix_policy.inputs_used.delta', 'mix_policy.delta', 'decision_trace.mix_policy.components.delta']
+2026-02-26 05:54:31,290 - services.recommendation.main - INFO - [t_612bba20] Response ready
+INFO:     127.0.0.1:59582 - "POST /score HTTP/1.1" 200 OK
+2026-02-26 05:54:31,355 - services.recommendation.main - INFO - [t_44273382] POST /score - user_id=u001, city=tokyo, tags=['ramen'], intent=balanced, memory_confidence=0.0
+2026-02-26 05:54:31,355 - services.recommendation.main - INFO - [t_44273382] Stage 1: Recall (CZ city-only, EZ global)
+2026-02-26 05:54:31,357 - services.recommendation.db - INFO - Loaded 15 items for city: tokyo
+2026-02-26 05:54:31,357 - services.recommendation.db - INFO - Title sanitization: changed=0 (city=tokyo)
+2026-02-26 05:54:31,357 - services.recommendation.recall - INFO - Recall: CZ=15 (city-only), EZ=13 (city-only, excellence >= 0.8)
+2026-02-26 05:54:31,357 - services.recommendation.main - INFO - [t_44273382] Recall: CZ=15 (city-only), EZ=13 (global)
+2026-02-26 05:54:31,357 - services.recommendation.main - INFO - [t_44273382] Stage 2: Rerank (v1.3)
+2026-02-26 05:54:31,396 - services.recommendation.rerank - INFO - Rerank: 10 CZ items (filtered 15 → 15), 0 EZ items
+2026-02-26 05:54:31,396 - services.recommendation.rerank - INFO - Top 5 CZ memory_influence: [1.1871, 1.1859, 1.1851, 1.1933, 1.1693]
+2026-02-26 05:54:31,396 - services.recommendation.main - INFO - [t_44273382] Rerank: 10 CZ, 0 EZ
+2026-02-26 05:54:31,396 - services.recommendation.mix_policy - INFO - Mix policy: 3 CZ + 0 EZ (ratio=3:0, rule=only_cz_available, delta=inf, intent=balanced, mem_conf=0.00)
+2026-02-26 05:54:31,396 - services.recommendation.main - INFO - [t_44273382] Mix policy: only_cz_available (ratio=3:0, conf=1.00)
+2026-02-26 05:54:31,396 - services.recommendation.main - INFO - [t_44273382] Non-finite response fields sanitized count=3 sample=['mix_policy.inputs_used.delta', 'mix_policy.delta', 'decision_trace.mix_policy.components.delta']
+2026-02-26 05:54:31,396 - services.recommendation.main - INFO - [t_44273382] Response ready
+INFO:     127.0.0.1:59546 - "POST /score HTTP/1.1" 200 OK
+2026-02-26 05:54:31,506 - services.recommendation.main - INFO - [t_59267171] POST /score - user_id=u001, city=tokyo, tags=['food', 'ramen'], intent=None, memory_confidence=None
+2026-02-26 05:54:31,506 - services.recommendation.main - INFO - [t_59267171] Stage 1: Recall (CZ city-only, EZ global)
+2026-02-26 05:54:31,508 - services.recommendation.db - INFO - Loaded 15 items for city: tokyo
+2026-02-26 05:54:31,508 - services.recommendation.db - INFO - Title sanitization: changed=0 (city=tokyo)
+2026-02-26 05:54:31,508 - services.recommendation.recall - INFO - Recall: CZ=15 (city-only), EZ=13 (city-only, excellence >= 0.8)
+2026-02-26 05:54:31,508 - services.recommendation.main - INFO - [t_59267171] Recall: CZ=15 (city-only), EZ=13 (global)
+2026-02-26 05:54:31,508 - services.recommendation.main - INFO - [t_59267171] Stage 2: Rerank (v1.3)
+2026-02-26 05:54:31,546 - services.recommendation.rerank - INFO - Rerank: 10 CZ items (filtered 15 → 15), 0 EZ items
+2026-02-26 05:54:31,546 - services.recommendation.rerank - INFO - Top 5 CZ memory_influence: [1.1741, 1.1693, 1.1648, 1.1633, 1.1936]
+2026-02-26 05:54:31,546 - services.recommendation.main - INFO - [t_59267171] Rerank: 10 CZ, 0 EZ
+2026-02-26 05:54:31,546 - services.recommendation.mix_policy - INFO - Mix policy: 3 CZ + 0 EZ (ratio=3:0, rule=only_cz_available, delta=inf, intent=balanced, mem_conf=0.50)
+2026-02-26 05:54:31,546 - services.recommendation.main - INFO - [t_59267171] Mix policy: only_cz_available (ratio=3:0, conf=1.00)
+2026-02-26 05:54:31,546 - services.recommendation.main - INFO - [t_59267171] Non-finite response fields sanitized count=3 sample=['mix_policy.inputs_used.delta', 'mix_policy.delta', 'decision_trace.mix_policy.components.delta']
+2026-02-26 05:54:31,546 - services.recommendation.main - INFO - [t_59267171] Response ready
+INFO:     127.0.0.1:59651 - "POST /score HTTP/1.1" 200 OK
+2026-02-26 05:54:31,708 - services.recommendation.main - INFO - [t_c5e95b59] POST /score - user_id=u001, city=tokyo, tags=['ramen'], intent=balanced, memory_confidence=0.0
+2026-02-26 05:54:31,708 - services.recommendation.main - INFO - [t_c5e95b59] Stage 1: Recall (CZ city-only, EZ global)
+2026-02-26 05:54:31,711 - services.recommendation.db - INFO - Loaded 15 items for city: tokyo
+2026-02-26 05:54:31,711 - services.recommendation.db - INFO - Title sanitization: changed=0 (city=tokyo)
+2026-02-26 05:54:31,711 - services.recommendation.recall - INFO - Recall: CZ=15 (city-only), EZ=13 (city-only, excellence >= 0.8)
+2026-02-26 05:54:31,711 - services.recommendation.main - INFO - [t_c5e95b59] Recall: CZ=15 (city-only), EZ=13 (global)
+2026-02-26 05:54:31,711 - services.recommendation.main - INFO - [t_c5e95b59] Stage 2: Rerank (v1.3)
+2026-02-26 05:54:31,747 - services.recommendation.rerank - INFO - Rerank: 10 CZ items (filtered 15 → 15), 0 EZ items
+2026-02-26 05:54:31,747 - services.recommendation.rerank - INFO - Top 5 CZ memory_influence: [1.1871, 1.1859, 1.1851, 1.1933, 1.1693]
+2026-02-26 05:54:31,747 - services.recommendation.main - INFO - [t_c5e95b59] Rerank: 10 CZ, 0 EZ
+2026-02-26 05:54:31,747 - services.recommendation.mix_policy - INFO - Mix policy: 3 CZ + 0 EZ (ratio=3:0, rule=only_cz_available, delta=inf, intent=balanced, mem_conf=0.00)
+2026-02-26 05:54:31,747 - services.recommendation.main - INFO - [t_c5e95b59] Mix policy: only_cz_available (ratio=3:0, conf=1.00)
+2026-02-26 05:54:31,747 - services.recommendation.main - INFO - [t_c5e95b59] Non-finite response fields sanitized count=3 sample=['mix_policy.inputs_used.delta', 'mix_policy.delta', 'decision_trace.mix_policy.components.delta']
+2026-02-26 05:54:31,747 - services.recommendation.main - INFO - [t_c5e95b59] Response ready
+INFO:     127.0.0.1:59546 - "POST /score HTTP/1.1" 200 OK
+2026-02-26 05:54:31,792 - services.recommendation.main - INFO - [t_2a4176d6] POST /score - user_id=u001, city=tokyo, tags=['food', 'ramen'], intent=None, memory_confidence=None
+2026-02-26 05:54:31,792 - services.recommendation.main - INFO - [t_2a4176d6] Stage 1: Recall (CZ city-only, EZ global)
+2026-02-26 05:54:31,794 - services.recommendation.db - INFO - Loaded 15 items for city: tokyo
+2026-02-26 05:54:31,794 - services.recommendation.db - INFO - Title sanitization: changed=0 (city=tokyo)
+2026-02-26 05:54:31,795 - services.recommendation.recall - INFO - Recall: CZ=15 (city-only), EZ=13 (city-only, excellence >= 0.8)
+2026-02-26 05:54:31,795 - services.recommendation.main - INFO - [t_2a4176d6] Recall: CZ=15 (city-only), EZ=13 (global)
+2026-02-26 05:54:31,795 - services.recommendation.main - INFO - [t_2a4176d6] Stage 2: Rerank (v1.3)
+2026-02-26 05:54:31,834 - services.recommendation.rerank - INFO - Rerank: 10 CZ items (filtered 15 → 15), 0 EZ items
+2026-02-26 05:54:31,834 - services.recommendation.rerank - INFO - Top 5 CZ memory_influence: [1.1741, 1.1693, 1.1648, 1.1633, 1.1936]
+2026-02-26 05:54:31,834 - services.recommendation.main - INFO - [t_2a4176d6] Rerank: 10 CZ, 0 EZ
+2026-02-26 05:54:31,834 - services.recommendation.mix_policy - INFO - Mix policy: 3 CZ + 0 EZ (ratio=3:0, rule=only_cz_available, delta=inf, intent=balanced, mem_conf=0.50)
+2026-02-26 05:54:31,834 - services.recommendation.main - INFO - [t_2a4176d6] Mix policy: only_cz_available (ratio=3:0, conf=1.00)
+2026-02-26 05:54:31,834 - services.recommendation.main - INFO - [t_2a4176d6] Non-finite response fields sanitized count=3 sample=['mix_policy.inputs_used.delta', 'mix_policy.delta', 'decision_trace.mix_policy.components.delta']
+2026-02-26 05:54:31,834 - services.recommendation.main - INFO - [t_2a4176d6] Response ready
+INFO:     127.0.0.1:59729 - "POST /score HTTP/1.1" 200 OK
+2026-02-26 05:54:31,872 - services.recommendation.main - INFO - [t_6485471f] POST /score - user_id=u001, city=tokyo, tags=['ramen', 'izakaya'], intent=casual, memory_confidence=0.5
+2026-02-26 05:54:31,872 - services.recommendation.main - INFO - [t_6485471f] Stage 1: Recall (CZ city-only, EZ global)
+2026-02-26 05:54:31,874 - services.recommendation.db - INFO - Loaded 15 items for city: tokyo
+2026-02-26 05:54:31,874 - services.recommendation.db - INFO - Title sanitization: changed=0 (city=tokyo)
+2026-02-26 05:54:31,874 - services.recommendation.recall - INFO - Recall: CZ=15 (city-only), EZ=13 (city-only, excellence >= 0.8)
+2026-02-26 05:54:31,874 - services.recommendation.main - INFO - [t_6485471f] Recall: CZ=15 (city-only), EZ=13 (global)
+2026-02-26 05:54:31,874 - services.recommendation.main - INFO - [t_6485471f] Stage 2: Rerank (v1.3)
+2026-02-26 05:54:31,912 - services.recommendation.rerank - INFO - Rerank: 10 CZ items (filtered 15 → 15), 0 EZ items
+2026-02-26 05:54:31,912 - services.recommendation.rerank - INFO - Top 5 CZ memory_influence: [1.1744, 1.1735, 1.1735, 1.1723, 1.2005]
+2026-02-26 05:54:31,912 - services.recommendation.main - INFO - [t_6485471f] Rerank: 10 CZ, 0 EZ
+2026-02-26 05:54:31,912 - services.recommendation.mix_policy - INFO - Mix policy: 3 CZ + 0 EZ (ratio=3:0, rule=only_cz_available, delta=inf, intent=balanced, mem_conf=0.50)
+2026-02-26 05:54:31,912 - services.recommendation.main - INFO - [t_6485471f] Mix policy: only_cz_available (ratio=3:0, conf=1.00)
+2026-02-26 05:54:31,912 - services.recommendation.main - INFO - [t_6485471f] Non-finite response fields sanitized count=3 sample=['mix_policy.inputs_used.delta', 'mix_policy.delta', 'decision_trace.mix_policy.components.delta']
+2026-02-26 05:54:31,912 - services.recommendation.main - INFO - [t_6485471f] Response ready
+INFO:     127.0.0.1:59546 - "POST /score HTTP/1.1" 200 OK
+2026-02-26 05:54:31,950 - services.recommendation.main - INFO - [t_a24c37bc] POST /score - user_id=u001, city=tokyo, tags=['ramen'], intent=balanced, memory_confidence=0.0
+2026-02-26 05:54:31,950 - services.recommendation.main - INFO - [t_a24c37bc] Stage 1: Recall (CZ city-only, EZ global)
+2026-02-26 05:54:31,952 - services.recommendation.db - INFO - Loaded 15 items for city: tokyo
+2026-02-26 05:54:31,952 - services.recommendation.db - INFO - Title sanitization: changed=0 (city=tokyo)
+2026-02-26 05:54:31,952 - services.recommendation.recall - INFO - Recall: CZ=15 (city-only), EZ=13 (city-only, excellence >= 0.8)
+2026-02-26 05:54:31,952 - services.recommendation.main - INFO - [t_a24c37bc] Recall: CZ=15 (city-only), EZ=13 (global)
+2026-02-26 05:54:31,952 - services.recommendation.main - INFO - [t_a24c37bc] Stage 2: Rerank (v1.3)
+2026-02-26 05:54:31,984 - services.recommendation.rerank - INFO - Rerank: 10 CZ items (filtered 15 → 15), 0 EZ items
+2026-02-26 05:54:31,984 - services.recommendation.rerank - INFO - Top 5 CZ memory_influence: [1.1871, 1.1859, 1.1851, 1.1933, 1.1693]
+2026-02-26 05:54:31,984 - services.recommendation.main - INFO - [t_a24c37bc] Rerank: 10 CZ, 0 EZ
+2026-02-26 05:54:31,984 - services.recommendation.mix_policy - INFO - Mix policy: 3 CZ + 0 EZ (ratio=3:0, rule=only_cz_available, delta=inf, intent=balanced, mem_conf=0.00)
+2026-02-26 05:54:31,984 - services.recommendation.main - INFO - [t_a24c37bc] Mix policy: only_cz_available (ratio=3:0, conf=1.00)
+2026-02-26 05:54:31,984 - services.recommendation.main - INFO - [t_a24c37bc] Non-finite response fields sanitized count=3 sample=['mix_policy.inputs_used.delta', 'mix_policy.delta', 'decision_trace.mix_policy.components.delta']
+2026-02-26 05:54:31,984 - services.recommendation.main - INFO - [t_a24c37bc] Response ready
+INFO:     127.0.0.1:59546 - "POST /score HTTP/1.1" 200 OK
+2026-02-26 05:54:31,990 - services.recommendation.main - INFO - [t_8f3a74a2] POST /score - user_id=u001, city=tokyo, tags=['ramen'], intent=None, memory_confidence=None
+2026-02-26 05:54:31,990 - services.recommendation.main - INFO - [t_8f3a74a2] Stage 1: Recall (CZ city-only, EZ global)
+2026-02-26 05:54:31,991 - services.recommendation.db - INFO - Loaded 15 items for city: tokyo
+2026-02-26 05:54:31,991 - services.recommendation.db - INFO - Title sanitization: changed=0 (city=tokyo)
+2026-02-26 05:54:31,991 - services.recommendation.recall - INFO - Recall: CZ=15 (city-only), EZ=13 (city-only, excellence >= 0.8)
+2026-02-26 05:54:31,991 - services.recommendation.main - INFO - [t_8f3a74a2] Recall: CZ=15 (city-only), EZ=13 (global)
+2026-02-26 05:54:31,991 - services.recommendation.main - INFO - [t_8f3a74a2] Stage 2: Rerank (v1.3)
+2026-02-26 05:54:32,022 - services.recommendation.rerank - INFO - Rerank: 10 CZ items (filtered 15 → 15), 0 EZ items
+2026-02-26 05:54:32,022 - services.recommendation.rerank - INFO - Top 5 CZ memory_influence: [1.1871, 1.1859, 1.1851, 1.1933, 1.1693]
+2026-02-26 05:54:32,022 - services.recommendation.main - INFO - [t_8f3a74a2] Rerank: 10 CZ, 0 EZ
+2026-02-26 05:54:32,022 - services.recommendation.mix_policy - INFO - Mix policy: 3 CZ + 0 EZ (ratio=3:0, rule=only_cz_available, delta=inf, intent=balanced, mem_conf=0.50)
+2026-02-26 05:54:32,022 - services.recommendation.main - INFO - [t_8f3a74a2] Mix policy: only_cz_available (ratio=3:0, conf=1.00)
+2026-02-26 05:54:32,022 - services.recommendation.main - INFO - [t_8f3a74a2] Non-finite response fields sanitized count=3 sample=['mix_policy.inputs_used.delta', 'mix_policy.delta', 'decision_trace.mix_policy.components.delta']
+2026-02-26 05:54:32,022 - services.recommendation.main - INFO - [t_8f3a74a2] Response ready
+INFO:     127.0.0.1:59831 - "POST /score HTTP/1.1" 200 OK
+2026-02-26 05:54:32,106 - services.recommendation.main - INFO - [t_e9f19155] POST /score - user_id=u001, city=tokyo, tags=['ramen'], intent=balanced, memory_confidence=0.0
+2026-02-26 05:54:32,106 - services.recommendation.main - INFO - [t_e9f19155] Stage 1: Recall (CZ city-only, EZ global)
+2026-02-26 05:54:32,108 - services.recommendation.db - INFO - Loaded 15 items for city: tokyo
+2026-02-26 05:54:32,108 - services.recommendation.db - INFO - Title sanitization: changed=0 (city=tokyo)
+2026-02-26 05:54:32,108 - services.recommendation.recall - INFO - Recall: CZ=15 (city-only), EZ=13 (city-only, excellence >= 0.8)
+2026-02-26 05:54:32,108 - services.recommendation.main - INFO - [t_e9f19155] Recall: CZ=15 (city-only), EZ=13 (global)
+2026-02-26 05:54:32,108 - services.recommendation.main - INFO - [t_e9f19155] Stage 2: Rerank (v1.3)
+2026-02-26 05:54:32,142 - services.recommendation.rerank - INFO - Rerank: 10 CZ items (filtered 15 → 15), 0 EZ items
+2026-02-26 05:54:32,142 - services.recommendation.rerank - INFO - Top 5 CZ memory_influence: [1.1871, 1.1859, 1.1851, 1.1933, 1.1693]
+2026-02-26 05:54:32,142 - services.recommendation.main - INFO - [t_e9f19155] Rerank: 10 CZ, 0 EZ
+2026-02-26 05:54:32,142 - services.recommendation.mix_policy - INFO - Mix policy: 3 CZ + 0 EZ (ratio=3:0, rule=only_cz_available, delta=inf, intent=balanced, mem_conf=0.00)
+2026-02-26 05:54:32,142 - services.recommendation.main - INFO - [t_e9f19155] Mix policy: only_cz_available (ratio=3:0, conf=1.00)
+2026-02-26 05:54:32,142 - services.recommendation.main - INFO - [t_e9f19155] Non-finite response fields sanitized count=3 sample=['mix_policy.inputs_used.delta', 'mix_policy.delta', 'decision_trace.mix_policy.components.delta']
+2026-02-26 05:54:32,142 - services.recommendation.main - INFO - [t_e9f19155] Response ready
+INFO:     127.0.0.1:59546 - "POST /score HTTP/1.1" 200 OK
+2026-02-26 05:54:32,148 - services.recommendation.main - INFO - [t_8a89d672] POST /score - user_id=u001, city=tokyo, tags=['ramen'], intent=None, memory_confidence=None
+2026-02-26 05:54:32,148 - services.recommendation.main - INFO - [t_8a89d672] Stage 1: Recall (CZ city-only, EZ global)
+2026-02-26 05:54:32,149 - services.recommendation.db - INFO - Loaded 15 items for city: tokyo
+2026-02-26 05:54:32,149 - services.recommendation.db - INFO - Title sanitization: changed=0 (city=tokyo)
+2026-02-26 05:54:32,149 - services.recommendation.recall - INFO - Recall: CZ=15 (city-only), EZ=13 (city-only, excellence >= 0.8)
+2026-02-26 05:54:32,149 - services.recommendation.main - INFO - [t_8a89d672] Recall: CZ=15 (city-only), EZ=13 (global)
+2026-02-26 05:54:32,149 - services.recommendation.main - INFO - [t_8a89d672] Stage 2: Rerank (v1.3)
+2026-02-26 05:54:32,180 - services.recommendation.rerank - INFO - Rerank: 10 CZ items (filtered 15 → 15), 0 EZ items
+2026-02-26 05:54:32,180 - services.recommendation.rerank - INFO - Top 5 CZ memory_influence: [1.1871, 1.1859, 1.1851, 1.1933, 1.1693]
+2026-02-26 05:54:32,180 - services.recommendation.main - INFO - [t_8a89d672] Rerank: 10 CZ, 0 EZ
+2026-02-26 05:54:32,180 - services.recommendation.mix_policy - INFO - Mix policy: 3 CZ + 0 EZ (ratio=3:0, rule=only_cz_available, delta=inf, intent=balanced, mem_conf=0.50)
+2026-02-26 05:54:32,180 - services.recommendation.main - INFO - [t_8a89d672] Mix policy: only_cz_available (ratio=3:0, conf=1.00)
+2026-02-26 05:54:32,180 - services.recommendation.main - INFO - [t_8a89d672] Non-finite response fields sanitized count=3 sample=['mix_policy.inputs_used.delta', 'mix_policy.delta', 'decision_trace.mix_policy.components.delta']
+2026-02-26 05:54:32,180 - services.recommendation.main - INFO - [t_8a89d672] Response ready
+INFO:     127.0.0.1:59906 - "POST /score HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59958 - "GET /health HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [56642]

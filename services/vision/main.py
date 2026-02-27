@@ -1,112 +1,205 @@
 """
-Vision Service - Image Analysis API
+Vision Service v2 — backend-agnostic image description API.
 
-FastAPI service for analyzing images and extracting tags.
-Vision v1: Rule-based keyword extraction (no external API calls).
+Backends (set via VISION_BACKEND env var):
+  rule_v0  — offline keyword extraction, no model required (fast)
+  clip_v1  — local CLIP model via open_clip_torch (default)
+  cloud_v1 — reserved extension point (not implemented)
+
+Environment:
+  VISION_BACKEND   rule_v0 | clip_v1          (default: clip_v1)
+  VISION_MODEL_ID  open_clip model identifier (default: ViT-B-32/openai)
+  DEVICE           cpu | cuda                 (default: cpu)
+
+Output contract (/describe):
+  {
+    "ok": true,
+    "backend": "clip_v1",
+    "model_id": "ViT-B-32/openai",
+    "device": "cpu",
+    "tags": ["ramen", "night_market", ...],
+    "raw": { "scores": [{"tag": "...", "score": 0.12}, ...] },
+    "meta": { "inputs": {"has_url": true, "has_base64": false, "top_k": 10},
+              "latency_ms": 42.1 }
+  }
+
+All returned numeric values are guaranteed to be finite JSON numbers.
 """
 
+import math
+import time
+import logging
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import Optional, Dict, Any, List
-import uvicorn
-import logging
-from .vision_core import describe_image
+from typing import Optional, List, Dict, Any
 
-# Configure logging
+from .backends import get_backend
+
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Taste Aligner Vision Service")
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Startup: eagerly initialise backend for fail-fast behaviour
+# ─────────────────────────────────────────────────────────────────────────────
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    try:
+        b = get_backend()
+        logger.info(
+            "[vision] Backend ready: %s  model_id=%s  device=%s",
+            b.name, b.model_id, b.device,
+        )
+        # For clip_v1, trigger model load at startup so the first request is fast
+        if hasattr(b, "warm_up"):
+            b.warm_up()
+    except Exception as exc:
+        logger.error("[vision] Backend initialisation FAILED: %s", exc)
+        raise
+    yield
 
 
+app = FastAPI(title="Taste Aligner Vision Service v2", lifespan=lifespan)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Request / Response models
+# ─────────────────────────────────────────────────────────────────────────────
 class ImageData(BaseModel):
-    """Image data for analysis."""
     image_url: Optional[str] = None
     image_base64: Optional[str] = None
+    top_k: Optional[int] = 10
 
 
-class DescribePayload(BaseModel):
-    """Request payload for /describe endpoint."""
+class DescribeRequest(BaseModel):
     data: ImageData
 
 
+class ScoreEntry(BaseModel):
+    tag: str
+    score: float
+
+
+class RawOutput(BaseModel):
+    scores: List[ScoreEntry]
+
+
+class VisionMeta(BaseModel):
+    inputs: Dict[str, Any]
+    latency_ms: float
+
+
 class VisionResponse(BaseModel):
-    """Response schema for vision analysis."""
-    dummy: bool
-    source: str
-    raw_tags: List[str]
-    style_tags: List[str]
-    scene_tags: List[str]
-    confidence: Dict[str, float]
-    meta: Dict[str, Any]
+    ok: bool
+    backend: str
+    model_id: Optional[str]
+    device: str
+    tags: List[str]
+    raw: RawOutput
+    meta: VisionMeta
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Helpers
+# ─────────────────────────────────────────────────────────────────────────────
+def _guard_finite(scores: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Replace non-finite score values so the JSON output is always valid."""
+    guarded = []
+    for entry in scores:
+        score = entry.get("score", 0.0)
+        if not isinstance(score, (int, float)) or not math.isfinite(float(score)):
+            score = 0.0
+        guarded.append({"tag": str(entry["tag"]), "score": round(float(score), 4)})
+    return guarded
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Routes
+# ─────────────────────────────────────────────────────────────────────────────
 @app.get("/health")
-async def health_check():
-    """Health check endpoint for service monitoring."""
+async def health_check() -> Dict[str, Any]:
+    """Return backend identity and warm state for health monitoring."""
+    b = get_backend()
     return {
         "ok": True,
-        "service": "vision"
+        "service": "vision",
+        "backend": b.name,
+        "model_id": b.model_id,
+        "device": b.device,
+        "warm": b.warm,
     }
 
 
 @app.post("/describe", response_model=VisionResponse)
-async def describe_endpoint(payload: DescribePayload):
+async def describe_endpoint(req: DescribeRequest) -> VisionResponse:
     """
-    Analyze image and return tags with confidence scores.
+    Analyse an image and return normalised tags for downstream TES enrichment.
 
-    Vision v1: Rule-based keyword extraction from image_url or image_base64.
+    Request:
+        { "data": { "image_url": "...", "image_base64": "...", "top_k": 10 } }
+    At least one of image_url / image_base64 is required.
 
-    Request body:
-        {
-            "data": {
-                "image_url": "http://example.com/image.jpg",  // optional
-                "image_base64": "base64_string_here"          // optional
-            }
-        }
-
-    At least one of image_url or image_base64 must be provided.
-
-    Returns:
-        {
-            "dummy": false,
-            "source": "rule",
-            "raw_tags": ["tag1", "tag2", ...],
-            "style_tags": ["style1", ...],
-            "scene_tags": ["scene1", ...],
-            "confidence": {"tag1": 0.92, "tag2": 0.88, ...},
-            "meta": {
-                "received": {
-                    "image_url": "...",
-                    "has_image_base64": true/false
-                }
-            }
-        }
+    Returns: see module docstring for full schema.
+    All numbers in the response are guaranteed to be finite JSON values.
     """
-    # Log request
-    logger.info(f"POST /describe - URL: {bool(payload.data.image_url)}, Base64: {bool(payload.data.image_base64)}")
+    data = req.data
 
-    # Validate input
-    if not payload.data.image_url and not payload.data.image_base64:
-        logger.warning("Request missing both image_url and image_base64")
+    if not data.image_url and not data.image_base64:
         raise HTTPException(
             status_code=422,
-            detail="Either image_url or image_base64 must be provided"
+            detail="Either data.image_url or data.image_base64 must be provided",
         )
 
-    # Process request
+    top_k = max(1, min(int(data.top_k or 10), 50))  # clamp [1, 50]
+    b = get_backend()
+    started = time.monotonic()
+
     try:
-        result = describe_image(payload)
-        logger.info(f"Vision analysis complete - {len(result.get('raw_tags', []))} tags detected")
-        return result
-    except Exception as e:
-        logger.error(f"Error processing vision request: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        result = b.describe(
+            image_url=data.image_url,
+            image_base64=data.image_base64,
+            top_k=top_k,
+        )
+    except ValueError as exc:
+        logger.warning("[vision] describe ValueError: %s", exc)
+        raise HTTPException(status_code=422, detail=str(exc))
+    except Exception as exc:
+        logger.error("[vision] describe error: %s", exc, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(exc))
+
+    latency_ms = (time.monotonic() - started) * 1000
+
+    raw_tags: List[str] = [str(t) for t in result.get("tags", []) if t]
+    scores: List[Dict[str, Any]] = _guard_finite(result.get("scores", []))
+
+    logger.info(
+        "[vision] describe OK: backend=%s tags=%d latency=%.1fms",
+        b.name, len(raw_tags), latency_ms,
+    )
+
+    return VisionResponse(
+        ok=True,
+        backend=b.name,
+        model_id=b.model_id,
+        device=b.device,
+        tags=raw_tags,
+        raw=RawOutput(scores=[ScoreEntry(**s) for s in scores]),
+        meta=VisionMeta(
+            inputs={
+                "has_url": bool(data.image_url),
+                "has_base64": bool(data.image_base64),
+                "top_k": top_k,
+            },
+            latency_ms=round(latency_ms, 1),
+        ),
+    )
 
 
 if __name__ == "__main__":
+    import uvicorn
     logger.info("Starting Vision Service on port 5002")
     uvicorn.run(app, host="0.0.0.0", port=5002)

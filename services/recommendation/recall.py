@@ -24,12 +24,8 @@ FORBIDDEN in recall stage:
 from typing import List, Dict, Any, Tuple
 import logging
 
-try:
-    from .config import RECALL_EZ_EXCELLENCE_THRESHOLD, MAX_RECALL_CANDIDATES
-    from .db import get_items_by_city, get_items_by_excellence_threshold, get_all_items
-except ImportError:
-    from config import RECALL_EZ_EXCELLENCE_THRESHOLD, MAX_RECALL_CANDIDATES
-    from db import get_items_by_city, get_items_by_excellence_threshold, get_all_items
+from .config import RECALL_EZ_EXCELLENCE_THRESHOLD, MAX_RECALL_CANDIDATES
+from .db import get_items_by_city, get_items_by_excellence_threshold, get_all_items
 
 logger = logging.getLogger(__name__)
 TRACE_SAMPLE_LIMIT = 100

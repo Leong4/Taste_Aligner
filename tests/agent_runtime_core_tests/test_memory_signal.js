@@ -7,26 +7,10 @@
  */
 
 const assert = require("assert");
-const path = require("path");
+const { loadCore, loadSkills } = require("./_load_src_runtime");
 
-let core, skills;
-try {
-    require("ts-node").register({
-        project: path.join(__dirname, "../../agent_runtime/tsconfig.json"),
-        transpileOnly: true,
-    });
-    core = require("../../agent_runtime/src/core");
-    skills = require("../../agent_runtime/src/skills");
-} catch (e) {
-    try {
-        core = require("../../agent_runtime/dist/core");
-        skills = require("../../agent_runtime/dist/skills");
-    } catch (e2) {
-        console.error("Cannot load modules. Run 'npm run build' in agent_runtime/ first.");
-        console.error(e2.message);
-        process.exit(1);
-    }
-}
+const core = loadCore();
+const skills = loadSkills();
 
 const { createExecutionContext } = core;
 const { createMemorySignalSkill } = skills;

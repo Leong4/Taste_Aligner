@@ -5,69 +5,9 @@
  */
 
 const assert = require("assert");
-const fs = require("fs");
-const path = require("path");
-const { execSync } = require("child_process");
+const { loadCore } = require("./_load_src_runtime");
 
-let SkillRegistry;
-let Orchestrator;
-const repoRoot = path.join(__dirname, "../..");
-const agentRuntimeDir = path.join(repoRoot, "agent_runtime");
-
-function loadDistCore() {
-  const distCoreDir = path.join(agentRuntimeDir, "dist/core");
-  for (const key of Object.keys(require.cache)) {
-    if (key.startsWith(distCoreDir)) {
-      delete require.cache[key];
-    }
-  }
-  const distCorePath = path.join(agentRuntimeDir, "dist/core/index.js");
-  return require(distCorePath);
-}
-
-try {
-  require("ts-node").register({
-    project: path.join(__dirname, "../../agent_runtime/tsconfig.json"),
-    transpileOnly: true,
-  });
-  const core = require("../../agent_runtime/src/core/index.ts");
-  SkillRegistry = core.SkillRegistry;
-  Orchestrator = core.Orchestrator;
-} catch (_e) {
-  try {
-    const ts = require("typescript");
-    const projectPath = path.join(__dirname, "../../agent_runtime/tsconfig.json");
-    const compilerOptions = ts.readConfigFile(projectPath, ts.sys.readFile).config?.compilerOptions || {};
-    require.extensions[".ts"] = function registerTs(module, filename) {
-      const source = fs.readFileSync(filename, "utf8");
-      const transpiled = ts.transpileModule(source, {
-        compilerOptions: {
-          module: ts.ModuleKind.CommonJS,
-          target: ts.ScriptTarget.ES2020,
-          esModuleInterop: true,
-          moduleResolution: ts.ModuleResolutionKind.NodeJs,
-          ...compilerOptions,
-        },
-        fileName: filename,
-      });
-      module._compile(transpiled.outputText, filename);
-    };
-    const core = require("../../agent_runtime/src/core/index.ts");
-    SkillRegistry = core.SkillRegistry;
-    Orchestrator = core.Orchestrator;
-  } catch (_e2) {
-    const core = loadDistCore();
-    SkillRegistry = core.SkillRegistry;
-    Orchestrator = core.Orchestrator;
-  }
-}
-
-if (!Orchestrator || typeof Orchestrator.prototype.runWithTrace !== "function") {
-  execSync("npm run build", { cwd: agentRuntimeDir, stdio: "ignore" });
-  const core = loadDistCore();
-  SkillRegistry = core.SkillRegistry;
-  Orchestrator = core.Orchestrator;
-}
+const { SkillRegistry, Orchestrator } = loadCore();
 
 let passed = 0;
 let failed = 0;

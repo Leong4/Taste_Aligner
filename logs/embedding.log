@@ -1,0 +1,887 @@
+INFO:     Started server process [56631]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:5004 (Press CTRL+C to quit)
+2026-02-26 05:54:23,123 - services.embedding.backends - INFO - Embedding backend ready: st_v1
+INFO:     127.0.0.1:59520 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59522 - "GET /health HTTP/1.1" 200 OK
+2026-02-26 05:54:26,366 - services.embedding.backends - INFO - Loading SentenceTransformer 'sentence-transformers/all-MiniLM-L6-v2' on device 'cpu'
+2026-02-26 05:54:29,453 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2026-02-26 05:54:31,043 - services.embedding.backends - INFO - SentenceTransformer loaded – native embedding_dim=384
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 81.62it/s]
+INFO:     127.0.0.1:59540 - "POST /tes/build HTTP/1.1" 200 OK
+2026-02-26 05:54:31,143 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,143 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,144 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,144 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59548 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,146 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,146 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,147 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,147 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59550 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,149 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,149 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,149 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,149 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59552 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,151 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,151 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,152 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,152 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59554 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,153 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,153 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,154 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,154 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59556 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,155 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,155 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,156 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,156 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59558 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,157 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,157 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,158 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,158 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59560 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,159 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,159 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,160 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,160 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59562 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,162 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,162 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,162 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,162 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59564 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,164 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,164 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,164 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,164 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59566 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,166 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,166 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,166 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,166 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59568 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,168 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,168 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,168 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,168 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59570 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,170 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,170 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,170 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,170 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59572 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,172 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,172 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,172 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,172 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59574 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,174 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,174 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,174 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,174 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59576 - "POST /generate HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 151.93it/s]
+INFO:     127.0.0.1:59578 - "POST /tes/build HTTP/1.1" 200 OK
+2026-02-26 05:54:31,258 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,259 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,259 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,259 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59584 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,261 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,261 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,262 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,262 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59586 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,264 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,264 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,264 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,264 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59588 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,267 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,267 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,267 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,267 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59590 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,269 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,269 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,269 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,269 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59592 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,272 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,272 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,272 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,272 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59594 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,274 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,274 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,274 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,274 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59596 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,276 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,276 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,276 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,276 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59598 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,278 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,278 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,278 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,278 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59600 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,280 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,280 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,280 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,280 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59602 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,282 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,282 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,282 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,282 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59604 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,284 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,284 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,284 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,284 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59606 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,285 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,286 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,286 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,286 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59608 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,287 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,287 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,288 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,288 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59610 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,289 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,289 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,290 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,290 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59612 - "POST /generate HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 175.94it/s]
+INFO:     127.0.0.1:59578 - "POST /tes/build HTTP/1.1" 200 OK
+2026-02-26 05:54:31,360 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,360 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,360 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,360 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59621 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,363 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,363 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,364 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,364 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59623 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,368 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,368 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,368 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,368 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59625 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,371 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,371 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,371 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,371 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59627 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,373 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,373 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,374 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,374 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59629 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,376 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,376 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,376 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,376 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59631 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,379 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,379 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,379 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,379 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59633 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,381 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,381 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,381 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,381 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59635 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,383 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,383 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,383 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,383 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59637 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,385 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,385 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,386 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,386 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59639 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,388 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,388 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,388 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,388 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59641 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,390 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,390 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,390 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,390 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59643 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,392 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,392 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,392 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,392 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59645 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,394 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,394 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,394 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,394 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59647 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,395 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,395 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,396 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,396 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59649 - "POST /generate HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 176.59it/s]
+INFO:     127.0.0.1:59578 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 183.21it/s]
+INFO:     127.0.0.1:59578 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 183.53it/s]
+INFO:     127.0.0.1:59578 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 177.75it/s]
+INFO:     127.0.0.1:59578 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 175.22it/s]
+INFO:     127.0.0.1:59578 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 190.84it/s]
+INFO:     127.0.0.1:59578 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 176.45it/s]
+INFO:     127.0.0.1:59578 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 196.97it/s]
+INFO:     127.0.0.1:59578 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 172.62it/s]
+INFO:     127.0.0.1:59578 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 190.44it/s]
+INFO:     127.0.0.1:59578 - "POST /tes/build HTTP/1.1" 200 OK
+2026-02-26 05:54:31,511 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,511 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,511 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,511 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59653 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,514 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,514 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,514 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,514 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59655 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,517 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,517 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,518 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,518 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59657 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,520 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,520 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,521 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,521 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59659 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,523 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,523 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,523 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,523 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59661 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,526 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,526 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,526 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,526 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59663 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,528 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,528 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,528 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,528 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59665 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,530 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,530 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,531 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,531 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59667 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,533 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,533 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,533 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,533 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59669 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,535 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,535 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,535 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,535 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59671 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,537 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,537 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,537 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,537 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59673 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,539 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,539 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,539 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,539 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59675 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,541 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,541 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,542 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,542 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59677 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,543 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,543 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,544 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,544 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59679 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,545 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,545 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,546 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,546 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59681 - "POST /generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59691 - "GET /health HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 153.87it/s]
+INFO:     127.0.0.1:59693 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 167.00it/s]
+INFO:     127.0.0.1:59578 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 161.37it/s]
+INFO:     127.0.0.1:59578 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 184.91it/s]
+INFO:     127.0.0.1:59578 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 178.57it/s]
+INFO:     127.0.0.1:59578 - "POST /tes/build HTTP/1.1" 200 OK
+2026-02-26 05:54:31,714 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,714 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,714 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,714 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59699 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,717 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,717 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,717 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,717 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59701 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,720 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,720 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,720 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,720 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59703 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,723 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,723 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,723 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,723 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59705 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,725 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,725 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,726 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,726 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59707 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,728 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,728 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,728 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,728 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59709 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,730 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,730 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,730 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,730 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59711 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,732 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,732 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,732 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,732 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59713 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,734 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,734 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,734 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,734 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59715 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,736 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,736 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,736 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,736 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59717 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,738 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,738 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,739 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,739 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59719 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,741 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,741 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,741 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,741 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59721 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,743 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,743 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,743 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,743 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59723 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,745 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,745 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,745 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,745 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59725 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,747 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,747 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,747 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,747 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59727 - "POST /generate HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 191.06it/s]
+INFO:     127.0.0.1:59578 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 185.88it/s]
+INFO:     127.0.0.1:59578 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 184.07it/s]
+INFO:     127.0.0.1:59578 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 199.97it/s]
+INFO:     127.0.0.1:59578 - "POST /tes/build HTTP/1.1" 200 OK
+2026-02-26 05:54:31,797 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,797 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,798 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,798 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59731 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,801 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,801 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,801 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,801 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59733 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,804 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,804 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,804 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,804 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59735 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,807 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,807 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,807 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,807 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59737 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,810 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,810 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,810 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,810 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59739 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,813 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,813 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,813 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,813 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59741 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,815 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,816 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,816 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,816 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59743 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,818 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,818 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,818 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,818 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59745 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,820 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,820 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,821 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,821 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59747 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,823 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,823 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,823 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,823 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59749 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,825 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,825 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,825 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,825 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59751 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,827 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,827 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,827 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,827 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59753 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,829 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,829 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,829 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,829 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59755 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,831 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,831 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,831 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,831 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59757 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,833 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,833 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,833 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,833 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59759 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,876 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,876 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,876 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,877 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59770 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,878 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,878 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,879 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,879 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59772 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,880 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,880 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,881 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,881 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59774 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,883 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,883 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,883 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,883 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59776 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,885 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,885 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,885 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,885 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59778 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,887 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,887 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,887 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,887 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59780 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,889 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,890 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,890 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,890 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59782 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,892 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,892 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,892 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,892 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59784 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,894 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,894 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,895 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,895 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59786 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,897 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,897 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,897 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,897 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59788 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,900 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,900 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,900 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,900 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59790 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,902 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,902 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,903 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,903 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59792 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,905 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,905 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,906 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,906 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59794 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,908 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,908 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,908 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,908 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59796 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,911 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 2
+2026-02-26 05:54:31,911 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 2, emotion: None, recency_days: None
+2026-02-26 05:54:31,911 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,911 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59798 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,954 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,954 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,954 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,954 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59801 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,957 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,957 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,957 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,957 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59803 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,959 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,959 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,959 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,959 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59805 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,961 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,961 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,962 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,962 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59807 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,963 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,963 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,964 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,964 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59809 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,966 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,966 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,966 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,966 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59811 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,967 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,968 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,968 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,968 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59813 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,969 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,969 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,970 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,970 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59815 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,971 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,971 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,972 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,972 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59817 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,974 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,974 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,974 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,974 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59819 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,975 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,975 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,976 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,976 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59821 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,977 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,977 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,977 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,977 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59823 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,979 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,979 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,979 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,979 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59825 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,981 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,981 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,981 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,981 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59827 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,983 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,983 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,983 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,983 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59829 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,993 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,993 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,993 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,993 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59833 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,995 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,995 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,996 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,996 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59835 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:31,997 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:31,997 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:31,998 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:31,998 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59837 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,000 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,000 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,000 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,000 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59839 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,002 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,002 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,002 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,002 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59841 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,004 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,004 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,004 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,004 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59843 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,006 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,006 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,006 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,006 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59845 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,008 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,008 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,008 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,008 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59847 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,010 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,010 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,010 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,010 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59849 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,012 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,012 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,012 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,012 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59851 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,014 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,014 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,014 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,014 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59853 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,016 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,016 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,016 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,016 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59855 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,018 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,018 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,018 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,018 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59857 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,020 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,020 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,020 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,020 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59859 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,022 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,022 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,022 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,022 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59861 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,110 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,110 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,111 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,111 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59876 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,113 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,113 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,113 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,113 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59878 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,115 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,115 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,116 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,116 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59880 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,118 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,118 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,118 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,118 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59882 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,120 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,120 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,120 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,120 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59884 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,122 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,122 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,122 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,122 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59886 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,124 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,124 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,124 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,124 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59888 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,126 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,126 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,127 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,127 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59890 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,129 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,129 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,129 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,129 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59892 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,131 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,131 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,131 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,131 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59894 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,133 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,133 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,133 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,133 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59896 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,135 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,135 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,136 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,136 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59898 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,137 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,137 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,138 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,138 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59900 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,139 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,139 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,140 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,140 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59902 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,141 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,141 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,142 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,142 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59904 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,151 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,151 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,151 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,151 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59908 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,153 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,153 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,153 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,153 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59910 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,155 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,155 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,156 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,156 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59912 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,158 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,158 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,158 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,158 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59915 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,160 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,160 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,160 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,160 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59917 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,162 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,162 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,162 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,162 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59919 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,164 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,164 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,164 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,164 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59921 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,166 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,166 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,166 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,166 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59923 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,167 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,168 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,168 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,168 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59925 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,170 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,170 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,170 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,170 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59927 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,172 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,172 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,172 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,172 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59929 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,174 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,174 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,174 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,174 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59931 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,176 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,176 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,176 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,176 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59933 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,178 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,178 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,178 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,178 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59935 - "POST /generate HTTP/1.1" 200 OK
+2026-02-26 05:54:32,179 - services.embedding.main - INFO - POST /generate - vision_tags: 1, normalized_tags: 1
+2026-02-26 05:54:32,179 - services.embedding.embedding_core - INFO - Generating embedding – vision_tags: 1, normalized_tags: 1, emotion: None, recency_days: None
+2026-02-26 05:54:32,180 - services.embedding.embedding_core - INFO - Embedding generated – dim: 512, normalized: True
+2026-02-26 05:54:32,180 - services.embedding.main - INFO - Embedding generated - dim: 512
+INFO:     127.0.0.1:59937 - "POST /generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59956 - "GET /health HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [56631]
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/multiprocessing/resource_tracker.py:276: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown: {'/loky-56631-i0zxdp3q'}
+  warnings.warn(

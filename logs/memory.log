@@ -1,0 +1,77 @@
+INFO:     Started server process [56622]
+INFO:     Waiting for application startup.
+2026-02-26 05:54:22,645 - services.memory.db - INFO - Database initialized at /Volumes/leong4/University_doc/RAG/Taste-Aligner/Taste_Aligner/services/memory/memory.db
+2026-02-26 05:54:22,645 - services.memory.main - INFO - Memory Service started on port 5001
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:5001 (Press CTRL+C to quit)
+INFO:     127.0.0.1:59514 - "GET /health HTTP/1.1" 200 OK
+2026-02-26 05:54:31,086 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 3, has_embedding: False
+2026-02-26 05:54:31,087 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-02-26 05:54:31,087 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:59544 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59614 - "GET /health HTTP/1.1" 200 OK
+2026-02-26 05:54:31,295 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-02-26 05:54:31,295 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-02-26 05:54:31,295 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:59616 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59544 - "POST /search HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:59683 - "GET /health HTTP/1.1" 200 OK
+2026-02-26 05:54:31,550 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-02-26 05:54:31,550 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-02-26 05:54:31,550 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:59685 - "POST /search HTTP/1.1" 200 OK
+2026-02-26 05:54:31,551 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-02-26 05:54:31,552 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-02-26 05:54:31,552 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:59687 - "POST /search HTTP/1.1" 200 OK
+2026-02-26 05:54:31,553 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-02-26 05:54:31,553 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-02-26 05:54:31,553 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:59689 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59544 - "POST /search HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:59761 - "GET /health HTTP/1.1" 200 OK
+2026-02-26 05:54:31,837 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-02-26 05:54:31,837 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-02-26 05:54:31,837 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:59763 - "POST /search HTTP/1.1" 200 OK
+2026-02-26 05:54:31,838 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-02-26 05:54:31,839 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-02-26 05:54:31,839 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:59765 - "POST /search HTTP/1.1" 200 OK
+2026-02-26 05:54:31,840 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-02-26 05:54:31,840 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-02-26 05:54:31,840 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:59767 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59544 - "POST /search HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:59863 - "GET /health HTTP/1.1" 200 OK
+2026-02-26 05:54:32,026 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-02-26 05:54:32,026 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-02-26 05:54:32,026 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:59865 - "POST /search HTTP/1.1" 200 OK
+2026-02-26 05:54:32,027 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-02-26 05:54:32,028 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-02-26 05:54:32,028 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:59867 - "POST /search HTTP/1.1" 200 OK
+2026-02-26 05:54:32,029 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-02-26 05:54:32,029 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-02-26 05:54:32,029 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:59869 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59544 - "POST /search HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:59940 - "GET /health HTTP/1.1" 200 OK
+2026-02-26 05:54:32,184 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-02-26 05:54:32,184 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-02-26 05:54:32,184 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:59942 - "POST /search HTTP/1.1" 200 OK
+2026-02-26 05:54:32,185 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-02-26 05:54:32,186 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-02-26 05:54:32,186 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:59944 - "POST /search HTTP/1.1" 200 OK
+2026-02-26 05:54:32,187 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-02-26 05:54:32,187 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-02-26 05:54:32,187 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:59946 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59954 - "GET /health HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [56622]

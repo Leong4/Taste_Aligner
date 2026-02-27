@@ -146,8 +146,10 @@ export function createTagExpandSkill(
             let llmData: TagExpandLLMOutput = { hard_expansions: [], soft_expansions: [] };
             let callTrace: LLMCallTrace | null = null;
             let adapterError: string | null = null;
-            let fallbackUsed = false;
+            let hardFallbackUsed = false;
             let fallbackReason = "";
+            let adapterFallbackUsed = false;
+            let adapterFallbackReason = "";
 
             const buildFallbackResult = (
                 reason: string,
@@ -181,9 +183,21 @@ export function createTagExpandSkill(
                     fallback_reason: reason,
                     error_message: reason === "adapter_error" ? (adapterError ?? "") : "",
                 };
-
                 if (callTrace) {
-                    trace.latency_ms = callTrace.latency_ms;
+                    const llmCallEntry: Record<string, unknown> = {
+                        provider: callTrace.model.provider,
+                        model_name: callTrace.model.model_name,
+                        model_version: callTrace.model.version,
+                        temperature: callTrace.temperature,
+                        prompt_version: callTrace.prompt_version,
+                        usage: callTrace.usage,
+                        fallback_used: callTrace.fallback_used,
+                    };
+                    const llmFallbackReason = callTrace.fallback_reason ?? (reason || "adapter_error");
+                    if (llmFallbackReason !== undefined && llmFallbackReason !== "") {
+                        llmCallEntry.fallback_reason = llmFallbackReason;
+                    }
+                    trace.llm_call = llmCallEntry;
                 }
 
                 return { output, trace };
@@ -205,8 +219,13 @@ export function createTagExpandSkill(
                 });
                 llmData = result.data ?? llmData;
                 callTrace = result.callTrace;
+                if (callTrace.fallback_used || adapter.fallbackReason) {
+                    adapterFallbackUsed = true;
+                    adapterFallbackReason =
+                        callTrace.fallback_reason ?? adapter.fallbackReason ?? "adapter_error";
+                }
             } catch (err: unknown) {
-                fallbackUsed = true;
+                hardFallbackUsed = true;
                 fallbackReason = "adapter_error";
                 adapterError = err instanceof Error ? err.message : String(err);
                 callTrace = {
@@ -216,10 +235,11 @@ export function createTagExpandSkill(
                     latency_ms: 0,
                     usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
                     fallback_used: true,
+                    fallback_reason: "adapter_error",
                 };
             }
 
-            if (!fallbackUsed) {
+            if (!hardFallbackUsed) {
                 const isObject = llmData !== null && typeof llmData === "object";
                 const hasExpectedShape =
                     isObject &&
@@ -228,12 +248,12 @@ export function createTagExpandSkill(
                     Array.isArray((llmData as unknown as Record<string, unknown>).hard_expansions) &&
                     Array.isArray((llmData as unknown as Record<string, unknown>).soft_expansions);
                 if (!hasExpectedShape) {
-                    fallbackUsed = true;
+                    hardFallbackUsed = true;
                     fallbackReason = "invalid_output";
                 }
             }
 
-            if (fallbackUsed) {
+            if (hardFallbackUsed) {
                 return buildFallbackResult(
                     fallbackReason || "invalid_output",
                     { by_confidence: 0, by_budget: 0, by_duplicate: 0, by_invalid: 0 }
@@ -377,13 +397,26 @@ export function createTagExpandSkill(
                     soft_kept: softTags.length,
                 },
                 drop_stats: dropStats,
-                fallback_used: false,
-                fallback_reason: "",
+                fallback_used: adapterFallbackUsed,
+                fallback_reason: adapterFallbackReason,
                 error_message: "",
             };
 
             if (callTrace) {
-                trace.latency_ms = callTrace.latency_ms;
+                const llmCallEntry: Record<string, unknown> = {
+                    provider: callTrace.model.provider,
+                    model_name: callTrace.model.model_name,
+                    model_version: callTrace.model.version,
+                    temperature: callTrace.temperature,
+                    prompt_version: callTrace.prompt_version,
+                    usage: callTrace.usage,
+                    fallback_used: callTrace.fallback_used,
+                };
+                const llmFallbackReason = callTrace.fallback_reason ?? (adapterFallbackUsed ? (adapterFallbackReason || "adapter_error") : undefined);
+                if (llmFallbackReason !== undefined && llmFallbackReason !== "") {
+                    llmCallEntry.fallback_reason = llmFallbackReason;
+                }
+                trace.llm_call = llmCallEntry;
             }
 
             return { output, trace };

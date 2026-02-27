@@ -81,9 +81,15 @@ const server = http.createServer(async (req, res) => {
             return;
         }
 
-        const orchInput: { text: string; user_id?: string } = { text };
+        const orchInput: { text: string; user_id?: string; image_url?: string; image_base64?: string } = { text };
         if (typeof body.user_id === "string") {
             orchInput.user_id = body.user_id;
+        }
+        if (typeof body.image_url === "string" && body.image_url.trim()) {
+            orchInput.image_url = body.image_url;
+        }
+        if (typeof body.image_base64 === "string" && body.image_base64.trim()) {
+            orchInput.image_base64 = body.image_base64;
         }
         const result = await orchestrator.runWithTrace(orchInput);
 

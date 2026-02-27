@@ -18,33 +18,11 @@
  */
 
 const assert = require("assert");
-const path = require("path");
+const { loadCore, loadLLM, loadSkills } = require("./_load_src_runtime");
 
-// ---------------------------------------------------------------------------
-// Load compiled modules
-// ---------------------------------------------------------------------------
-let core, llm, skills;
-try {
-    require("ts-node").register({
-        project: path.join(__dirname, "../../agent_runtime/tsconfig.json"),
-        transpileOnly: true,
-    });
-    core = require("../../agent_runtime/src/core");
-    llm = require("../../agent_runtime/src/llm");
-    skills = require("../../agent_runtime/src/skills");
-} catch (e) {
-    try {
-        core = require("../../agent_runtime/dist/core");
-        llm = require("../../agent_runtime/dist/llm");
-        skills = require("../../agent_runtime/dist/skills");
-    } catch (e2) {
-        console.error(
-            "Cannot load modules. Run 'npm run build' in agent_runtime/ first."
-        );
-        console.error(e2.message);
-        process.exit(1);
-    }
-}
+const core = loadCore();
+const llm = loadLLM();
+const skills = loadSkills();
 
 const { SkillRegistry, Orchestrator, validateGraph, createExecutionContext, RECOMMENDATION_GRAPH } = core;
 const { MockLLMAdapter, createLLMAdapterFromEnv } = llm;
@@ -227,12 +205,13 @@ async function runAll() {
         assert.strictEqual(result.output.explanation, "Explanation unavailable.");
         assert.deepStrictEqual(result.output.bullets, []);
         assert.strictEqual(result.trace.fallback_used, true);
-        assert.ok(typeof result.trace.error === "string", "error recorded in trace");
-        assert.ok(result.trace.error.includes("Simulated"), "error mentions simulated");
+        assert.strictEqual(result.trace.fallback_reason, "adapter_error");
+        assert.strictEqual(result.trace.error, "adapter_error");
 
         const llmCall = result.trace.llm_call;
         assert.ok(llmCall, "llm_call present even on error");
         assert.strictEqual(llmCall.fallback_used, true);
+        assert.strictEqual(llmCall.fallback_reason, "adapter_error");
     });
 
     // =========================================================================
@@ -310,8 +289,8 @@ async function runAll() {
     // =========================================================================
     console.log("\n--- Graph structure ---");
 
-    await test("RECOMMENDATION_GRAPH v10.0 includes explain_from_trace node", () => {
-        assert.strictEqual(RECOMMENDATION_GRAPH.version, "10.0.0");
+    await test("RECOMMENDATION_GRAPH v12.0 includes explain_from_trace node", () => {
+        assert.strictEqual(RECOMMENDATION_GRAPH.version, "12.0.0");
         assert.strictEqual(RECOMMENDATION_GRAPH.nodes.length, 12, "12 nodes");
 
         const lastNode = RECOMMENDATION_GRAPH.nodes[11];

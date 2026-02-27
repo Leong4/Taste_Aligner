@@ -73,10 +73,21 @@ class TesBuildRequest(BaseModel):
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint for service monitoring."""
+    """
+    Health check endpoint for service monitoring.
+
+    Returns backend identity and warm-up state so callers can distinguish
+    between a freshly-started (not yet warm) and a ready service.
+    """
+    from .backends import get_backend
+    backend = get_backend()
     return {
         "ok": True,
-        "service": "embedding"
+        "service": "embedding",
+        "backend": backend.name,
+        "model_id": backend.model_id,
+        "device": backend.device,
+        "warm": backend.warm,
     }
 
 

@@ -72,8 +72,6 @@ export class MockLLMAdapter implements LLMAdapter {
     }
 
     async generateStructuredJSON<T>(input: LLMGenerateInput): Promise<LLMGenerateOutput<T>> {
-        const start = Date.now();
-
         if (this.mode === "error") {
             throw new Error("[MockLLMAdapter] Simulated adapter error (LLM_MOCK_MODE=error)");
         }
@@ -84,7 +82,7 @@ export class MockLLMAdapter implements LLMAdapter {
             model: this.modelInfo,
             temperature: input.temperature,
             prompt_version: input.promptVersion,
-            latency_ms: Date.now() - start,
+            latency_ms: 0,
             usage: ZERO_USAGE,
             fallback_used: false,
         };

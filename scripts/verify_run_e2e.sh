@@ -58,6 +58,11 @@ call_tool_and_assert_200() {
 }
 
 echo "== Gateway tool checks =="
+# Warm-up embedding directly to avoid first-call gateway timeout on cold model load.
+curl -sS -X POST "${EMBED_URL}/tes/build" \
+  -H 'Content-Type: application/json' \
+  -d '{"tags":["warmup"],"normalize":true}' >/dev/null
+
 call_tool_and_assert_200 "memory.search" '{"data":{"user_id":"u001","query_tags":["ramen"],"city":"tokyo","top_k":3}}'
 call_tool_and_assert_200 "recommendation.score" '{"data":{"user_id":"u001","city":"tokyo","tags":["ramen","food"],"intent":"balanced","memory_confidence":0.7}}'
 call_tool_and_assert_200 "embedding.tes_build" '{"tags":["ramen","izakaya"],"vision_features":["night"],"sentiment":0.4,"recency_days":2,"location":"tokyo","normalize":true}'
@@ -73,9 +78,12 @@ if [[ "${RUN_CODE}" != "200" ]]; then
   exit 1
 fi
 
-cat "${RUN_TMP}" | python3 - <<'PY'
-import json, sys
-d = json.load(sys.stdin)
+python3 - "${RUN_TMP}" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], "r", encoding="utf-8") as f:
+    d = json.load(f)
 dt = d.get("decision_trace")
 assert isinstance(dt, dict), "decision_trace missing"
 
@@ -103,4 +111,3 @@ PY
 
 rm -f "${RUN_TMP}"
 echo "verify_run_e2e: PASS"
-

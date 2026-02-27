@@ -1,0 +1,3 @@
+# Projection matrices are generated here on first run.
+# Files named proj_{input_dim}_512.npy are auto-generated and safe to commit
+# for reproducibility, or ignored — the service regenerates them if absent.

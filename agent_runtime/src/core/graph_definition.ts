@@ -31,11 +31,6 @@
  *             │
  *             ▼
  *   ┌─────────────────────┐
- *   │   memory_signal      │  → anchor_tags, memory_confidence
- *   └─────────┬────────────┘
- *             │
- *             ▼
- *   ┌─────────────────────┐
  *   │    tes_builder       │  → tes_vector (512)
  *   └─────────┬────────────┘
  *             │
@@ -74,6 +69,19 @@ import { GraphDefinition } from "./types";
 
 /**
  * The default recommendation pipeline graph (v8.0).
+ *
+ * v12.0 changes from v11.0:
+ *   - Removed legacy memory_signal node from default /run main path.
+ *   - mix_policy.memory_confidence now reads from memory_weight_adjust.
+ *   - Graph version bumped to 12.0.0.
+ *
+ * v11.0 changes from v10.0:
+ *   - Added vision_describe node between memory_weight_adjust and tes_builder.
+ *     Reads image_url / image_base64 from root input (optional).
+ *     Provides vision_features[] to tes_builder for multimodal TES enrichment.
+ *     Falls back gracefully to vision_features=[] when no image is supplied.
+ *   - tes_builder now receives vision_features from vision_describe.
+ *   - Graph version bumped to 11.0.0.
  *
  * v10.0 changes from v9.0:
  *   - rerank node now receives tes_vector, tes_dim, tes_normalized,
@@ -119,7 +127,7 @@ import { GraphDefinition } from "./types";
  */
 export const RECOMMENDATION_GRAPH: GraphDefinition = {
     name: "recommendation_pipeline",
-    version: "10.0.0",
+    version: "12.0.0",
     nodes: [
         // ─────────────────────────────────────────────────────────
         // Node 1: Extract intent from raw user text
@@ -202,24 +210,24 @@ export const RECOMMENDATION_GRAPH: GraphDefinition = {
         },
 
         // ─────────────────────────────────────────────────────────
-        // Node 6: Aggregate memory signal (legacy, retained for compat)
-        // Output: anchor_memory_ids, anchor_tags, memory_confidence
+        // Node 6: Vision describe — optional multimodal signal
+        // Reads image_url / image_base64 from root input (optional).
+        // Returns vision_features[] for TES enrichment.
+        // Falls back gracefully to [] when no image is provided.
         // ─────────────────────────────────────────────────────────
         {
-            id: "memory_signal",
-            skill: "memory_signal",
+            id: "vision_describe",
+            skill: "vision_describe",
             inputFrom: {
-                user_id: "extract_intent.user_id",
-                city: "extract_intent.city",
-                tags: "tag_normalize.normalized_tags",
-                intent_tags: "tag_expand.tags_final",
-                now_ts: "input.request_ts",
+                image_url: "input.image_url",
+                image_base64: "input.image_base64",
             },
         },
 
         // ─────────────────────────────────────────────────────────
-        // Node 7: Build TES vector from anchor_tags
+        // Node 7: Build TES vector from anchor_tags + vision_features
         // Now reads from memory_weight_adjust instead of memory_signal.
+        // vision_features wired from vision_describe for multimodal enrichment.
         // Output: tes_vector, normalized, backend, tes_version
         // ─────────────────────────────────────────────────────────
         {
@@ -228,6 +236,7 @@ export const RECOMMENDATION_GRAPH: GraphDefinition = {
             inputFrom: {
                 anchor_tags: "memory_weight_adjust.anchor_tags",
                 normalized_tags: "tag_normalize.normalized_tags",
+                vision_features: "vision_describe.vision_features",
                 request_ts: "input.request_ts",
                 user_city: "extract_intent.city",
                 decision_trace: "memory_weight_adjust.decision_trace",
@@ -275,9 +284,10 @@ export const RECOMMENDATION_GRAPH: GraphDefinition = {
         },
 
         // ─────────────────────────────────────────────────────────
-        // Node 9: Mix policy — consumes from graph input
+        // Node 10: Mix policy — consumes from graph input
         // Primary: uses reco_mix_policy and reco_decision_trace
         // from fetch_recommendation
+        // memory_confidence reads from memory_weight_adjust (single source).
         // Output: policy, upstream_trace
         // ─────────────────────────────────────────────────────────
         {
@@ -287,14 +297,14 @@ export const RECOMMENDATION_GRAPH: GraphDefinition = {
                 cz_ranked: "rerank.cz_ranked",
                 ez_ranked: "rerank.ez_ranked",
                 intent: "extract_intent.type",
-                memory_confidence: "memory_signal.memory_confidence",
+                memory_confidence: "memory_weight_adjust.memory_confidence",
                 reco_mix_policy: "fetch_recommendation.mix_policy",
                 reco_decision_trace: "fetch_recommendation.decision_trace",
             },
         },
 
         // ─────────────────────────────────────────────────────────
-        // Node 10: Build final journey cards
+        // Node 11: Build final journey cards
         // Calls planner.compose via gateway.
         // Output: cards + decision_trace
         // ─────────────────────────────────────────────────────────
@@ -316,7 +326,7 @@ export const RECOMMENDATION_GRAPH: GraphDefinition = {
         },
 
         // ─────────────────────────────────────────────────────────
-        // Node 11: Explain from trace (LLM-backed)
+        // Node 12: Explain from trace (LLM-backed)
         // Generates a human-readable explanation of the recommendation
         // decision. Uses the accumulated decision_trace as input.
         // Output: explanation, bullets, meta

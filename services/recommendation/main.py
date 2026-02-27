@@ -40,38 +40,22 @@ import uvicorn
 import logging
 import uuid
 
-try:
-    from .recall import recall_candidates
-    from .rerank import rerank_candidates
-    from .mix_policy import compute_mix_policy
-    from .db import get_database_stats, sanitize_titles_in_db, ensure_item_embeddings_table
-    from .config import (
-        CZ_ALPHA, CZ_BETA, CZ_GAMMA,
-        EZ_MU, EZ_NU, SIM_CAP,
-        T_HIGH, T_MID,
-        RECALL_EZ_EXCELLENCE_THRESHOLD,
-        TOP_K_CZ, TOP_K_EZ,
-        RECO_DB_PATH,
-        RECO_SERVICE_VERSION,
-        MEM_INFLUENCE_MODE,
-        EMBEDDING_URL
-    )
-except ImportError:
-    from recall import recall_candidates
-    from rerank import rerank_candidates
-    from mix_policy import compute_mix_policy
-    from db import get_database_stats, sanitize_titles_in_db, ensure_item_embeddings_table
-    from config import (
-        CZ_ALPHA, CZ_BETA, CZ_GAMMA,
-        EZ_MU, EZ_NU, SIM_CAP,
-        T_HIGH, T_MID,
-        RECALL_EZ_EXCELLENCE_THRESHOLD,
-        TOP_K_CZ, TOP_K_EZ,
-        RECO_DB_PATH,
-        RECO_SERVICE_VERSION,
-        MEM_INFLUENCE_MODE,
-        EMBEDDING_URL
-    )
+from .recall import recall_candidates
+from .rerank import rerank_candidates
+from .mix_policy import compute_mix_policy
+from .db import get_database_stats, sanitize_titles_in_db, ensure_item_embeddings_table
+from .number_safety import sanitize_floats
+from .config import (
+    CZ_ALPHA, CZ_BETA, CZ_GAMMA,
+    EZ_MU, EZ_NU, SIM_CAP,
+    T_HIGH, T_MID,
+    RECALL_EZ_EXCELLENCE_THRESHOLD,
+    TOP_K_CZ, TOP_K_EZ,
+    RECO_DB_PATH,
+    RECO_SERVICE_VERSION,
+    MEM_INFLUENCE_MODE,
+    EMBEDDING_URL
+)
 
 # Configure logging
 logging.basicConfig(
@@ -395,8 +379,30 @@ async def score_endpoint(request: ScoreRequest):
             }
         }
 
+        sanitized_response, sanitized_count, sanitized_fields = sanitize_floats(response)
+        sanitizer_trace = {
+            "rule_id": "response_finite_guard_v1",
+            "sanitized_non_finite_count": sanitized_count,
+            "sanitized_fields_sample": sanitized_fields
+        }
+        decision_trace = sanitized_response.setdefault("decision_trace", {})
+        if isinstance(decision_trace, dict):
+            decision_trace["response_sanitizer"] = sanitizer_trace
+        debug = sanitized_response.setdefault("debug", {})
+        if isinstance(debug, dict):
+            debug["sanitized_non_finite_count"] = sanitized_count
+            debug["sanitized_fields_sample"] = sanitized_fields
+
+        if sanitized_count > 0:
+            logger.info(
+                "[%s] Non-finite response fields sanitized count=%s sample=%s",
+                trace_id,
+                sanitized_count,
+                sanitized_fields
+            )
+
         logger.info(f"[{trace_id}] Response ready")
-        return response
+        return sanitized_response
 
     except Exception as e:
         logger.error(f"[{trace_id}] Error: {e}", exc_info=True)

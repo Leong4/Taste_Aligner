@@ -1,0 +1,462 @@
+
+> agent_runtime@1.0.0 dev
+> ts-node-dev --respawn --transpile-only src/server.ts
+
+[INFO] 05:54:22 ts-node-dev ver. 2.0.0 (using ts-node ver. 10.9.2, typescript ver. 5.9.3)
+[bootstrap] LLM adapter: mock/mock-v1
+[bootstrap] Registered 13 skills: [extract_intent, decide_tag_budget, tag_expand, tag_normalize, memory_signal, memory_weight_adjust, vision_describe, tes_builder, fetch_recommendation, rerank, mix_policy, build_cards, explain_from_trace]
+[bootstrap] Orchestrator ready with graph "recommendation_pipeline" v12.0.0
+[agent_runtime] server listening on http://localhost:8787
+[Orchestrator] Starting pipeline "recommendation_pipeline" v12.0.0 with 12 nodes
+[Orchestrator] Executing node: extract_intent (skill: extract_intent)
+[Orchestrator] Node "extract_intent" completed in 1ms
+[Orchestrator] Executing node: decide_tag_budget (skill: decide_tag_budget)
+[Orchestrator] Node "decide_tag_budget" completed in 0ms
+[Orchestrator] Executing node: tag_expand (skill: tag_expand)
+[Orchestrator] Node "tag_expand" completed in 0ms
+[Orchestrator] Executing node: tag_normalize (skill: tag_normalize)
+[toolClient] -> /tool/ontology.normalize {
+  traceId: 't_mm31tee9_yvkves',
+  input: { data: { tags: [Array], lang: 'auto', strict: true } }
+}
+[Orchestrator] Node "tag_normalize" completed in 12ms
+[Orchestrator] Executing node: memory_weight_adjust (skill: memory_weight_adjust)
+[toolClient] -> /tool/memory.search {
+  traceId: 't_mm31teek_myh3j0',
+  input: {
+    data: {
+      user_id: 'u001',
+      query_tags: [Array],
+      top_k: 10,
+      city: 'tokyo',
+      now_ts: 1772085271327
+    }
+  }
+}
+[Orchestrator] Node "memory_weight_adjust" completed in 3ms
+[Orchestrator] Executing node: vision_describe (skill: vision_describe)
+[Orchestrator] Node "vision_describe" completed in 0ms
+[Orchestrator] Executing node: tes_builder (skill: tes_builder)
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mm31teen_dbd43s',
+  input: { vision_features: [], tags: [ 'ramen' ], normalize: true }
+}
+[Orchestrator] Node "tes_builder" completed in 10ms
+[Orchestrator] Executing node: fetch_recommendation (skill: fetch_recommendation)
+[toolClient] -> /tool/recommendation.score {
+  traceId: 't_mm31teex_34xfus',
+  input: {
+    data: {
+      user_id: 'u001',
+      city: 'tokyo',
+      tags: [Array],
+      intent: 'balanced',
+      memory_confidence: 0
+    }
+  }
+}
+[Orchestrator] Node "fetch_recommendation" completed in 45ms
+[Orchestrator] Executing node: rerank (skill: rerank)
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mm31tegb_ajwwqf',
+  input: {
+    tags: [ 'casual', 'comfort', 'japanese', 'noodles', 'ramen' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mm31tegl_wssry5',
+  input: {
+    tags: [ 'japanese', 'michelin', 'noodles', 'ramen', 'spicy' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mm31tegu_38sag8',
+  input: {
+    tags: [ 'japanese', 'modern', 'noodles', 'ramen', 'yuzu' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mm31teh4_6qk44a',
+  input: {
+    tags: [ 'casual', 'chinese', 'noodles', 'sichuan', 'spicy' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mm31tehd_kqvkv5',
+  input: {
+    tags: [ 'casual', 'chinese', 'dumplings', 'northern', 'traditional' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mm31teho_h8wlcl',
+  input: {
+    tags: [ 'chinese', 'comfort', 'noodles', 'shanghai', 'soup' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mm31tehx_zblura',
+  input: {
+    tags: [ 'art', 'digital', 'experience', 'modern', 'sightseeing' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mm31tei6_zpqfho',
+  input: {
+    tags: [ 'fine_dining', 'japanese', 'seafood', 'sushi' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mm31teif_7n5ln2',
+  input: {
+    tags: [ 'culture', 'sightseeing', 'temple', 'traditional', 'walk' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mm31teio_akhdnv',
+  input: {
+    tags: [ 'casual', 'drinks', 'izakaya', 'japanese', 'nightlife' ],
+    normalize: true
+  }
+}
+[Orchestrator] Node "rerank" completed in 98ms
+[Orchestrator] Executing node: mix_policy (skill: mix_policy)
+[Orchestrator] Node "mix_policy" completed in 1ms
+[Orchestrator] Executing node: build_cards (skill: build_cards)
+[toolClient] -> /tool/planner.compose {
+  traceId: 't_mm31teix_9x7y08',
+  input: {
+    data: {
+      city: 'tokyo',
+      cz: [Array],
+      ez: [],
+      tags: [Array],
+      user_id: 'u001',
+      intent: {},
+      cz_ranked: [Array],
+      ez_ranked: [],
+      mix_policy: [Object],
+      decision_trace: [Object],
+      meta: [Object]
+    }
+  }
+}
+[Orchestrator] Node "build_cards" completed in 58ms
+[Orchestrator] Executing node: explain_from_trace (skill: explain_from_trace)
+[Orchestrator] Node "explain_from_trace" completed in 0ms
+[Orchestrator] Starting pipeline "recommendation_pipeline" v12.0.0 with 12 nodes
+[Orchestrator] Executing node: extract_intent (skill: extract_intent)
+[Orchestrator] Node "extract_intent" completed in 1ms
+[Orchestrator] Executing node: decide_tag_budget (skill: decide_tag_budget)
+[Orchestrator] Node "decide_tag_budget" completed in 0ms
+[Orchestrator] Executing node: tag_expand (skill: tag_expand)
+[Orchestrator] Node "tag_expand" completed in 0ms
+[Orchestrator] Executing node: tag_normalize (skill: tag_normalize)
+[toolClient] -> /tool/ontology.normalize {
+  traceId: 't_mm31teoe_ufb1eo',
+  input: { data: { tags: [Array], lang: 'auto', strict: true } }
+}
+[Orchestrator] Node "tag_normalize" completed in 2ms
+[Orchestrator] Executing node: memory_weight_adjust (skill: memory_weight_adjust)
+[toolClient] -> /tool/memory.search {
+  traceId: 't_mm31teog_pwumsz',
+  input: {
+    data: {
+      user_id: 'u001',
+      query_tags: [Array],
+      top_k: 10,
+      city: 'tokyo',
+      now_ts: 1772085271693
+    }
+  }
+}
+[Orchestrator] Node "memory_weight_adjust" completed in 2ms
+[Orchestrator] Executing node: vision_describe (skill: vision_describe)
+[Orchestrator] Node "vision_describe" completed in 0ms
+[Orchestrator] Executing node: tes_builder (skill: tes_builder)
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mm31teoi_0p8cre',
+  input: { vision_features: [], tags: [ 'ramen' ], normalize: true }
+}
+[Orchestrator] Node "tes_builder" completed in 9ms
+[Orchestrator] Executing node: fetch_recommendation (skill: fetch_recommendation)
+[toolClient] -> /tool/recommendation.score {
+  traceId: 't_mm31teor_ldyzin',
+  input: {
+    data: {
+      user_id: 'u001',
+      city: 'tokyo',
+      tags: [Array],
+      intent: 'balanced',
+      memory_confidence: 0
+    }
+  }
+}
+[Orchestrator] Node "fetch_recommendation" completed in 42ms
+[Orchestrator] Executing node: rerank (skill: rerank)
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mm31tepx_wzk46i',
+  input: {
+    tags: [ 'casual', 'comfort', 'japanese', 'noodles', 'ramen' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mm31teq5_qzkl4u',
+  input: {
+    tags: [ 'japanese', 'michelin', 'noodles', 'ramen', 'spicy' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mm31teqe_uocqks',
+  input: {
+    tags: [ 'japanese', 'modern', 'noodles', 'ramen', 'yuzu' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mm31teqm_340kts',
+  input: {
+    tags: [ 'casual', 'chinese', 'noodles', 'sichuan', 'spicy' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mm31tequ_esvzgt',
+  input: {
+    tags: [ 'casual', 'chinese', 'dumplings', 'northern', 'traditional' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mm31teqv_hs5vqu',
+  input: {
+    tags: [ 'chinese', 'comfort', 'noodles', 'shanghai', 'soup' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mm31teqw_9r6cl7',
+  input: {
+    tags: [ 'art', 'digital', 'experience', 'modern', 'sightseeing' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mm31teqx_qn4cog',
+  input: {
+    tags: [ 'fine_dining', 'japanese', 'seafood', 'sushi' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mm31teqx_xajx6b',
+  input: {
+    tags: [ 'culture', 'sightseeing', 'temple', 'traditional', 'walk' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mm31teqy_qih0yr',
+  input: {
+    tags: [ 'casual', 'drinks', 'izakaya', 'japanese', 'nightlife' ],
+    normalize: true
+  }
+}
+[Orchestrator] Node "rerank" completed in 38ms
+[Orchestrator] Executing node: mix_policy (skill: mix_policy)
+[Orchestrator] Node "mix_policy" completed in 0ms
+[Orchestrator] Executing node: build_cards (skill: build_cards)
+[toolClient] -> /tool/planner.compose {
+  traceId: 't_mm31teqz_fikmxi',
+  input: {
+    data: {
+      city: 'tokyo',
+      cz: [Array],
+      ez: [],
+      tags: [Array],
+      user_id: 'u001',
+      intent: {},
+      cz_ranked: [Array],
+      ez_ranked: [],
+      mix_policy: [Object],
+      decision_trace: [Object],
+      meta: [Object]
+    }
+  }
+}
+[Orchestrator] Node "build_cards" completed in 55ms
+[Orchestrator] Executing node: explain_from_trace (skill: explain_from_trace)
+[Orchestrator] Node "explain_from_trace" completed in 0ms
+[Orchestrator] Starting pipeline "recommendation_pipeline" v12.0.0 with 12 nodes
+[Orchestrator] Executing node: extract_intent (skill: extract_intent)
+[Orchestrator] Node "extract_intent" completed in 0ms
+[Orchestrator] Executing node: decide_tag_budget (skill: decide_tag_budget)
+[Orchestrator] Node "decide_tag_budget" completed in 0ms
+[Orchestrator] Executing node: tag_expand (skill: tag_expand)
+[Orchestrator] Node "tag_expand" completed in 0ms
+[Orchestrator] Executing node: tag_normalize (skill: tag_normalize)
+[toolClient] -> /tool/ontology.normalize {
+  traceId: 't_mm31tevc_171fa6',
+  input: { data: { tags: [Array], lang: 'auto', strict: true } }
+}
+[Orchestrator] Node "tag_normalize" completed in 2ms
+[Orchestrator] Executing node: memory_weight_adjust (skill: memory_weight_adjust)
+[toolClient] -> /tool/memory.search {
+  traceId: 't_mm31tevf_y9hk52',
+  input: {
+    data: {
+      user_id: 'u001',
+      query_tags: [Array],
+      top_k: 10,
+      city: 'tokyo',
+      now_ts: 1772085271944
+    }
+  }
+}
+[Orchestrator] Node "memory_weight_adjust" completed in 1ms
+[Orchestrator] Executing node: vision_describe (skill: vision_describe)
+[Orchestrator] Node "vision_describe" completed in 0ms
+[Orchestrator] Executing node: tes_builder (skill: tes_builder)
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mm31tevg_492p4s',
+  input: { vision_features: [], tags: [ 'ramen' ], normalize: true }
+}
+[Orchestrator] Node "tes_builder" completed in 1ms
+[Orchestrator] Executing node: fetch_recommendation (skill: fetch_recommendation)
+[toolClient] -> /tool/recommendation.score {
+  traceId: 't_mm31tevh_tw2wky',
+  input: {
+    data: {
+      user_id: 'u001',
+      city: 'tokyo',
+      tags: [Array],
+      intent: 'balanced',
+      memory_confidence: 0
+    }
+  }
+}
+[Orchestrator] Node "fetch_recommendation" completed in 36ms
+[Orchestrator] Executing node: rerank (skill: rerank)
+[Orchestrator] Node "rerank" completed in 0ms
+[Orchestrator] Executing node: mix_policy (skill: mix_policy)
+[Orchestrator] Node "mix_policy" completed in 0ms
+[Orchestrator] Executing node: build_cards (skill: build_cards)
+[toolClient] -> /tool/planner.compose {
+  traceId: 't_mm31tewh_6np3cn',
+  input: {
+    data: {
+      city: 'tokyo',
+      cz: [Array],
+      ez: [],
+      tags: [Array],
+      user_id: 'u001',
+      intent: {},
+      cz_ranked: [Array],
+      ez_ranked: [],
+      mix_policy: [Object],
+      decision_trace: [Object],
+      meta: [Object]
+    }
+  }
+}
+[Orchestrator] Node "build_cards" completed in 46ms
+[Orchestrator] Executing node: explain_from_trace (skill: explain_from_trace)
+[Orchestrator] Node "explain_from_trace" completed in 0ms
+[Orchestrator] Starting pipeline "recommendation_pipeline" v12.0.0 with 12 nodes
+[Orchestrator] Executing node: extract_intent (skill: extract_intent)
+[Orchestrator] Node "extract_intent" completed in 0ms
+[Orchestrator] Executing node: decide_tag_budget (skill: decide_tag_budget)
+[Orchestrator] Node "decide_tag_budget" completed in 0ms
+[Orchestrator] Executing node: tag_expand (skill: tag_expand)
+[Orchestrator] Node "tag_expand" completed in 0ms
+[Orchestrator] Executing node: tag_normalize (skill: tag_normalize)
+[toolClient] -> /tool/ontology.normalize {
+  traceId: 't_mm31tezn_ual9dr',
+  input: { data: { tags: [Array], lang: 'auto', strict: true } }
+}
+[Orchestrator] Node "tag_normalize" completed in 2ms
+[Orchestrator] Executing node: memory_weight_adjust (skill: memory_weight_adjust)
+[toolClient] -> /tool/memory.search {
+  traceId: 't_mm31tezp_0tvj9o',
+  input: {
+    data: {
+      user_id: 'u001',
+      query_tags: [Array],
+      top_k: 10,
+      city: 'tokyo',
+      now_ts: 1772085272099
+    }
+  }
+}
+[Orchestrator] Node "memory_weight_adjust" completed in 2ms
+[Orchestrator] Executing node: vision_describe (skill: vision_describe)
+[toolClient] -> /tool/vision.describe {
+  traceId: 't_mm31tezr_fa17qy',
+  input: {
+    data: {
+      top_k: 10,
+      image_base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
+    }
+  }
+}
+[Orchestrator] Node "vision_describe" completed in 1ms
+[Orchestrator] Executing node: tes_builder (skill: tes_builder)
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mm31tezs_ux9sn2',
+  input: {
+    vision_features: [ 'nightlife', 'ramen', 'street_food' ],
+    tags: [ 'ramen' ],
+    normalize: true
+  }
+}
+[Orchestrator] Node "tes_builder" completed in 1ms
+[Orchestrator] Executing node: fetch_recommendation (skill: fetch_recommendation)
+[toolClient] -> /tool/recommendation.score {
+  traceId: 't_mm31tezt_mw1ljn',
+  input: {
+    data: {
+      user_id: 'u001',
+      city: 'tokyo',
+      tags: [Array],
+      intent: 'balanced',
+      memory_confidence: 0
+    }
+  }
+}
+[Orchestrator] Node "fetch_recommendation" completed in 38ms
+[Orchestrator] Executing node: rerank (skill: rerank)
+[Orchestrator] Node "rerank" completed in 0ms
+[Orchestrator] Executing node: mix_policy (skill: mix_policy)
+[Orchestrator] Node "mix_policy" completed in 0ms
+[Orchestrator] Executing node: build_cards (skill: build_cards)
+[toolClient] -> /tool/planner.compose {
+  traceId: 't_mm31tf0w_471f22',
+  input: {
+    data: {
+      city: 'tokyo',
+      cz: [Array],
+      ez: [],
+      tags: [Array],
+      user_id: 'u001',
+      intent: {},
+      cz_ranked: [Array],
+      ez_ranked: [],
+      mix_policy: [Object],
+      decision_trace: [Object],
+      meta: [Object]
+    }
+  }
+}
+[Orchestrator] Node "build_cards" completed in 45ms
+[Orchestrator] Executing node: explain_from_trace (skill: explain_from_trace)
+[Orchestrator] Node "explain_from_trace" completed in 0ms

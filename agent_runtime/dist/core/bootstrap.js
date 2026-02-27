@@ -47,6 +47,7 @@ function createOrchestrator(config = {}) {
     registry.register((0, skills_1.createTagNormalizeSkill)());
     registry.register((0, skills_1.createMemorySignalSkill)(toolClient));
     registry.register((0, skills_1.createMemoryWeightAdjustSkill)(toolClient));
+    registry.register((0, skills_1.createVisionDescribeSkill)(toolClient));
     registry.register((0, skills_1.createTesBuilderSkill)(toolClient));
     registry.register((0, skills_1.createFetchRecommendationSkill)(toolClient));
     registry.register((0, skills_1.createRerankSkill)(toolClient));

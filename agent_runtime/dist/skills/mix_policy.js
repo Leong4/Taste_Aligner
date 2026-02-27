@@ -72,6 +72,8 @@ exports.mixPolicySkill = {
         // The mix_policy trace for the orchestrator
         const trace = {
             ...(recoTrace.mix_policy ?? {}),
+            memory_confidence_source: "memory_weight_adjust",
+            memory_confidence: input.memory_confidence,
         };
         if (fallback_used) {
             trace.fallback_used = true;

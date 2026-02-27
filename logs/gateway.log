@@ -1,0 +1,422 @@
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::staticFieldBase has been called by com.google.inject.internal.aop.HiddenClassDefiner (file:/opt/homebrew/Cellar/maven/3.9.11/libexec/lib/guice-5.1.0-classes.jar)
+WARNING: Please consider reporting this to the maintainers of class com.google.inject.internal.aop.HiddenClassDefiner
+WARNING: sun.misc.Unsafe::staticFieldBase will be removed in a future release
+2月 26, 2026 5:54:23 上午 gateway.GatewayServer loadToolModes
+信息: Loaded tool modes: {vision=remote, memory=remote, recommendation=remote, embedding=remote, planner=remote, ontology=remote}
+2月 26, 2026 5:54:23 上午 gateway.GatewayServer loadServiceUrls
+信息: Loaded service URLs: {vision=http://localhost:5002, memory=http://localhost:5001, recommendation=http://localhost:5005, embedding=http://localhost:5004, planner=http://localhost:5006, ontology=http://localhost:5003}
+2月 26, 2026 5:54:23 上午 gateway.GatewayServer start
+信息: Gateway server started on port 8080
+2月 26, 2026 5:54:26 上午 gateway.GatewayServer logInfo
+信息: [trace_id=b2f9d384-3513-4561-81d3-b572e57d40db] [tool=health] [stage=health] status ok
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=dd2d4205-c120-4f9f-8df0-f8a29731fbfa] [tool=memory.search] [stage=incoming] method=POST path=/tool/memory.search
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=dd2d4205-c120-4f9f-8df0-f8a29731fbfa] [tool=memory.search] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=dd2d4205-c120-4f9f-8df0-f8a29731fbfa] [tool=memory] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=dd2d4205-c120-4f9f-8df0-f8a29731fbfa] [tool=memory.search] [stage=respond] latency=13ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=3d1c0a04-9c7c-45f9-b760-c3eb55221fcb] [tool=recommendation.score] [stage=incoming] method=POST path=/tool/recommendation.score
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=3d1c0a04-9c7c-45f9-b760-c3eb55221fcb] [tool=recommendation.score] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=3d1c0a04-9c7c-45f9-b760-c3eb55221fcb] [tool=recommendation] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=3d1c0a04-9c7c-45f9-b760-c3eb55221fcb] [tool=recommendation.score] [stage=respond] latency=51ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=e9fa7274-e625-44bd-8738-74482a32fcf9] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=e9fa7274-e625-44bd-8738-74482a32fcf9] [tool=embedding.tes_build] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=e9fa7274-e625-44bd-8738-74482a32fcf9] [tool=embedding] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=e9fa7274-e625-44bd-8738-74482a32fcf9] [tool=embedding.tes_build] [stage=respond] latency=10ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=a4e6668c-34d9-4eae-85bc-27174292cad5] [tool=planner.compose] [stage=incoming] method=POST path=/tool/planner.compose
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=a4e6668c-34d9-4eae-85bc-27174292cad5] [tool=planner.compose] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=a4e6668c-34d9-4eae-85bc-27174292cad5] [tool=planner] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=a4e6668c-34d9-4eae-85bc-27174292cad5] [tool=planner.compose] [stage=respond] latency=50ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=b66253ae-5578-4404-b65f-3789bf6c0bc7] [tool=ontology.normalize] [stage=incoming] method=POST path=/tool/ontology.normalize
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=b66253ae-5578-4404-b65f-3789bf6c0bc7] [tool=ontology.normalize] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=b66253ae-5578-4404-b65f-3789bf6c0bc7] [tool=ontology] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=b66253ae-5578-4404-b65f-3789bf6c0bc7] [tool=ontology.normalize] [stage=respond] latency=3ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=899cbd69-9da0-474f-97fe-95cc8cd2b51f] [tool=memory.search] [stage=incoming] method=POST path=/tool/memory.search
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=899cbd69-9da0-474f-97fe-95cc8cd2b51f] [tool=memory.search] [stage=forward] attempt=1 status=422
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logWarn
+警告: [trace_id=899cbd69-9da0-474f-97fe-95cc8cd2b51f] [tool=memory] [stage=circuit] circuit failure recorded
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=899cbd69-9da0-474f-97fe-95cc8cd2b51f] [tool=memory.search] [stage=respond] latency=2ms status=422
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=7a0d6cb9-bbbc-42da-bafe-68dee98c4fa6] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=7a0d6cb9-bbbc-42da-bafe-68dee98c4fa6] [tool=embedding.tes_build] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=7a0d6cb9-bbbc-42da-bafe-68dee98c4fa6] [tool=embedding] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=7a0d6cb9-bbbc-42da-bafe-68dee98c4fa6] [tool=embedding.tes_build] [stage=respond] latency=9ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=eaf727f5-9352-4017-815f-4c989e6e5486] [tool=recommendation.score] [stage=incoming] method=POST path=/tool/recommendation.score
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=eaf727f5-9352-4017-815f-4c989e6e5486] [tool=recommendation.score] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=eaf727f5-9352-4017-815f-4c989e6e5486] [tool=recommendation] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=eaf727f5-9352-4017-815f-4c989e6e5486] [tool=recommendation.score] [stage=respond] latency=43ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=d268c4d2-d059-4646-ab7f-42640eb5d656] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=d268c4d2-d059-4646-ab7f-42640eb5d656] [tool=embedding.tes_build] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=d268c4d2-d059-4646-ab7f-42640eb5d656] [tool=embedding] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=d268c4d2-d059-4646-ab7f-42640eb5d656] [tool=embedding.tes_build] [stage=respond] latency=8ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=dd053f58-e7b2-422b-b6da-4c046805efe2] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=dd053f58-e7b2-422b-b6da-4c046805efe2] [tool=embedding.tes_build] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=dd053f58-e7b2-422b-b6da-4c046805efe2] [tool=embedding] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=dd053f58-e7b2-422b-b6da-4c046805efe2] [tool=embedding.tes_build] [stage=respond] latency=8ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=1a5214e1-510d-4e90-95c0-aa41ea795d38] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=1a5214e1-510d-4e90-95c0-aa41ea795d38] [tool=embedding.tes_build] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=1a5214e1-510d-4e90-95c0-aa41ea795d38] [tool=embedding] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=1a5214e1-510d-4e90-95c0-aa41ea795d38] [tool=embedding.tes_build] [stage=respond] latency=8ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=95a0ec44-107a-4c65-bcb5-0089abad9262] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=95a0ec44-107a-4c65-bcb5-0089abad9262] [tool=embedding.tes_build] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=95a0ec44-107a-4c65-bcb5-0089abad9262] [tool=embedding] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=95a0ec44-107a-4c65-bcb5-0089abad9262] [tool=embedding.tes_build] [stage=respond] latency=8ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=003843c5-21fe-4dee-922b-1827da8b5962] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=003843c5-21fe-4dee-922b-1827da8b5962] [tool=embedding.tes_build] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=003843c5-21fe-4dee-922b-1827da8b5962] [tool=embedding] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=003843c5-21fe-4dee-922b-1827da8b5962] [tool=embedding.tes_build] [stage=respond] latency=8ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=b2bc34dc-04c5-4776-824e-10a91612db82] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=b2bc34dc-04c5-4776-824e-10a91612db82] [tool=embedding.tes_build] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=b2bc34dc-04c5-4776-824e-10a91612db82] [tool=embedding] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=b2bc34dc-04c5-4776-824e-10a91612db82] [tool=embedding.tes_build] [stage=respond] latency=7ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=3fd353ff-db19-43fd-adcc-60ff21d51bba] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=3fd353ff-db19-43fd-adcc-60ff21d51bba] [tool=embedding.tes_build] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=3fd353ff-db19-43fd-adcc-60ff21d51bba] [tool=embedding] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=3fd353ff-db19-43fd-adcc-60ff21d51bba] [tool=embedding.tes_build] [stage=respond] latency=9ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=97d5b3b8-e0da-4715-98b2-a27b7e46314c] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=97d5b3b8-e0da-4715-98b2-a27b7e46314c] [tool=embedding.tes_build] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=97d5b3b8-e0da-4715-98b2-a27b7e46314c] [tool=embedding] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=97d5b3b8-e0da-4715-98b2-a27b7e46314c] [tool=embedding.tes_build] [stage=respond] latency=8ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=f638667f-1b35-427b-85fa-0f91840fc13b] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=f638667f-1b35-427b-85fa-0f91840fc13b] [tool=embedding.tes_build] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=f638667f-1b35-427b-85fa-0f91840fc13b] [tool=embedding] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=f638667f-1b35-427b-85fa-0f91840fc13b] [tool=embedding.tes_build] [stage=respond] latency=8ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=464128d1-58ab-4520-a478-e705fec0f050] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=464128d1-58ab-4520-a478-e705fec0f050] [tool=embedding.tes_build] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=464128d1-58ab-4520-a478-e705fec0f050] [tool=embedding] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=464128d1-58ab-4520-a478-e705fec0f050] [tool=embedding.tes_build] [stage=respond] latency=8ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=70c02d74-99a0-4107-b98e-a2e7fe6641d7] [tool=planner.compose] [stage=incoming] method=POST path=/tool/planner.compose
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=70c02d74-99a0-4107-b98e-a2e7fe6641d7] [tool=planner.compose] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=70c02d74-99a0-4107-b98e-a2e7fe6641d7] [tool=planner] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=70c02d74-99a0-4107-b98e-a2e7fe6641d7] [tool=planner.compose] [stage=respond] latency=57ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=17a80d1a-2d90-405e-885d-2882f05a10f0] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=17a80d1a-2d90-405e-885d-2882f05a10f0] [tool=embedding.tes_build] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=17a80d1a-2d90-405e-885d-2882f05a10f0] [tool=embedding] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=17a80d1a-2d90-405e-885d-2882f05a10f0] [tool=embedding.tes_build] [stage=respond] latency=9ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=660b91d5-d3c6-4da8-814f-3a00485c9489] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=660b91d5-d3c6-4da8-814f-3a00485c9489] [tool=embedding.tes_build] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=660b91d5-d3c6-4da8-814f-3a00485c9489] [tool=embedding] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=660b91d5-d3c6-4da8-814f-3a00485c9489] [tool=embedding.tes_build] [stage=respond] latency=9ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=a49cb83b-e45c-45a0-bc3f-9d6f4d70d664] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=a49cb83b-e45c-45a0-bc3f-9d6f4d70d664] [tool=embedding.tes_build] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=a49cb83b-e45c-45a0-bc3f-9d6f4d70d664] [tool=embedding] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=a49cb83b-e45c-45a0-bc3f-9d6f4d70d664] [tool=embedding.tes_build] [stage=respond] latency=8ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=3f08ef07-6376-497e-9ef6-b7d1a3a37e87] [tool=ontology.normalize] [stage=incoming] method=POST path=/tool/ontology.normalize
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=3f08ef07-6376-497e-9ef6-b7d1a3a37e87] [tool=ontology.normalize] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=3f08ef07-6376-497e-9ef6-b7d1a3a37e87] [tool=ontology] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=3f08ef07-6376-497e-9ef6-b7d1a3a37e87] [tool=ontology.normalize] [stage=respond] latency=2ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=7ef22a8d-6e20-4bad-b970-5b7b7fbcd563] [tool=memory.search] [stage=incoming] method=POST path=/tool/memory.search
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=7ef22a8d-6e20-4bad-b970-5b7b7fbcd563] [tool=memory.search] [stage=forward] attempt=1 status=422
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logWarn
+警告: [trace_id=7ef22a8d-6e20-4bad-b970-5b7b7fbcd563] [tool=memory] [stage=circuit] circuit failure recorded
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=7ef22a8d-6e20-4bad-b970-5b7b7fbcd563] [tool=memory.search] [stage=respond] latency=1ms status=422
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=4f523e15-83b6-4aaf-b25d-06f87c5e1b51] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=4f523e15-83b6-4aaf-b25d-06f87c5e1b51] [tool=embedding.tes_build] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=4f523e15-83b6-4aaf-b25d-06f87c5e1b51] [tool=embedding] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=4f523e15-83b6-4aaf-b25d-06f87c5e1b51] [tool=embedding.tes_build] [stage=respond] latency=8ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=da7c3076-509c-4322-9bb9-244c9a07792a] [tool=recommendation.score] [stage=incoming] method=POST path=/tool/recommendation.score
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=da7c3076-509c-4322-9bb9-244c9a07792a] [tool=recommendation.score] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=da7c3076-509c-4322-9bb9-244c9a07792a] [tool=recommendation] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=da7c3076-509c-4322-9bb9-244c9a07792a] [tool=recommendation.score] [stage=respond] latency=40ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=5d686665-b522-40f3-b9ba-36f3edf5eeda] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=5d686665-b522-40f3-b9ba-36f3edf5eeda] [tool=embedding.tes_build] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=5d686665-b522-40f3-b9ba-36f3edf5eeda] [tool=embedding] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=5d686665-b522-40f3-b9ba-36f3edf5eeda] [tool=embedding.tes_build] [stage=respond] latency=8ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=ac52cb7e-870c-4212-9ff6-145f43a3016d] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=ac52cb7e-870c-4212-9ff6-145f43a3016d] [tool=embedding.tes_build] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=ac52cb7e-870c-4212-9ff6-145f43a3016d] [tool=embedding] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=ac52cb7e-870c-4212-9ff6-145f43a3016d] [tool=embedding.tes_build] [stage=respond] latency=8ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=a553c058-3ad5-4d8d-b207-c6a7f1cf1ba9] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=a553c058-3ad5-4d8d-b207-c6a7f1cf1ba9] [tool=embedding.tes_build] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=a553c058-3ad5-4d8d-b207-c6a7f1cf1ba9] [tool=embedding] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=a553c058-3ad5-4d8d-b207-c6a7f1cf1ba9] [tool=embedding.tes_build] [stage=respond] latency=8ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=9aaab6d4-0a79-40d1-aa1b-1890abc89f8c] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=9aaab6d4-0a79-40d1-aa1b-1890abc89f8c] [tool=embedding.tes_build] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=9aaab6d4-0a79-40d1-aa1b-1890abc89f8c] [tool=embedding] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=9aaab6d4-0a79-40d1-aa1b-1890abc89f8c] [tool=embedding.tes_build] [stage=respond] latency=7ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=2558aef7-7c92-4594-9473-726feb2daec1] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logWarn
+警告: [trace_id=2558aef7-7c92-4594-9473-726feb2daec1] [tool=embedding.tes_build] [stage=rate_limit] rate limit exceeded
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=2558aef7-7c92-4594-9473-726feb2daec1] [tool=embedding.tes_build] [stage=respond] latency=0ms status=429
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=6bdce049-37e1-4303-9ecc-b5c9184baf09] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logWarn
+警告: [trace_id=6bdce049-37e1-4303-9ecc-b5c9184baf09] [tool=embedding.tes_build] [stage=rate_limit] rate limit exceeded
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=6bdce049-37e1-4303-9ecc-b5c9184baf09] [tool=embedding.tes_build] [stage=respond] latency=0ms status=429
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=6fa98a83-472b-4669-8481-be92522d9d29] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logWarn
+警告: [trace_id=6fa98a83-472b-4669-8481-be92522d9d29] [tool=embedding.tes_build] [stage=rate_limit] rate limit exceeded
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=6fa98a83-472b-4669-8481-be92522d9d29] [tool=embedding.tes_build] [stage=respond] latency=1ms status=429
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=0500d556-5646-4bf3-956c-8ceb3ce1e152] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logWarn
+警告: [trace_id=0500d556-5646-4bf3-956c-8ceb3ce1e152] [tool=embedding.tes_build] [stage=rate_limit] rate limit exceeded
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=0500d556-5646-4bf3-956c-8ceb3ce1e152] [tool=embedding.tes_build] [stage=respond] latency=0ms status=429
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=2a541897-17e4-4a1f-9069-9e6d620c27da] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logWarn
+警告: [trace_id=2a541897-17e4-4a1f-9069-9e6d620c27da] [tool=embedding.tes_build] [stage=rate_limit] rate limit exceeded
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=2a541897-17e4-4a1f-9069-9e6d620c27da] [tool=embedding.tes_build] [stage=respond] latency=0ms status=429
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=ac37f2cc-ad59-4bfd-ab5b-406fd56c1624] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logWarn
+警告: [trace_id=ac37f2cc-ad59-4bfd-ab5b-406fd56c1624] [tool=embedding.tes_build] [stage=rate_limit] rate limit exceeded
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=ac37f2cc-ad59-4bfd-ab5b-406fd56c1624] [tool=embedding.tes_build] [stage=respond] latency=1ms status=429
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=954eabf2-0abe-46bd-ae64-5a79ad5ce6bc] [tool=planner.compose] [stage=incoming] method=POST path=/tool/planner.compose
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=954eabf2-0abe-46bd-ae64-5a79ad5ce6bc] [tool=planner.compose] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=954eabf2-0abe-46bd-ae64-5a79ad5ce6bc] [tool=planner] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=954eabf2-0abe-46bd-ae64-5a79ad5ce6bc] [tool=planner.compose] [stage=respond] latency=55ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=7ca79a27-aaf0-4860-9799-72a0d20ba72f] [tool=recommendation.score] [stage=incoming] method=POST path=/tool/recommendation.score
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=7ca79a27-aaf0-4860-9799-72a0d20ba72f] [tool=recommendation.score] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=7ca79a27-aaf0-4860-9799-72a0d20ba72f] [tool=recommendation] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=7ca79a27-aaf0-4860-9799-72a0d20ba72f] [tool=recommendation.score] [stage=respond] latency=42ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=17b847de-c436-4f37-ab88-9bd8fb868361] [tool=ontology.normalize] [stage=incoming] method=POST path=/tool/ontology.normalize
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=17b847de-c436-4f37-ab88-9bd8fb868361] [tool=ontology.normalize] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=17b847de-c436-4f37-ab88-9bd8fb868361] [tool=ontology] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=17b847de-c436-4f37-ab88-9bd8fb868361] [tool=ontology.normalize] [stage=respond] latency=1ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=fae0c423-09c1-4bb9-9181-84eaaaa71bc1] [tool=memory.search] [stage=incoming] method=POST path=/tool/memory.search
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=fae0c423-09c1-4bb9-9181-84eaaaa71bc1] [tool=memory.search] [stage=forward] attempt=1 status=422
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logWarn
+警告: [trace_id=fae0c423-09c1-4bb9-9181-84eaaaa71bc1] [tool=memory] [stage=circuit] circuit failure recorded
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=fae0c423-09c1-4bb9-9181-84eaaaa71bc1] [tool=memory.search] [stage=respond] latency=1ms status=422
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=065c04af-6104-41ca-9fe2-4d860110c7b9] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logWarn
+警告: [trace_id=065c04af-6104-41ca-9fe2-4d860110c7b9] [tool=embedding.tes_build] [stage=rate_limit] rate limit exceeded
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=065c04af-6104-41ca-9fe2-4d860110c7b9] [tool=embedding.tes_build] [stage=respond] latency=1ms status=429
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=4c778ddc-dcb6-4aed-bd25-3684261abe9b] [tool=recommendation.score] [stage=incoming] method=POST path=/tool/recommendation.score
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=4c778ddc-dcb6-4aed-bd25-3684261abe9b] [tool=recommendation.score] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=4c778ddc-dcb6-4aed-bd25-3684261abe9b] [tool=recommendation] [stage=circuit] circuit closed
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=4c778ddc-dcb6-4aed-bd25-3684261abe9b] [tool=recommendation.score] [stage=respond] latency=36ms status=200
+2月 26, 2026 5:54:31 上午 gateway.GatewayServer logInfo
+信息: [trace_id=63cb244a-edb9-40ee-9339-8c26b8bdea17] [tool=planner.compose] [stage=incoming] method=POST path=/tool/planner.compose
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=63cb244a-edb9-40ee-9339-8c26b8bdea17] [tool=planner.compose] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=63cb244a-edb9-40ee-9339-8c26b8bdea17] [tool=planner] [stage=circuit] circuit closed
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=63cb244a-edb9-40ee-9339-8c26b8bdea17] [tool=planner.compose] [stage=respond] latency=44ms status=200
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=ee425b35-afe6-4ef4-92f2-17f178842acc] [tool=vision.describe] [stage=incoming] method=POST path=/tool/vision.describe
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=ee425b35-afe6-4ef4-92f2-17f178842acc] [tool=vision.describe] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=ee425b35-afe6-4ef4-92f2-17f178842acc] [tool=vision] [stage=circuit] circuit closed
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=ee425b35-afe6-4ef4-92f2-17f178842acc] [tool=vision.describe] [stage=respond] latency=2ms status=200
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=44c5f6fb-ef19-43c9-a930-8e1a4dc2f420] [tool=ontology.normalize] [stage=incoming] method=POST path=/tool/ontology.normalize
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=44c5f6fb-ef19-43c9-a930-8e1a4dc2f420] [tool=ontology.normalize] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=44c5f6fb-ef19-43c9-a930-8e1a4dc2f420] [tool=ontology] [stage=circuit] circuit closed
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=44c5f6fb-ef19-43c9-a930-8e1a4dc2f420] [tool=ontology.normalize] [stage=respond] latency=2ms status=200
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=582ac99e-d215-4261-a38d-e4dc792a75c0] [tool=memory.search] [stage=incoming] method=POST path=/tool/memory.search
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=582ac99e-d215-4261-a38d-e4dc792a75c0] [tool=memory.search] [stage=forward] attempt=1 status=422
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logWarn
+警告: [trace_id=582ac99e-d215-4261-a38d-e4dc792a75c0] [tool=memory] [stage=circuit] circuit failure recorded
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=582ac99e-d215-4261-a38d-e4dc792a75c0] [tool=memory.search] [stage=respond] latency=0ms status=422
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=c068ddab-53f7-4c08-9699-cf2a75bec2df] [tool=vision.describe] [stage=incoming] method=POST path=/tool/vision.describe
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=c068ddab-53f7-4c08-9699-cf2a75bec2df] [tool=vision.describe] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=c068ddab-53f7-4c08-9699-cf2a75bec2df] [tool=vision] [stage=circuit] circuit closed
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=c068ddab-53f7-4c08-9699-cf2a75bec2df] [tool=vision.describe] [stage=respond] latency=1ms status=200
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=113fd0b8-cf71-48ec-b59b-224100a6979f] [tool=embedding.tes_build] [stage=incoming] method=POST path=/tool/embedding.tes_build
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logWarn
+警告: [trace_id=113fd0b8-cf71-48ec-b59b-224100a6979f] [tool=embedding.tes_build] [stage=rate_limit] rate limit exceeded
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=113fd0b8-cf71-48ec-b59b-224100a6979f] [tool=embedding.tes_build] [stage=respond] latency=0ms status=429
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=42d254e8-48cd-44c5-9a5c-d051b05f9a05] [tool=recommendation.score] [stage=incoming] method=POST path=/tool/recommendation.score
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=42d254e8-48cd-44c5-9a5c-d051b05f9a05] [tool=recommendation.score] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=42d254e8-48cd-44c5-9a5c-d051b05f9a05] [tool=recommendation] [stage=circuit] circuit closed
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=42d254e8-48cd-44c5-9a5c-d051b05f9a05] [tool=recommendation.score] [stage=respond] latency=38ms status=200
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=4250e7b7-b1e3-443a-9ce2-b0fb95fab8aa] [tool=planner.compose] [stage=incoming] method=POST path=/tool/planner.compose
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=4250e7b7-b1e3-443a-9ce2-b0fb95fab8aa] [tool=planner.compose] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=4250e7b7-b1e3-443a-9ce2-b0fb95fab8aa] [tool=planner] [stage=circuit] circuit closed
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=4250e7b7-b1e3-443a-9ce2-b0fb95fab8aa] [tool=planner.compose] [stage=respond] latency=44ms status=200
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=71912d3b-fea9-4d70-b680-1d575ea3f346] [tool=ontology.normalize] [stage=incoming] method=POST path=/tool/ontology.normalize
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=71912d3b-fea9-4d70-b680-1d575ea3f346] [tool=ontology.normalize] [stage=respond] latency=0ms status=400
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=20e6314d-36e1-42b6-b421-0f862f952219] [tool=ontology.normalize] [stage=incoming] method=POST path=/tool/ontology.normalize
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=20e6314d-36e1-42b6-b421-0f862f952219] [tool=ontology.normalize] [stage=respond] latency=0ms status=400
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=549bc820-c784-4207-be1f-04bb5bbcce4b] [tool=ontology.normalize] [stage=incoming] method=POST path=/tool/ontology.normalize
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=549bc820-c784-4207-be1f-04bb5bbcce4b] [tool=ontology.normalize] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=549bc820-c784-4207-be1f-04bb5bbcce4b] [tool=ontology] [stage=circuit] circuit closed
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=549bc820-c784-4207-be1f-04bb5bbcce4b] [tool=ontology.normalize] [stage=respond] latency=1ms status=200
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=89c98f92-b55b-4b1e-8bd4-70560f3b628a] [tool=ontology.normalize] [stage=incoming] method=POST path=/tool/ontology.normalize
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=89c98f92-b55b-4b1e-8bd4-70560f3b628a] [tool=ontology.normalize] [stage=forward] attempt=1 status=200
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=89c98f92-b55b-4b1e-8bd4-70560f3b628a] [tool=ontology] [stage=circuit] circuit closed
+2月 26, 2026 5:54:32 上午 gateway.GatewayServer logInfo
+信息: [trace_id=89c98f92-b55b-4b1e-8bd4-70560f3b628a] [tool=ontology.normalize] [stage=respond] latency=0ms status=200
+2月 26, 2026 5:54:41 上午 gateway.GatewayServer logInfo
+信息: [trace_id=8157b15b-79b1-4616-9367-f7b5df4868f3] [tool=health] [stage=health] status ok

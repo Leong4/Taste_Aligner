@@ -9,10 +9,7 @@ import logging
 import time
 import requests
 
-try:
-    from .config import EMBEDDING_URL, EMBEDDING_TIMEOUT_MS
-except ImportError:
-    from config import EMBEDDING_URL, EMBEDDING_TIMEOUT_MS
+from .config import EMBEDDING_URL, EMBEDDING_TIMEOUT_MS
 
 logger = logging.getLogger(__name__)
 

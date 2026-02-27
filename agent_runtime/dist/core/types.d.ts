@@ -105,6 +105,10 @@ export interface OrchestratorInput {
     user_id?: string;
     /** Optional fixed request timestamp in ms epoch for deterministic skills. */
     request_ts?: number;
+    /** Optional image URL for multimodal input (passed to vision_describe). */
+    image_url?: string;
+    /** Optional base64-encoded image for multimodal input (passed to vision_describe). */
+    image_base64?: string;
 }
 /** Final output from the orchestrator, returned to the /run endpoint. */
 export interface OrchestratorOutput {
@@ -201,9 +205,54 @@ export interface MemorySignalOutput {
         memory_signal: MemorySignalDecisionTrace;
     };
 }
+/** Input to the vision_describe skill. */
+export interface VisionDescribeInput {
+    /** Optional image URL. */
+    image_url?: string;
+    /** Optional base64-encoded image. */
+    image_base64?: string;
+    /** Max tags to return (default 10, clamped [1, 50]). */
+    top_k?: number;
+}
+/** Decision trace for the vision_describe skill. */
+export interface VisionDescribeDecisionTrace extends Record<string, unknown> {
+    rule_id: "vision_describe_v1";
+    schema_version: "1.0";
+    used: boolean;
+    backend?: string;
+    model_id?: string | null;
+    device?: string;
+    tags_count: number;
+    latency_ms?: number;
+    fallback_used: boolean;
+    fallback_reason?: "no_image" | "tool_error" | "invalid_output";
+    input_summary: {
+        has_url: boolean;
+        has_base64: boolean;
+        top_k: number;
+    };
+}
+/** Output of the vision_describe skill. */
+export interface VisionDescribeOutput {
+    vision_features: string[];
+    used: boolean;
+    backend?: string;
+    model_id?: string | null;
+    device?: string;
+    tags_count: number;
+    latency_ms?: number;
+    fallback_used: boolean;
+    fallback_reason?: "no_image" | "tool_error" | "invalid_output";
+    decision_trace: {
+        vision_describe: VisionDescribeDecisionTrace;
+    };
+}
 /** Input to the tes_builder skill. */
 export interface TesBuilderInput {
     anchor_tags?: string[];
+    normalized_tags?: string[];
+    /** Vision features from vision_describe for multimodal TES enrichment. */
+    vision_features?: string[];
     request_ts?: number | string;
     user_city?: string;
     decision_trace?: Record<string, unknown>;
@@ -215,14 +264,19 @@ export interface TesBuilderDecisionTrace extends Record<string, unknown> {
     request_ts: number;
     input_summary: {
         anchor_tag_count: number;
+        normalized_tag_count?: number;
+        vision_features_count?: number;
         first_5_tags: string[];
     };
+    tag_source?: "anchor_tags" | "normalized_tags_fallback" | "none";
     tool: {
         name: string;
         endpoint: string;
     };
     backend: string;
     tes_version: string;
+    model_id?: string | null;
+    device?: string;
     latency_ms: number;
     vector_checks: {
         dim_expected: 512;
@@ -274,6 +328,8 @@ export interface RerankInput {
     tes_normalized?: boolean;
     /** Whether the tes_builder indicated fallback. */
     tes_fallback_used?: boolean;
+    /** TES backend identity from tes_builder trace/output. */
+    tes_backend?: string;
 }
 /** Decision trace for TES-driven rerank. */
 export interface RerankTesDecisionTrace extends Record<string, unknown> {
@@ -301,6 +357,7 @@ export interface RerankTesDecisionTrace extends Record<string, unknown> {
         cz_count: number;
         ez_count: number;
     };
+    tes_backend?: string;
     fallback_used: boolean;
     fallback_reason?: "no_user_tes" | "zero_budget" | "no_candidates";
     latency_ms?: number;

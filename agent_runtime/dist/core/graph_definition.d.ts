@@ -31,11 +31,6 @@
  *             │
  *             ▼
  *   ┌─────────────────────┐
- *   │   memory_signal      │  → anchor_tags, memory_confidence
- *   └─────────┬────────────┘
- *             │
- *             ▼
- *   ┌─────────────────────┐
  *   │    tes_builder       │  → tes_vector (512)
  *   └─────────┬────────────┘
  *             │
@@ -72,6 +67,19 @@
 import { GraphDefinition } from "./types";
 /**
  * The default recommendation pipeline graph (v8.0).
+ *
+ * v12.0 changes from v11.0:
+ *   - Removed legacy memory_signal node from default /run main path.
+ *   - mix_policy.memory_confidence now reads from memory_weight_adjust.
+ *   - Graph version bumped to 12.0.0.
+ *
+ * v11.0 changes from v10.0:
+ *   - Added vision_describe node between memory_weight_adjust and tes_builder.
+ *     Reads image_url / image_base64 from root input (optional).
+ *     Provides vision_features[] to tes_builder for multimodal TES enrichment.
+ *     Falls back gracefully to vision_features=[] when no image is supplied.
+ *   - tes_builder now receives vision_features from vision_describe.
+ *   - Graph version bumped to 11.0.0.
  *
  * v10.0 changes from v9.0:
  *   - rerank node now receives tes_vector, tes_dim, tes_normalized,

@@ -253,6 +253,7 @@ function createRerankSkill(toolClient) {
             const userTesDim = typeof input.tes_dim === "number" ? input.tes_dim : 0;
             const userTesNormalized = input.tes_normalized === true;
             const tesFallbackUpstream = input.tes_fallback_used === true;
+            const tesBackend = typeof input.tes_backend === "string" ? input.tes_backend : undefined;
             const userTesValid = !tesFallbackUpstream
                 && isValidTesVector(userTes, TES_DIM)
                 && userTesDim === TES_DIM
@@ -293,6 +294,9 @@ function createRerankSkill(toolClient) {
                     fallback_reason: "no_user_tes",
                     latency_ms: Date.now() - startedAt,
                 };
+                if (tesBackend !== undefined) {
+                    trace.tes_backend = tesBackend;
+                }
                 const merged = { ...upstreamRerankTrace, ...trace };
                 if (inputFallbackUsed) {
                     merged.input_fallback_used = true;
@@ -327,6 +331,9 @@ function createRerankSkill(toolClient) {
                     fallback_reason: "no_candidates",
                     latency_ms: Date.now() - startedAt,
                 };
+                if (tesBackend !== undefined) {
+                    trace.tes_backend = tesBackend;
+                }
                 return {
                     output: { cz_ranked: [], ez_ranked: [] },
                     trace: { ...upstreamRerankTrace, ...trace },
@@ -371,6 +378,9 @@ function createRerankSkill(toolClient) {
                 fallback_used: false,
                 latency_ms: Date.now() - startedAt,
             };
+            if (tesBackend !== undefined) {
+                trace.tes_backend = tesBackend;
+            }
             const merged = { ...upstreamRerankTrace, ...trace };
             if (inputFallbackUsed) {
                 merged.input_fallback_used = true;

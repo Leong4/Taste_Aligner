@@ -13,12 +13,8 @@ import logging
 import math
 from datetime import datetime
 
-try:
-    from .db import init_database, write_memory, read_memory, load_user_memories, get_database_stats, delete_all_memories
-    from .search import search_memories
-except ImportError:
-    from db import init_database, write_memory, read_memory, load_user_memories, get_database_stats, delete_all_memories
-    from search import search_memories
+from .db import init_database, write_memory, read_memory, load_user_memories, get_database_stats, delete_all_memories
+from .search import search_memories
 
 # Configure logging
 logging.basicConfig(

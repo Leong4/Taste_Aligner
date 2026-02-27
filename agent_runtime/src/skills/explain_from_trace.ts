@@ -200,7 +200,7 @@ export function createExplainFromTraceSkill(
             let bullets: string[];
             let callTrace: LLMCallTrace | null = null;
             let fallbackUsed = false;
-            let adapterError: string | null = null;
+            let fallbackReason = "";
 
             try {
                 const result = await adapter.generateStructuredJSON<{
@@ -218,12 +218,17 @@ export function createExplainFromTraceSkill(
                 explanation = result.data.explanation;
                 bullets = result.data.bullets;
                 callTrace = result.callTrace;
+                if (callTrace.fallback_used || adapter.fallbackReason) {
+                    fallbackUsed = true;
+                    fallbackReason = callTrace.fallback_reason ?? adapter.fallbackReason ?? "adapter_error";
+                }
             } catch (err: unknown) {
                 // Graceful fallback — never throw from this skill
                 fallbackUsed = true;
+                fallbackReason = "adapter_error";
                 explanation = "Explanation unavailable.";
                 bullets = [];
-                adapterError = err instanceof Error ? err.message : String(err);
+                const adapterError = err instanceof Error ? err.message : String(err);
 
                 callTrace = {
                     model: adapter.modelInfo,
@@ -232,6 +237,7 @@ export function createExplainFromTraceSkill(
                     latency_ms: 0,
                     usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
                     fallback_used: true,
+                    fallback_reason: "adapter_error",
                 };
 
                 console.warn(
@@ -252,22 +258,29 @@ export function createExplainFromTraceSkill(
                 style,
                 fallback_used: fallbackUsed,
             };
+            if (fallbackUsed) {
+                trace.fallback_reason = fallbackReason || "adapter_error";
+            }
 
             if (callTrace) {
-                trace.llm_call = {
+                const llmCallEntry: Record<string, unknown> = {
                     provider: callTrace.model.provider,
                     model_name: callTrace.model.model_name,
                     model_version: callTrace.model.version,
                     temperature: callTrace.temperature,
                     prompt_version: callTrace.prompt_version,
-                    latency_ms: callTrace.latency_ms,
                     usage: callTrace.usage,
                     fallback_used: callTrace.fallback_used,
                 };
+                const llmFallbackReason = callTrace.fallback_reason ?? (fallbackUsed ? (fallbackReason || "adapter_error") : undefined);
+                if (llmFallbackReason !== undefined) {
+                    llmCallEntry.fallback_reason = llmFallbackReason;
+                }
+                trace.llm_call = llmCallEntry;
             }
 
-            if (adapterError) {
-                trace.error = adapterError;
+            if (fallbackUsed && (fallbackReason || "adapter_error") === "adapter_error") {
+                trace.error = "adapter_error";
             }
 
             return { output, trace };

@@ -29,31 +29,10 @@
  */
 
 const assert = require("assert");
-const path = require("path");
+const { loadCore, loadSkills } = require("./_load_src_runtime");
 
-// ---------------------------------------------------------------------------
-// Load compiled modules
-// ---------------------------------------------------------------------------
-let core, skills;
-try {
-    require("ts-node").register({
-        project: path.join(__dirname, "../../agent_runtime/tsconfig.json"),
-        transpileOnly: true,
-    });
-    core = require("../../agent_runtime/src/core");
-    skills = require("../../agent_runtime/src/skills");
-} catch (e) {
-    try {
-        core = require("../../agent_runtime/dist/core");
-        skills = require("../../agent_runtime/dist/skills");
-    } catch (e2) {
-        console.error(
-            "Cannot load modules. Run 'npm run build' in agent_runtime/ first."
-        );
-        console.error(e2.message);
-        process.exit(1);
-    }
-}
+const core = loadCore();
+const skills = loadSkills();
 
 const {
     SkillRegistry,
@@ -405,8 +384,8 @@ async function runAll() {
     // =========================================================================
     console.log("\n--- Graph structure ---");
 
-    await test("RECOMMENDATION_GRAPH v10.0 has decide_tag_budget as node 2", () => {
-        assert.strictEqual(RECOMMENDATION_GRAPH.version, "10.0.0");
+    await test("RECOMMENDATION_GRAPH v12.0 has decide_tag_budget as node 2", () => {
+        assert.strictEqual(RECOMMENDATION_GRAPH.version, "12.0.0");
         assert.strictEqual(RECOMMENDATION_GRAPH.nodes.length, 12, "12 nodes");
 
         const node = RECOMMENDATION_GRAPH.nodes[1];
@@ -553,6 +532,34 @@ async function runAll() {
         });
 
         // Stub tes_builder (new node between memory_signal and fetch_recommendation)
+        reg.register({
+            name: "vision_describe",
+            inputSchema: { description: "", required: [] },
+            outputSchema: { description: "", required: [] },
+            execute: async () => ({
+                output: {
+                    vision_features: [],
+                    used: false,
+                    tags_count: 0,
+                    fallback_used: true,
+                    fallback_reason: "no_image",
+                    decision_trace: {
+                        vision_describe: {
+                            rule_id: "vision_describe_v1",
+                            schema_version: "1.0",
+                            used: false,
+                            tags_count: 0,
+                            fallback_used: true,
+                            fallback_reason: "no_image",
+                            input_summary: { has_url: false, has_base64: false, top_k: 10 },
+                        },
+                    },
+                },
+                trace: { rule_id: "vision_describe_v1", schema_version: "1.0" },
+            }),
+        });
+
+        // Stub tes_builder (new node between memory_weight_adjust and fetch_recommendation)
         reg.register({
             name: "tes_builder",
             inputSchema: { description: "", required: [] },

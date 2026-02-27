@@ -96,6 +96,7 @@ function buildTrace(
     usedTags: string[],
     anchorTagCount: number,
     normalizedTagCount: number,
+    visionFeaturesCount: number,
     tagSource: TagSource,
     latencyMs: number,
     vectorChecks: TesBuilderDecisionTrace["vector_checks"],
@@ -114,6 +115,7 @@ function buildTrace(
         input_summary: {
             anchor_tag_count: anchorTagCount,
             normalized_tag_count: normalizedTagCount,
+            vision_features_count: visionFeaturesCount,
             first_5_tags: usedTags.slice(0, 5),
         },
         tag_source: tagSource,
@@ -148,6 +150,7 @@ function buildFallbackOutput(
     inputTags: string[],
     anchorTagCount: number,
     normalizedTagCount: number,
+    visionFeaturesCount: number,
     tagSource: TagSource,
     latencyMs: number,
     errorMessage: string,
@@ -159,6 +162,7 @@ function buildFallbackOutput(
         inputTags,
         anchorTagCount,
         normalizedTagCount,
+        visionFeaturesCount,
         tagSource,
         latencyMs,
         {
@@ -204,9 +208,9 @@ export function createTesBuilderSkill(
         name: "tes_builder",
 
         inputSchema: {
-            description: "Build TES vector from memory_signal anchor tags",
+            description: "Build TES vector from memory_signal anchor tags and optional vision features",
             required: [],
-            optional: ["anchor_tags", "normalized_tags", "request_ts", "user_city", "decision_trace"],
+            optional: ["anchor_tags", "normalized_tags", "vision_features", "request_ts", "user_city", "decision_trace"],
         },
 
         outputSchema: {
@@ -231,6 +235,7 @@ export function createTesBuilderSkill(
         ): Promise<SkillResult<TesBuilderOutput>> {
             const anchorTags = normalizeAnchorTags(input.anchor_tags);
             const normalizedTags = normalizeAnchorTags(input.normalized_tags);
+            const visionFeatures = normalizeAnchorTags(input.vision_features);
             const tagsForTes = anchorTags.length > 0 ? anchorTags : normalizedTags;
             const tagSource: TagSource = anchorTags.length > 0
                 ? "anchor_tags"
@@ -238,13 +243,14 @@ export function createTesBuilderSkill(
             const requestTs = resolveRequestTs(input.request_ts, context);
             const upstreamDecisionTrace = asObject(input.decision_trace) ?? {};
 
-            if (tagsForTes.length === 0) {
+            if (tagsForTes.length === 0 && visionFeatures.length === 0) {
                 return buildFallbackOutput(
                     "no_tags",
                     requestTs,
                     tagsForTes,
                     anchorTags.length,
                     normalizedTags.length,
+                    0,
                     tagSource,
                     0,
                     "",
@@ -258,12 +264,9 @@ export function createTesBuilderSkill(
                 observation = await toolClient.call({
                     tool: TOOL_NAME,
                     input: {
-                        data: {
-                            vision_tags: [],
-                            normalized_tags: tagsForTes,
-                            emotion: null,
-                            recency_days: null,
-                        },
+                        vision_features: visionFeatures,
+                        tags: tagsForTes,
+                        normalize: true,
                     },
                 });
             } catch (error: unknown) {
@@ -274,6 +277,7 @@ export function createTesBuilderSkill(
                     tagsForTes,
                     anchorTags.length,
                     normalizedTags.length,
+                    visionFeatures.length,
                     tagSource,
                     Date.now() - startedAt,
                     message,
@@ -289,6 +293,7 @@ export function createTesBuilderSkill(
                         tagsForTes,
                         anchorTags.length,
                         normalizedTags.length,
+                        visionFeatures.length,
                         tagSource,
                         observation.latency_ms ?? (Date.now() - startedAt),
                         observation.error?.message ?? "gateway_call_failed",
@@ -304,6 +309,7 @@ export function createTesBuilderSkill(
                         tagsForTes,
                         anchorTags.length,
                         normalizedTags.length,
+                        visionFeatures.length,
                         tagSource,
                         observation.latency_ms ?? (Date.now() - startedAt),
                         "response_not_object",
@@ -329,6 +335,7 @@ export function createTesBuilderSkill(
                         tagsForTes,
                         anchorTags.length,
                         normalizedTags.length,
+                        visionFeatures.length,
                         tagSource,
                         observation.latency_ms ?? (Date.now() - startedAt),
                         "missing_or_invalid_vector_fields",
@@ -346,6 +353,7 @@ export function createTesBuilderSkill(
                         tagsForTes,
                         anchorTags.length,
                         normalizedTags.length,
+                        visionFeatures.length,
                         tagSource,
                         observation.latency_ms ?? (Date.now() - startedAt),
                         "vector_contains_non_finite",
@@ -370,6 +378,7 @@ export function createTesBuilderSkill(
                         tagsForTes,
                         anchorTags.length,
                         normalizedTags.length,
+                        visionFeatures.length,
                         tagSource,
                         observation.latency_ms ?? (Date.now() - startedAt),
                         "vector_validation_failed",
@@ -382,6 +391,7 @@ export function createTesBuilderSkill(
                     tagsForTes,
                     anchorTags.length,
                     normalizedTags.length,
+                    visionFeatures.length,
                     tagSource,
                     observation.latency_ms ?? (Date.now() - startedAt),
                     {
@@ -425,6 +435,7 @@ export function createTesBuilderSkill(
                     tagsForTes,
                     anchorTags.length,
                     normalizedTags.length,
+                    visionFeatures.length,
                     tagSource,
                     observation.latency_ms ?? (Date.now() - startedAt),
                     message,

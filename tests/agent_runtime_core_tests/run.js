@@ -14,44 +14,18 @@
 
 const assert = require("assert");
 const path = require("path");
+const { loadCore } = require("./_load_src_runtime");
 
-// ---------------------------------------------------------------------------
-// We need to load the compiled TS. Use ts-node/register if available,
-// otherwise fall back to pre-compiled dist.
-// ---------------------------------------------------------------------------
 let deepMergeTrace, SkillRegistry, validateGraph, Orchestrator,
     createExecutionContext, mergeTrace, mergeTraceBundle;
-
-try {
-    // Try loading via ts-node (dev mode)
-    require("ts-node").register({
-        project: path.join(__dirname, "../../agent_runtime/tsconfig.json"),
-        transpileOnly: true,
-    });
-    const core = require("../../agent_runtime/src/core");
-    deepMergeTrace = core.deepMergeTrace;
-    SkillRegistry = core.SkillRegistry;
-    validateGraph = core.validateGraph;
-    Orchestrator = core.Orchestrator;
-    createExecutionContext = core.createExecutionContext;
-    mergeTrace = core.mergeTrace;
-    mergeTraceBundle = core.mergeTraceBundle;
-} catch (e) {
-    try {
-        const core = require("../../agent_runtime/dist/core");
-        deepMergeTrace = core.deepMergeTrace;
-        SkillRegistry = core.SkillRegistry;
-        validateGraph = core.validateGraph;
-        Orchestrator = core.Orchestrator;
-        createExecutionContext = core.createExecutionContext;
-        mergeTrace = core.mergeTrace;
-        mergeTraceBundle = core.mergeTraceBundle;
-    } catch (e2) {
-        console.error("Cannot load core modules. Run 'npm run build' in agent_runtime/ first, or install ts-node.");
-        console.error(e2.message);
-        process.exit(1);
-    }
-}
+const core = loadCore();
+deepMergeTrace = core.deepMergeTrace;
+SkillRegistry = core.SkillRegistry;
+validateGraph = core.validateGraph;
+Orchestrator = core.Orchestrator;
+createExecutionContext = core.createExecutionContext;
+mergeTrace = core.mergeTrace;
+mergeTraceBundle = core.mergeTraceBundle;
 
 let passed = 0;
 let failed = 0;
@@ -392,11 +366,13 @@ async function runAll() {
         path.join(__dirname, "test_memory_signal.js"),
         path.join(__dirname, "test_memory_weight_adjust.js"),
         path.join(__dirname, "test_tes_builder.js"),
+        path.join(__dirname, "test_vision_describe.js"),
         path.join(__dirname, "test_fetch_recommendation.js"),
         path.join(__dirname, "test_rerank_tes.js"),
         path.join(__dirname, "test_tag_expand.js"),
         path.join(__dirname, "test_tag_normalize.js"),
         path.join(__dirname, "test_explain_from_trace.js"),
+        path.join(__dirname, "test_llm_adapter_fallback.js"),
     ];
 
     for (const filePath of satelliteFiles) {

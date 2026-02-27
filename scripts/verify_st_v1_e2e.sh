@@ -8,6 +8,13 @@ EMBED_BASE_URL="${EMBED_BASE_URL:-http://localhost:5004}"
 GATEWAY_BASE_URL="${GATEWAY_BASE_URL:-http://localhost:8080}"
 AGENT_RUNTIME_BASE_URL="${AGENT_RUNTIME_BASE_URL:-http://localhost:8787}"
 
+# Optional override, otherwise derived from AGENT_RUNTIME_BASE_URL
+if [ -n "${AGENT_RUN_URL:-}" ]; then
+  AGENT_RUN_URL="$AGENT_RUN_URL"
+else
+  AGENT_RUN_URL="${AGENT_RUNTIME_BASE_URL}/run"
+fi
+
 TES_REQ='{"tags":["ramen","izakaya"],"vision_features":["night"],"sentiment":0.4,"recency_days":3,"location":"tokyo","normalize":true}'
 
 echo "=== Step 1: embedding /health ==="
@@ -33,7 +40,63 @@ test "${V1}" = "${V2}"
 echo "determinism: PASS"
 
 echo "=== Step 5: agent_runtime /run trace evidence ==="
-curl -sS -X POST "${AGENT_RUNTIME_BASE_URL}/run" -H 'Content-Type: application/json' -d '{"text":"I want to travel to tokyo for food and ramen.","user_id":"u001"}' \
-  | python3 -c 'import json,sys; d=json.load(sys.stdin); dt=d.get("decision_trace") or {}; tb=dt.get("tes_builder") or {}; rr=dt.get("rerank") or {}; ok_tb=(tb.get("backend")=="st_v1"); ok_rr=(rr.get("tes_backend")=="st_v1"); assert (ok_tb or ok_rr), f"missing st_v1 backend evidence in trace: tes_builder={tb.get('"'"'backend'"'"')}, rerank={rr.get('"'"'tes_backend'"'"')}"; assert rr.get("tes_used") is True, f"rerank.tes_used={rr.get('"'"'tes_used'"'"')}"; if tb.get("fallback_used") is True: assert tb.get("fallback_reason"), "tes_builder fallback_used=true but fallback_reason missing"; print(f"/run trace: tes_builder.backend={tb.get('"'"'backend'"'"')} rerank.tes_backend={rr.get('"'"'tes_backend'"'"')} rerank.tes_used={rr.get('"'"'tes_used'"'"')}")'
+
+TMP_RESP="$(mktemp -t taste_aligner_run.XXXXXX.json)"
+trap 'rm -f "$TMP_RESP"' EXIT
+
+HTTP_CODE="$(curl -sS -o "$TMP_RESP" -w "%{http_code}" -X POST "$AGENT_RUN_URL" \
+  -H 'Content-Type: application/json' \
+  -d '{"text":"I want to travel to tokyo for food and ramen.","user_id":"u001"}')"
+
+if [ "$HTTP_CODE" != "200" ]; then
+  echo "FAIL: agent_runtime /run returned HTTP $HTTP_CODE"
+  echo "URL: $AGENT_RUN_URL"
+  echo "Body (first 500 chars):"
+  head -c 500 "$TMP_RESP" || true
+  echo
+  exit 1
+fi
+
+python3 - <<'PY' "$TMP_RESP"
+import json, sys
+
+path = sys.argv[1]
+raw = open(path, 'rb').read()
+if not raw.strip():
+    raise SystemExit("FAIL: /run returned empty body")
+
+try:
+    d = json.loads(raw)
+except Exception as e:
+    # Print a small prefix for debugging
+    prefix = raw[:500].decode('utf-8', errors='replace')
+    raise SystemExit(f"FAIL: /run body is not valid JSON: {e}\nBody prefix (500): {prefix}")
+
+dt = d.get("decision_trace") or {}
+
+tb = dt.get("tes_builder") or {}
+rr = dt.get("rerank") or {}
+
+ok_tb = (tb.get("backend") == "st_v1")
+ok_rr = (rr.get("tes_backend") == "st_v1")
+
+if not (ok_tb or ok_rr):
+    raise SystemExit(
+        "FAIL: missing st_v1 backend evidence in trace: "
+        f"tes_builder.backend={tb.get('backend')}, rerank.tes_backend={rr.get('tes_backend')}"
+    )
+
+if rr.get("tes_used") is not True:
+    raise SystemExit(f"FAIL: rerank.tes_used={rr.get('tes_used')}")
+
+if tb.get("fallback_used") is True and not tb.get("fallback_reason"):
+    raise SystemExit("FAIL: tes_builder fallback_used=true but fallback_reason missing")
+
+print(
+    "PASS: /run trace evidence: "
+    f"tes_builder.backend={tb.get('backend')} "
+    f"rerank.tes_backend={rr.get('tes_backend')} rerank.tes_used={rr.get('tes_used')}"
+)
+PY
 
 echo "verify_st_v1_e2e: PASS"

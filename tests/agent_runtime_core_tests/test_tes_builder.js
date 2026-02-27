@@ -7,26 +7,10 @@
  */
 
 const assert = require("assert");
-const path = require("path");
+const { loadCore, loadSkills } = require("./_load_src_runtime");
 
-let core, skills;
-try {
-    require("ts-node").register({
-        project: path.join(__dirname, "../../agent_runtime/tsconfig.json"),
-        transpileOnly: true,
-    });
-    core = require("../../agent_runtime/src/core");
-    skills = require("../../agent_runtime/src/skills");
-} catch (e) {
-    try {
-        core = require("../../agent_runtime/dist/core");
-        skills = require("../../agent_runtime/dist/skills");
-    } catch (e2) {
-        console.error("Cannot load modules. Run 'npm run build' in agent_runtime/ first.");
-        console.error(e2.message);
-        process.exit(1);
-    }
-}
+const core = loadCore();
+const skills = loadSkills();
 
 const { createExecutionContext, SkillRegistry, Orchestrator } = core;
 const { createTesBuilderSkill } = skills;
@@ -81,7 +65,10 @@ async function runAll() {
         const unit = makeUnitVector512();
         const client = new StubToolClient(async (action) => {
             assert.strictEqual(action.tool, "embedding.tes_build");
-            assert.deepStrictEqual(action.input.data.normalized_tags, ["izakaya", "quiet", "ramen"]);
+            // New root-level format: { tags, vision_features, normalize }
+            assert.deepStrictEqual(action.input.tags, ["izakaya", "quiet", "ramen"]);
+            assert.deepStrictEqual(action.input.vision_features, []);
+            assert.strictEqual(action.input.normalize, true);
             return {
                 ok: true,
                 tool: "embedding.tes_build",
@@ -166,12 +153,42 @@ async function runAll() {
             return {};
         });
         const skill = createTesBuilderSkill(client);
-        const result = await skill.execute(makeInput({ anchor_tags: [] }), makeContext());
+        const result = await skill.execute(makeInput({ anchor_tags: [], vision_features: [] }), makeContext());
         assert.strictEqual(called, false);
         assert.strictEqual(result.output.tes_vector.length, 512);
         assert.strictEqual(result.output.normalized, false);
         assert.strictEqual(result.output.fallback_used, true);
         assert.strictEqual(result.output.fallback_reason, "no_tags");
+    });
+
+    await test("vision_features forwarded in tool call when no anchor_tags", async () => {
+        let capturedAction = null;
+        const client = new StubToolClient(async (action) => {
+            capturedAction = action;
+            return {
+                ok: true,
+                tool: "embedding.tes_build",
+                trace_id: "t_vis",
+                latency_ms: 7,
+                output: {
+                    vector: makeUnitVector512(),
+                    dim: 512,
+                    normalized: true,
+                    meta: { backend: "hash_v2", tes_version: "2.0" },
+                },
+            };
+        });
+        const skill = createTesBuilderSkill(client);
+        const result = await skill.execute(
+            makeInput({ anchor_tags: [], normalized_tags: [], vision_features: ["ramen", "cafe", "Ramen"] }),
+            makeContext()
+        );
+        assert.ok(capturedAction, "tool should have been called");
+        // vision_features are sorted deduplicated
+        assert.deepStrictEqual(capturedAction.input.vision_features, ["cafe", "ramen"]);
+        assert.deepStrictEqual(capturedAction.input.tags, []);
+        assert.strictEqual(result.output.fallback_used, false);
+        assert.strictEqual(result.trace.input_summary.vision_features_count, 2);
     });
 
     await test("tool_error fallback", async () => {
@@ -290,12 +307,12 @@ async function runAll() {
 
         const registry = new SkillRegistry();
         registry.register({
-            name: "memory_signal_stub",
+            name: "memory_weight_adjust_stub",
             inputSchema: { description: "stub", required: [] },
             outputSchema: { description: "stub", required: ["anchor_tags"] },
             execute: async () => ({
                 output: { anchor_tags: ["ramen", "quiet"] },
-                trace: { rule_id: "memory_signal_v1" },
+                trace: { rule_id: "memory_weight_adjust_v1" },
             }),
         });
         registry.register(tesSkill);
@@ -304,12 +321,12 @@ async function runAll() {
             name: "test_tes_builder_graph",
             version: "1.0",
             nodes: [
-                { id: "memory_signal", skill: "memory_signal_stub", inputFrom: {} },
+                { id: "memory_weight_adjust", skill: "memory_weight_adjust_stub", inputFrom: {} },
                 {
                     id: "tes_builder",
                     skill: "tes_builder",
                     inputFrom: {
-                        anchor_tags: "memory_signal.anchor_tags",
+                        anchor_tags: "memory_weight_adjust.anchor_tags",
                         request_ts: "input.request_ts",
                     },
                 },
@@ -339,13 +356,13 @@ async function runAll() {
         const result = await skill.execute(
             makeInput({
                 decision_trace: {
-                    memory_signal: { rule_id: "memory_signal_v1", marker: "keep" },
+                    memory_weight_adjust: { rule_id: "memory_weight_adjust_v1", marker: "keep" },
                 },
             }),
             makeContext()
         );
-        assert.ok(result.output.decision_trace.memory_signal);
-        assert.strictEqual(result.output.decision_trace.memory_signal.marker, "keep");
+        assert.ok(result.output.decision_trace.memory_weight_adjust);
+        assert.strictEqual(result.output.decision_trace.memory_weight_adjust.marker, "keep");
         assert.ok(result.output.decision_trace.tes_builder);
         assert.strictEqual(result.output.decision_trace.tes_builder.rule_id, "tes_builder_v1");
     });

@@ -145,7 +145,7 @@ public class GatewayServer {
         routes.put("ontology.normalize", new ToolRoute("ontology.normalize", "ontology", "/normalize", 3000, true, false, 20));
         routes.put("embedding.generate", new ToolRoute("embedding.generate", "embedding", "/generate", 3000, true, false, 20));
         routes.put("embedding.tes_build", new ToolRoute("embedding.tes_build", "embedding", "/tes/build", 15000, true, false, 20));
-        routes.put("vision.describe", new ToolRoute("vision.describe", "vision", "/describe", 5000, true, false, 10));
+        routes.put("vision.describe", new ToolRoute("vision.describe", "vision", "/describe", 15000, true, false, 20));
         routes.put("recommendation.score", new ToolRoute("recommendation.score", "recommendation", "/score", 3000, true, false, 20));
         routes.put("memory.search", new ToolRoute("memory.search", "memory", "/search", 3000, true, true, 30));
         routes.put("memory.read", new ToolRoute("memory.read", "memory", "/read", 2000, true, true, 30));
@@ -304,6 +304,9 @@ public class GatewayServer {
                                 ? "{\"error\":\"empty response\"}"
                                 : new String(is.readAllBytes(), StandardCharsets.UTF_8);
 
+                        if (code >= 200 && code < 300 && "ontology.normalize".equals(toolName)) {
+                            body = normalizeOntologyResponse(body);
+                        }
                         lastResponse = new ResponseData(code, body, "application/json");
                         logInfo(traceId, toolName, "forward", String.format("attempt=%d status=%d", attempt, code));
 
@@ -360,8 +363,12 @@ public class GatewayServer {
                     }
                     break;
                 case "ontology.normalize":
-                    if (!hasAnyPath(payload, List.of("data", "tags", "data.tags"))) {
-                        missing.add("data|tags");
+                    if (!validateOntologyNormalizePayload(payload, missing)) {
+                        return invalidToolInput(
+                                toolName,
+                                missing,
+                                "Provide data.tags as non-empty string array; allowed data fields: tags,lang,strict,top_k"
+                        );
                     }
                     break;
                 case "embedding.generate":
@@ -379,8 +386,12 @@ public class GatewayServer {
                     }
                     break;
                 case "vision.describe":
-                    if (!hasAnyPath(payload, List.of("data.image_url", "image_url", "data.image_base64", "image_base64"))) {
-                        missing.add("data.image_url|data.image_base64");
+                    if (!validateVisionDescribePayload(payload, missing)) {
+                        return invalidToolInput(
+                                toolName,
+                                missing,
+                                "Provide data.image_url or data.image_base64 (allowed data fields: image_url, image_base64, top_k)"
+                        );
                     }
                     break;
                 case "recommendation.score":
@@ -472,12 +483,74 @@ public class GatewayServer {
 
         private ResponseData invalidToolInput(String toolName, List<String> missing, String hint) {
             String body = String.format(
-                    "{\"error\":{\"code\":\"INVALID_TOOL_INPUT\",\"message\":\"invalid input for tool\",\"details\":{\"missing\":%s,\"hint\":\"%s\"}},\"tool\":\"%s\"}",
+                    "{\"ok\":false,\"error\":{\"code\":\"INVALID_TOOL_INPUT\",\"message\":\"invalid input for tool '%s'\",\"details\":{\"missing\":%s,\"hint\":\"%s\"}},\"tool\":\"%s\"}",
+                    escapeJson(toolName),
                     toJsonStringArray(missing),
                     escapeJson(hint),
                     escapeJson(toolName)
             );
             return new ResponseData(400, body, "application/json");
+        }
+
+        private boolean validateOntologyNormalizePayload(Map<String, Object> payload, List<String> errors) {
+            Object dataObj = payload.get("data");
+            if (!(dataObj instanceof Map<?, ?>)) {
+                errors.add("data");
+                return false;
+            }
+
+            @SuppressWarnings("unchecked")
+            Map<String, Object> data = (Map<String, Object>) dataObj;
+            List<String> allowedData = List.of("tags", "lang", "strict", "top_k");
+            errors.addAll(findUnknownKeys(data, allowedData, "data"));
+
+            Object tagsObj = data.get("tags");
+            if (!(tagsObj instanceof List<?>)) {
+                errors.add("data.tags(array)");
+                return false;
+            }
+
+            List<?> tags = (List<?>) tagsObj;
+            if (tags.isEmpty()) {
+                errors.add("data.tags(non_empty)");
+                return false;
+            }
+
+            for (int i = 0; i < tags.size(); i++) {
+                Object item = tags.get(i);
+                if (!(item instanceof String)) {
+                    errors.add("data.tags[" + i + "](string)");
+                    continue;
+                }
+                if (((String) item).trim().isEmpty()) {
+                    errors.add("data.tags[" + i + "](non_empty)");
+                }
+            }
+            return errors.isEmpty();
+        }
+
+        private String normalizeOntologyResponse(String body) {
+            if (body == null || body.isBlank()) {
+                return body;
+            }
+            try {
+                Yaml yaml = new Yaml();
+                Object parsed = yaml.load(body);
+                if (!(parsed instanceof Map<?, ?>)) {
+                    return body;
+                }
+                @SuppressWarnings("unchecked")
+                Map<String, Object> result = (Map<String, Object>) parsed;
+                if (!result.containsKey("normalized_tags")) {
+                    Object normalized = result.get("normalized");
+                    if (normalized instanceof List<?>) {
+                        result.put("normalized_tags", normalized);
+                    }
+                }
+                return toJson(result);
+            } catch (Exception e) {
+                return body;
+            }
         }
 
         private boolean validateMemorySearchPayload(Map<String, Object> payload, List<String> missing) {
@@ -499,6 +572,24 @@ public class GatewayServer {
             );
             List<String> invalid = findUnknownKeys(data, allowed, "data");
             missing.addAll(invalid);
+            return missing.isEmpty();
+        }
+
+        private boolean validateVisionDescribePayload(Map<String, Object> payload, List<String> missing) {
+            if (!hasPath(payload, "data")) {
+                missing.add("data");
+                return false;
+            }
+            if (!hasAnyPath(payload, List.of("data.image_url", "data.image_base64"))) {
+                missing.add("data.image_url|data.image_base64");
+            }
+            Object dataObj = payload.get("data");
+            if (dataObj instanceof Map<?, ?>) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> data = (Map<String, Object>) dataObj;
+                List<String> allowedData = List.of("image_url", "image_base64", "top_k");
+                missing.addAll(findUnknownKeys(data, allowedData, "data"));
+            }
             return missing.isEmpty();
         }
 

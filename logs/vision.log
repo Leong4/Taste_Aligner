@@ -1,0 +1,18 @@
+INFO:     Started server process [56729]
+INFO:     Waiting for application startup.
+2026-02-26 05:54:22,995 - services.vision.backends - INFO - [vision] Backend selected: rule_v0 (no model)
+2026-02-26 05:54:22,995 - services.vision.main - INFO - [vision] Backend ready: rule_v0  model_id=None  device=cpu
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:5002 (Press CTRL+C to quit)
+INFO:     127.0.0.1:59528 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59530 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59871 - "GET /health HTTP/1.1" 200 OK
+2026-02-26 05:54:32,069 - services.vision.main - INFO - [vision] describe OK: backend=rule_v0 tags=3 latency=0.1ms
+INFO:     127.0.0.1:59873 - "POST /describe HTTP/1.1" 200 OK
+2026-02-26 05:54:32,103 - services.vision.main - INFO - [vision] describe OK: backend=rule_v0 tags=3 latency=0.0ms
+INFO:     127.0.0.1:59873 - "POST /describe HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59964 - "GET /health HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [56729]
