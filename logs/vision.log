@@ -1,18 +1,30 @@
-INFO:     Started server process [56729]
+INFO:     Started server process [74721]
 INFO:     Waiting for application startup.
-2026-02-26 05:54:22,995 - services.vision.backends - INFO - [vision] Backend selected: rule_v0 (no model)
-2026-02-26 05:54:22,995 - services.vision.main - INFO - [vision] Backend ready: rule_v0  model_id=None  device=cpu
+2026-03-03 00:40:54,456 - services.vision.backends - INFO - [vision] Backend selected: clip_v1  model=ViT-B-32/openai  device=cpu
+2026-03-03 00:40:54,457 - services.vision.main - INFO - [vision] Backend ready: clip_v1  model_id=ViT-B-32/openai  device=cpu
+2026-03-03 00:40:54,457 - services.vision.backends - INFO - [clip_v1] Loading CLIP model: ViT-B-32/openai on cpu
+2026-03-03 00:40:54,457 - root - INFO - Parsing model identifier. Schema: None, Identifier: ViT-B-32
+2026-03-03 00:40:54,457 - root - INFO - Loaded built-in ViT-B-32 model config.
+/Volumes/leong4/University_doc/RAG/Taste-Aligner/Taste_Aligner/.venv/lib/python3.13/site-packages/open_clip/factory.py:450: UserWarning: QuickGELU mismatch between final model config (quick_gelu=False) and pretrained tag 'openai' (quick_gelu=True).
+  warnings.warn(
+2026-03-03 00:40:54,647 - root - INFO - Instantiating model architecture: CLIP
+2026-03-03 00:40:55,420 - root - INFO - Loading full pretrained weights from: /Users/leongjyuhang/.cache/huggingface/hub/models--timm--vit_base_patch32_clip_224.openai/snapshots/a6f597a30f7b82c51704746581f9a4e41421e878/open_clip_model.safetensors
+2026-03-03 00:40:55,939 - root - INFO - Final image preprocessing configuration set: {'size': (224, 224), 'mode': 'RGB', 'mean': (0.48145466, 0.4578275, 0.40821073), 'std': (0.26862954, 0.26130258, 0.27577711), 'interpolation': 'bicubic', 'resize_mode': 'shortest', 'fill_color': 0}
+2026-03-03 00:40:55,939 - root - INFO - Model ViT-B-32 creation process complete.
+2026-03-03 00:40:55,939 - root - INFO - Parsing tokenizer identifier. Schema: None, Identifier: ViT-B-32
+2026-03-03 00:40:55,939 - root - INFO - Attempting to load config from built-in: ViT-B-32
+2026-03-03 00:40:55,939 - root - INFO - Using default SimpleTokenizer.
+2026-03-03 00:40:55,969 - services.vision.backends - INFO - [clip_v1] Precomputing text embeddings for 52 vocabulary tags
+2026-03-03 00:40:56,264 - services.vision.backends - INFO - [clip_v1] Model loaded and warm
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:5002 (Press CTRL+C to quit)
-INFO:     127.0.0.1:59528 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59530 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59871 - "GET /health HTTP/1.1" 200 OK
-2026-02-26 05:54:32,069 - services.vision.main - INFO - [vision] describe OK: backend=rule_v0 tags=3 latency=0.1ms
-INFO:     127.0.0.1:59873 - "POST /describe HTTP/1.1" 200 OK
-2026-02-26 05:54:32,103 - services.vision.main - INFO - [vision] describe OK: backend=rule_v0 tags=3 latency=0.0ms
-INFO:     127.0.0.1:59873 - "POST /describe HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59964 - "GET /health HTTP/1.1" 200 OK
-INFO:     Shutting down
-INFO:     Waiting for application shutdown.
-INFO:     Application shutdown complete.
-INFO:     Finished server process [56729]
+INFO:     127.0.0.1:62933 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62935 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62948 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63301 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:41:25,497 - services.vision.main - INFO - [vision] describe OK: backend=clip_v1 type=food cues=5 tags=5 latency=176.6ms
+INFO:     127.0.0.1:63303 - "POST /describe HTTP/1.1" 200 OK
+2026-03-03 00:41:28,410 - services.vision.main - INFO - [vision] describe OK: backend=clip_v1 type=unknown cues=10 tags=10 latency=28.3ms
+INFO:     127.0.0.1:63303 - "POST /describe HTTP/1.1" 200 OK
+2026-03-03 00:53:23,837 - services.vision.main - WARNING - [vision] describe ValueError: Failed to decode image_base64: cannot identify image file <_io.BytesIO object at 0x168732fc0>
+INFO:     127.0.0.1:63509 - "POST /describe HTTP/1.1" 422 Unprocessable Content

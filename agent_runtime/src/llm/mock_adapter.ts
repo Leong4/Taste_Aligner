@@ -58,7 +58,6 @@ const MOCK_RESPONSES: Record<"short" | "long", { explanation: string; bullets: s
             "Cross-city guard filtered irrelevant results",
             "Exploration candidates scored for novelty potential",
             "Mix policy balanced comfort vs. exploration ratio",
-            "Final cards composed by the planner service",
         ],
     },
 };

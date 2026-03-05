@@ -258,6 +258,101 @@ async function runAll() {
     );
 
     // =========================================================================
+    // 5. Skill-level fallback: HTTP error status codes (429, 401)
+    // =========================================================================
+    console.log("\n--- OpenAICompatAdapter + HTTP error status codes → skill fallback ---");
+
+    /**
+     * Starts an in-process HTTP server that always responds with the given status,
+     * calls fn(port), then closes the server.  No real network required.
+     */
+    function withStatusServer(statusCode, fn) {
+        const httpMod = require("http");
+        return new Promise((resolve, reject) => {
+            const server = httpMod.createServer((_req, res) => {
+                res.writeHead(statusCode, { "Content-Type": "application/json" });
+                res.end(JSON.stringify({ error: { message: `HTTP ${statusCode}` } }));
+            });
+            server.listen(0, "127.0.0.1", () => {
+                const { port } = server.address();
+                fn(port).then(
+                    (v) => { server.close(); resolve(v); },
+                    (e) => { server.close(); reject(e); }
+                );
+            });
+            server.on("error", reject);
+        });
+    }
+
+    await test(
+        "HTTP 429 (rate limit) → explain_from_trace: fallback_used=true, adapter_error, deterministic",
+        () => withStatusServer(429, async (port) => {
+            const adapter = new OpenAICompatAdapter({
+                apiKey: "dummy",
+                baseUrl: `http://127.0.0.1:${port}`,
+                maxRetries: 0,
+            });
+            const skill = createExplainFromTraceSkill(adapter);
+            const ctx = createExecutionContext({ text: "test" });
+
+            const result = await skill.execute(MINIMAL_INPUT, ctx);
+
+            assert.strictEqual(result.trace.fallback_used, true,
+                "HTTP 429: fallback_used=true");
+            assert.strictEqual(result.trace.fallback_reason, "adapter_error",
+                "HTTP 429: fallback_reason=adapter_error");
+            assert.strictEqual(result.trace.error, "adapter_error",
+                "HTTP 429: trace.error=adapter_error (stable enum)");
+
+            const llmCall = result.trace.llm_call;
+            assert.ok(llmCall, "HTTP 429: llm_call present");
+            assert.strictEqual(llmCall.provider, "openai_compat",
+                "HTTP 429: llm_call.provider=openai_compat");
+            assert.strictEqual(llmCall.fallback_reason, "adapter_error",
+                "HTTP 429: llm_call.fallback_reason=adapter_error");
+
+            // Determinism: same error path must produce an identical trace
+            const result2 = await skill.execute(MINIMAL_INPUT, ctx);
+            assert.deepStrictEqual(result, result2,
+                "HTTP 429: deterministic across repeated calls");
+        })
+    );
+
+    await test(
+        "HTTP 401 (invalid key) → explain_from_trace: fallback_used=true, adapter_error, deterministic",
+        () => withStatusServer(401, async (port) => {
+            const adapter = new OpenAICompatAdapter({
+                apiKey: "sk-invalid",
+                baseUrl: `http://127.0.0.1:${port}`,
+                maxRetries: 0,
+            });
+            const skill = createExplainFromTraceSkill(adapter);
+            const ctx = createExecutionContext({ text: "test" });
+
+            const result = await skill.execute(MINIMAL_INPUT, ctx);
+
+            assert.strictEqual(result.trace.fallback_used, true,
+                "HTTP 401: fallback_used=true");
+            assert.strictEqual(result.trace.fallback_reason, "adapter_error",
+                "HTTP 401: fallback_reason=adapter_error");
+            assert.strictEqual(result.trace.error, "adapter_error",
+                "HTTP 401: trace.error=adapter_error (stable enum)");
+
+            const llmCall = result.trace.llm_call;
+            assert.ok(llmCall, "HTTP 401: llm_call present");
+            assert.strictEqual(llmCall.provider, "openai_compat",
+                "HTTP 401: llm_call.provider=openai_compat");
+            assert.strictEqual(llmCall.fallback_reason, "adapter_error",
+                "HTTP 401: llm_call.fallback_reason=adapter_error");
+
+            // Determinism: same error path must produce an identical trace
+            const result2 = await skill.execute(MINIMAL_INPUT, ctx);
+            assert.deepStrictEqual(result, result2,
+                "HTTP 401: deterministic across repeated calls");
+        })
+    );
+
+    // =========================================================================
     // Summary
     // =========================================================================
     console.log(`\n${"=".repeat(50)}`);

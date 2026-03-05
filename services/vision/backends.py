@@ -44,6 +44,30 @@ VISION_VOCABULARY: List[str] = [
     "vibrant", "calm", "lively",
 ]
 
+# Tag type classification sets (used by both backends)
+_FOOD_TAGS: frozenset = frozenset([
+    "ramen", "sushi", "izakaya", "cafe", "coffee", "dessert", "pastry",
+    "street_food", "food", "restaurant", "noodles", "rice",
+    "seafood", "grilled", "spicy", "hotpot",
+])
+_SCENERY_TAGS: frozenset = frozenset([
+    "temple", "shrine", "museum", "art", "culture", "traditional",
+    "architecture", "landmark", "garden", "park", "nature", "mountain",
+    "lake", "seaside", "beach", "hiking", "outdoor", "forest",
+])
+
+
+def _classify_type(tags: List[str]) -> str:
+    """Classify image type based on top tag distribution: food, scenery, or unknown."""
+    food_count = sum(1 for t in tags if t in _FOOD_TAGS)
+    scenery_count = sum(1 for t in tags if t in _SCENERY_TAGS)
+    if food_count > scenery_count:
+        return "food"
+    if scenery_count > food_count:
+        return "scenery"
+    return "unknown"
+
+
 # Keyword rules for rule_v0 backend
 _KEYWORD_MAP: Dict[str, str] = {
     "ramen": "ramen", "noodle": "ramen", "sushi": "sushi",
@@ -112,7 +136,14 @@ class RuleV0Backend:
             {"tag": t, "score": round(0.90 + (hash(t) % 10) * 0.005, 4)}
             for t in found
         ]
-        return {"tags": sorted(set(found)), "scores": scores}
+        sorted_tags = sorted(set(found))
+        return {
+            "tags": sorted_tags,
+            "scores": scores,
+            "cues": sorted_tags[:20],
+            "type": _classify_type(found),
+            "model": None,
+        }
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -135,6 +166,9 @@ class ClipV1Backend:
     def __init__(self, model_id: str, device: str) -> None:
         self._model_id = model_id
         self._device = device
+        parts = model_id.split("/", 1)
+        self._arch = parts[0]
+        self._pretrained = parts[1] if len(parts) > 1 else "openai"
         self._model = None
         self._preprocess = None
         self._text_features = None
@@ -266,7 +300,14 @@ class ClipV1Backend:
             scores.append({"tag": VISION_VOCABULARY[int(idx)], "score": round(score, 4)})
 
         tags = [s["tag"] for s in scores]
-        return {"tags": sorted(set(tags)), "scores": scores}
+        sorted_tags = sorted(set(tags))
+        return {
+            "tags": sorted_tags,
+            "scores": scores,
+            "cues": sorted_tags[:20],
+            "type": _classify_type(tags),
+            "model": {"name": self._arch, "pretrained": self._pretrained},
+        }
 
 
 # ─────────────────────────────────────────────────────────────────────────────

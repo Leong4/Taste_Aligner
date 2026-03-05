@@ -101,6 +101,8 @@ async function runAll() {
         assert.strictEqual(result.trace.tool.name, "embedding.tes_build");
         assert.strictEqual(result.trace.vector_checks.dim_expected, 512);
         assert.strictEqual(result.trace.vector_checks.dim_actual, 512);
+        // S2 gate: deterministic payload key evidence in trace
+        assert.deepStrictEqual(result.trace.tes_build_payload_keys, ["normalize", "tags", "vision_features"]);
     });
 
     await test("anchor_tags normalization: trim + dedup + stable numeric/base sort", async () => {
@@ -365,6 +367,64 @@ async function runAll() {
         assert.strictEqual(result.output.decision_trace.memory_weight_adjust.marker, "keep");
         assert.ok(result.output.decision_trace.tes_builder);
         assert.strictEqual(result.output.decision_trace.tes_builder.rule_id, "tes_builder_v1");
+    });
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Goal B gate: tes_build payload must NOT include recency/sentiment fields.
+    // This test FAILS if someone adds recency_days/sentiment/w_time/etc to the
+    // embedding service call, which would cause double-weighting (those scalars
+    // belong exclusively in memory.search).
+    // ─────────────────────────────────────────────────────────────────────────
+
+    await test("tes_build payload: only {vision_features, tags, normalize} — no recency/sentiment", async () => {
+        let capturedInput = null;
+        const client = new StubToolClient(async (action) => {
+            capturedInput = action.input;
+            return {
+                ok: true,
+                tool: "embedding.tes_build",
+                trace_id: "t_payload_gate",
+                latency_ms: 3,
+                output: {
+                    vector: makeUnitVector512(),
+                    dim: 512,
+                    normalized: true,
+                    meta: { backend: "hash_v2", tes_version: "2.0" },
+                },
+            };
+        });
+        const skill = createTesBuilderSkill(client);
+        await skill.execute(
+            makeInput({ vision_features: ["cozy", "warm"] }),
+            makeContext()
+        );
+
+        assert.ok(capturedInput !== null, "tool was called");
+
+        // Exact key whitelist: only these three keys are allowed.
+        // Any extra key (recency, sentiment, time, etc.) breaks this assertion.
+        const actualKeys = Object.keys(capturedInput).sort();
+        assert.deepStrictEqual(
+            actualKeys,
+            ["normalize", "tags", "vision_features"],
+            "tes_build payload must have exactly {vision_features, tags, normalize} — " +
+            "got: " + JSON.stringify(actualKeys)
+        );
+
+        // Explicit absence checks for double-weighting scalar fields
+        const forbidden = [
+            "recency_days", "recencyDays", "recency",
+            "sentiment", "emotion", "mood",
+            "w_time", "w_sent", "w_context",
+            "timestamp", "time_decay",
+        ];
+        for (const key of forbidden) {
+            assert.strictEqual(
+                capturedInput[key],
+                undefined,
+                `tes_build must NOT send '${key}' (scalar encoding belongs in memory.search only)`
+            );
+        }
     });
 
     console.log(`\n${"=".repeat(50)}`);

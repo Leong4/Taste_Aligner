@@ -70,6 +70,32 @@ class InvalidOutputAdapter {
     }
 }
 
+/** Returns valid tag data but reports total_tokens=801 to trigger the budget guard. */
+class HighTokenAdapter {
+    constructor() {
+        this.modelInfo = { provider: "mock", model_name: "mock-v1", version: "1.0.0" };
+    }
+
+    async generateStructuredJSON(input) {
+        const usage = { prompt_tokens: 400, completion_tokens: 401, total_tokens: 801 };
+        return {
+            data: {
+                hard_expansions: [{ tag: "izakaya", confidence: 0.9 }],
+                soft_expansions: [{ tag: "quiet", confidence: 0.75 }],
+            },
+            usage,
+            callTrace: {
+                model: this.modelInfo,
+                temperature: input.temperature,
+                prompt_version: input.promptVersion,
+                latency_ms: 0,
+                usage,
+                fallback_used: false,
+            },
+        };
+    }
+}
+
 let passed = 0;
 let failed = 0;
 
@@ -213,6 +239,68 @@ async function runAll() {
         assert.strictEqual(t.fallback_used, false);
         assert.strictEqual(t.fallback_reason, "");
         assert.strictEqual(t.error_message, "");
+    });
+
+    await test(">20 valid tags from LLM → capped at exactly 20 (hard tags take priority)", async () => {
+        // Return 12 hard + 12 soft expansions — all valid, all above threshold, all unique.
+        // With expanded limits (15/15), all 24 pass filtering.
+        // The slice(0, MAX_GENERATED_TAGS=20) must cap the result deterministically.
+        const adapter = new FixedMockAdapter({
+            hard_expansions: Array.from({ length: 12 }, (_, i) => ({
+                tag: `tag${String(i + 1).padStart(2, "0")}`,
+                confidence: 0.9,
+            })),
+            soft_expansions: Array.from({ length: 12 }, (_, i) => ({
+                tag: `stag${String(i + 1).padStart(2, "0")}`,
+                confidence: 0.75,
+            })),
+        });
+        const skill = createTagExpandSkill(adapter);
+        const input = makeInput({
+            tag_budget: {
+                budget: 40,
+                hard_expand_limit: 15,
+                soft_expand_limit: 15,
+                thresholds: { min_confidence_soft: 0.6, min_confidence_hard: 0.55 },
+            },
+        });
+        const result = await skill.execute(input, createExecutionContext({ text: "test" }));
+
+        assert.strictEqual(result.trace.fallback_used, false, "should not fall back");
+        assert.strictEqual(result.output.tags_added.length, 20,
+            "tags_added capped at MAX_GENERATED_TAGS=20");
+        // Hard tags fill the first 12 slots; soft tags fill the remaining 8.
+        assert.ok(result.output.tags_added.every((t) => typeof t === "string"),
+            "all tags_added are strings");
+        // Determinism: same input always produces the same 20 tags.
+        const result2 = await skill.execute(input, createExecutionContext({ text: "test" }));
+        assert.deepStrictEqual(result.output.tags_added, result2.output.tags_added,
+            "tag cap is deterministic across calls");
+    });
+
+    await test("wrong-schema JSON from LLM ({ tags: [...] }) → invalid_output fallback", async () => {
+        // Adapter returns an object with wrong keys — not the expected shape.
+        const adapter = new InvalidOutputAdapter({ tags: ["ramen", "izakaya"] });
+        const skill = createTagExpandSkill(adapter);
+        const result = await skill.execute(makeInput(), createExecutionContext({ text: "test" }));
+
+        assertFallback(result, "invalid_output", ["ramen", "food"]);
+    });
+
+    await test("token_budget_exceeded: total_tokens > 800 → deterministic fallback", async () => {
+        const adapter = new HighTokenAdapter();
+        const skill = createTagExpandSkill(adapter);
+        const result = await skill.execute(makeInput(), createExecutionContext({ text: "test" }));
+
+        assertFallback(result, "token_budget_exceeded", ["ramen", "food"]);
+        // llm_call must still be present (the call completed, just over budget)
+        assert.ok(result.trace.llm_call, "llm_call present even on token_budget_exceeded");
+        assert.strictEqual(result.trace.llm_call.usage.total_tokens, 801,
+            "llm_call.usage reflects actual token count");
+
+        // Determinism
+        const result2 = await skill.execute(makeInput(), createExecutionContext({ text: "test" }));
+        assert.deepStrictEqual(result, result2, "token_budget_exceeded is deterministic");
     });
 
     console.log(`\n${"=".repeat(50)}`);

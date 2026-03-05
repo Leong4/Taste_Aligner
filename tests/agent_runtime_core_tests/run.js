@@ -365,14 +365,17 @@ async function runAll() {
         path.join(__dirname, "test_decide_tag_budget.js"),
         path.join(__dirname, "test_memory_signal.js"),
         path.join(__dirname, "test_memory_weight_adjust.js"),
+        path.join(__dirname, "test_build_profile_vector.js"),
         path.join(__dirname, "test_tes_builder.js"),
         path.join(__dirname, "test_vision_describe.js"),
         path.join(__dirname, "test_fetch_recommendation.js"),
         path.join(__dirname, "test_rerank_tes.js"),
         path.join(__dirname, "test_tag_expand.js"),
         path.join(__dirname, "test_tag_normalize.js"),
+        path.join(__dirname, "test_extract_intent.js"),
         path.join(__dirname, "test_explain_from_trace.js"),
         path.join(__dirname, "test_llm_adapter_fallback.js"),
+        path.join(__dirname, "test_memory_write_integration.js"),
     ];
 
     for (const filePath of satelliteFiles) {

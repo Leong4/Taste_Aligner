@@ -81,17 +81,42 @@ function buildZoneSeed(type: IntentType): { cz_seed: string[]; ez_seed: string[]
     return { cz_seed: ["ramen_shop"], ez_seed: ["park"] };
 }
 
+function hasUploadImageSignal(
+    input: { image_url?: unknown; image_base64?: unknown },
+    context: ExecutionContext
+): boolean {
+    const rootInput = context.input as typeof context.input & {
+        image?: unknown;
+        image_url?: unknown;
+        image_base64?: unknown;
+    };
+    const rootContext = context as ExecutionContext & { image?: unknown };
+    return !!(
+        rootContext.image ||
+        rootInput.image ||
+        (typeof input.image_url === "string" && input.image_url.trim()) ||
+        (typeof input.image_base64 === "string" && input.image_base64.trim()) ||
+        (typeof rootInput.image_url === "string" && rootInput.image_url.trim()) ||
+        (typeof rootInput.image_base64 === "string" && rootInput.image_base64.trim())
+    );
+}
+
 // ---------------------------------------------------------------------------
 // Skill implementation
 // ---------------------------------------------------------------------------
 
-export const extractIntentSkill: Skill<{ text: string; user_id?: string }, ExtractIntentOutput> = {
+export const extractIntentSkill: Skill<{
+    text: string;
+    user_id?: string;
+    image_url?: string;
+    image_base64?: string;
+}, ExtractIntentOutput> = {
     name: "extract_intent",
 
     inputSchema: {
         description: "Raw user text and optional user ID",
         required: ["text"],
-        optional: ["user_id"],
+        optional: ["user_id", "image_url", "image_base64"],
     },
 
     outputSchema: {
@@ -100,14 +125,15 @@ export const extractIntentSkill: Skill<{ text: string; user_id?: string }, Extra
     },
 
     async execute(
-        input: { text: string; user_id?: string },
-        _context: ExecutionContext
+        input: { text: string; user_id?: string; image_url?: string; image_base64?: string },
+        context: ExecutionContext
     ): Promise<SkillResult<ExtractIntentOutput>> {
         const text = (input.text ?? "").toLowerCase();
         const city = detectCity(text);
         const type = detectType(text);
         const tags = extractMatchedTags(text);
         const seed = buildZoneSeed(type);
+        const isUploadFlow = hasUploadImageSignal(input, context);
 
         const output: ExtractIntentOutput = {
             city,
@@ -125,6 +151,7 @@ export const extractIntentSkill: Skill<{ text: string; user_id?: string }, Extra
                 rule_id: "intent_v1_keywords",
                 city_detected: true,
                 city,
+                upload_flow: isUploadFlow,
                 type,
                 cz_seed: seed.cz_seed,
                 ez_seed: seed.ez_seed,
@@ -134,19 +161,18 @@ export const extractIntentSkill: Skill<{ text: string; user_id?: string }, Extra
             : {
                 rule_id: "intent_v1_keywords",
                 city_detected: false,
-                abort_reason: "no_city_detected",
+                upload_flow: isUploadFlow,
                 type,
                 tags,
                 text: input.text,
             };
 
-        // Signal terminal if no city detected — the pipeline cannot
-        // continue without a city. The orchestrator will stop without
-        // needing to know anything about this skill's semantics.
-        if (!city) {
+        if (!city && !isUploadFlow) {
+            // Query flow still requires city detection to keep downstream
+            // recommendation quality unchanged. Upload flow is exempt.
             return {
                 output,
-                trace,
+                trace: { ...trace, abort_reason: "no_city_detected" },
                 terminal: true,
                 terminalReason: "no_city_detected",
             };

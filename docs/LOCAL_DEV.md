@@ -163,9 +163,12 @@ Verifies that the LLM-backed skills (`tag_expand`, `explain_from_trace`) are usi
 a real provider and not falling back to mock.  The test **skips** (exit 0) if
 `LLM_API_KEY` is not set, so it is safe to run in offline CI.
 
+> **Default behavior:** `dev_up.sh` starts agent_runtime with the **mock** LLM
+> adapter even if `LLM_API_KEY` is set in your shell or `.env.local`.  Pass
+> `--with-llm` to opt in to the real LLM adapter.
+
 **Prerequisites:**
-- agent_runtime must be running (`./scripts/dev_up.sh`)
-- agent_runtime must be started with the LLM env vars (see below)
+- agent_runtime must be running with real LLM enabled (`--with-llm`)
 
 **Setup — example for OpenAI `gpt-4o-mini`:**
 ```bash
@@ -175,10 +178,15 @@ export LLM_API_KEY=sk-...          # your OpenAI key
 # export LLM_BASE_URL=...          # optional; omit to use OpenAI default
 ```
 
-**Start the stack with LLM env vars:**
+**Start the stack with real LLM enabled:**
 ```bash
-./scripts/dev_up.sh --no-verify    # env vars inherited from current shell
+./scripts/dev_up.sh --with-llm             # starts all services + enables real LLM
+./scripts/dev_up.sh --with-llm --no-verify # skip auto-verify if you want faster startup
 ```
+
+Without `--with-llm` the LLM env vars are unset from the agent_runtime process
+environment, so the adapter always falls back to mock regardless of what is in
+your shell.
 
 **Run the smoke:**
 ```bash
@@ -191,15 +199,17 @@ export LLM_PROVIDER=openai_compat
 export LLM_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
 export LLM_MODEL=qwen-plus
 export LLM_API_KEY=sk-...
-./scripts/dev_up.sh --no-verify
+./scripts/dev_up.sh --with-llm --no-verify
 node tests/integration/agent_llm_openai_compat_smoke.js
 ```
 
 The smoke checks:
 - HTTP 200 + valid JSON from `/run`
 - No `NaN`/`Infinity` tokens in the response
-- `decision_trace.tag_expand.llm_call.provider` is not `"mock"` and `fallback_used=false`
-- `decision_trace.explain_from_trace.llm_call.provider` is not `"mock"` and `fallback_used=false`
+- `decision_trace.tag_expand.llm_call.provider === "openai_compat"` and `fallback_used=false`
+- `decision_trace.explain_from_trace.llm_call.provider === "openai_compat"` and `fallback_used=false`
+- `tag_expand.llm_call.usage.total_tokens` does not exceed `TAG_EXPAND_MAX_TOTAL_TOKENS` (default 800)
+- Determinism gate: two sequential `/run` calls with identical payload produce identical normalized traces
 
 ---
 

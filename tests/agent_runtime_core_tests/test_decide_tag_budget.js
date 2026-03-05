@@ -384,11 +384,21 @@ async function runAll() {
     // =========================================================================
     console.log("\n--- Graph structure ---");
 
-    await test("RECOMMENDATION_GRAPH v12.0 has decide_tag_budget as node 2", () => {
-        assert.strictEqual(RECOMMENDATION_GRAPH.version, "12.0.0");
-        assert.strictEqual(RECOMMENDATION_GRAPH.nodes.length, 12, "12 nodes");
+    await test("RECOMMENDATION_GRAPH contains required nodes and decide_tag_budget stays after extract_intent", () => {
+        const nodeIds = RECOMMENDATION_GRAPH.nodes.map((n) => n.id);
+        const requiredNodeIds = [
+            "vision_describe",
+            "tes_builder",
+            "memory_weight_adjust",
+            "build_profile_vector",
+            "explain_from_trace",
+        ];
+        for (const requiredId of requiredNodeIds) {
+            assert.ok(nodeIds.includes(requiredId), `graph must include node ${requiredId}`);
+        }
 
-        const node = RECOMMENDATION_GRAPH.nodes[1];
+        const node = RECOMMENDATION_GRAPH.nodes.find((n) => n.id === "decide_tag_budget");
+        assert.ok(node, "decide_tag_budget node must exist");
         assert.strictEqual(node.id, "decide_tag_budget");
         assert.strictEqual(node.skill, "decide_tag_budget");
         assert.ok(node.inputFrom.tags, "has tags input");
@@ -405,6 +415,15 @@ async function runAll() {
                 `input path "${path}" should reference extract_intent`
             );
         }
+
+        const extractIdx = nodeIds.indexOf("extract_intent");
+        const budgetIdx = nodeIds.indexOf("decide_tag_budget");
+        const profileIdx = nodeIds.indexOf("build_profile_vector");
+        const explainIdx = nodeIds.indexOf("explain_from_trace");
+        assert.ok(extractIdx !== -1 && budgetIdx !== -1 && budgetIdx > extractIdx,
+            "decide_tag_budget must execute after extract_intent");
+        assert.ok(profileIdx !== -1 && explainIdx !== -1 && profileIdx < explainIdx,
+            "build_profile_vector must execute before explain_from_trace");
 
         // Graph still validates
         const errors = validateGraph(RECOMMENDATION_GRAPH);
@@ -559,7 +578,48 @@ async function runAll() {
             }),
         });
 
-        // Stub tes_builder (new node between memory_weight_adjust and fetch_recommendation)
+        // Stub build_profile_vector (new node between memory_weight_adjust and vision_describe)
+        reg.register({
+            name: "build_profile_vector",
+            inputSchema: { description: "", required: [] },
+            outputSchema: { description: "", required: [] },
+            execute: async () => ({
+                output: {
+                    profile_vector: Array.from({ length: 512 }, () => 0),
+                    anchors: [],
+                    total_memories_considered: 1,
+                    weights: {
+                        per_memory: [],
+                        summary: {
+                            dominant_reason: "balanced",
+                            time_bias: 1,
+                            sentiment_bias: 1,
+                            context_bias: 1,
+                        },
+                    },
+                    decision_trace: {
+                        profile_vector_node: {
+                            rule_id: "profile_vector_v1",
+                            schema_version: "1.0",
+                            anchors: [],
+                            weights_summary: {
+                                dominant_reason: "balanced",
+                                time_bias: 1,
+                                sentiment_bias: 1,
+                                context_bias: 1,
+                            },
+                            total_memories_considered: 1,
+                            profile_vector_dim: 512,
+                            has_embeddings: false,
+                            fallback_used: false,
+                        },
+                    },
+                },
+                trace: { rule_id: "profile_vector_v1", schema_version: "1.0" },
+            }),
+        });
+
+        // Stub tes_builder (node after vision_describe)
         reg.register({
             name: "tes_builder",
             inputSchema: { description: "", required: [] },

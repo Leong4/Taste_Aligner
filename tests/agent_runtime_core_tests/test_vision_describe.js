@@ -210,6 +210,64 @@ async function runAll() {
         assert.deepStrictEqual(r1.output.vision_features, r2.output.vision_features);
     });
 
+    // ── V1 schema (clip_v1 cues + vision_type) ────────────────────────────────
+    await test("clip_v1 V1 schema: cues merged with tags, vision_type in trace", async () => {
+        const client = new StubToolClient(async () => ({
+            ok: true,
+            latency_ms: 20,
+            output: {
+                backend: "clip_v1",
+                type: "food",
+                cues: ["ramen", "noodles", "izakaya"],
+                tags: ["RAMEN", "cafe"],   // "ramen" deduped across cues+tags
+                model_id: "ViT-B-32/openai",
+                device: "cuda",
+            },
+        }));
+        const skill = createVisionDescribeSkill(client);
+        const result = await skill.execute(
+            { image_url: "http://example.com/dish.jpg" },
+            makeContext()
+        );
+
+        assert.strictEqual(result.output.used, true);
+        assert.strictEqual(result.output.fallback_used, false);
+        // cafe < izakaya < noodles < ramen — merged, deduped, lowercased, sorted
+        assert.deepStrictEqual(result.output.vision_features, ["cafe", "izakaya", "noodles", "ramen"]);
+        assert.strictEqual(result.output.tags_count, 4);
+
+        const trace = result.output.decision_trace.vision_describe;
+        assert.strictEqual(trace.vision_type, "food", "vision_type must be propagated from V1 schema");
+        assert.strictEqual(trace.used, true);
+        assert.strictEqual(trace.backend, "clip_v1");
+    });
+
+    await test("V1 schema cues-only (no tags field): cues used as sole source", async () => {
+        const client = new StubToolClient(async () => ({
+            ok: true,
+            latency_ms: 12,
+            output: {
+                backend: "clip_v1",
+                type: "scenery",
+                cues: ["temple", "Garden", "  outdoor  "],
+                // no tags field
+                model_id: "ViT-B-32/openai",
+                device: "cpu",
+            },
+        }));
+        const skill = createVisionDescribeSkill(client);
+        const result = await skill.execute(
+            { image_base64: "iVBORw0KGgo=" },
+            makeContext()
+        );
+
+        assert.strictEqual(result.output.used, true);
+        assert.strictEqual(result.output.fallback_used, false);
+        // garden < outdoor < temple
+        assert.deepStrictEqual(result.output.vision_features, ["garden", "outdoor", "temple"]);
+        assert.strictEqual(result.trace.vision_type, "scenery");
+    });
+
     await test("top_k clamped and forwarded", async () => {
         let capturedTopK;
         const client = new StubToolClient(async (action) => {

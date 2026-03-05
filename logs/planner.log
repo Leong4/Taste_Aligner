@@ -1,15 +1,78 @@
-INFO:     Started server process [56653]
+INFO:     Started server process [74633]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:5006 (Press CTRL+C to quit)
-INFO:     127.0.0.1:59518 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59580 - "POST /compose HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59580 - "POST /compose HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59580 - "POST /compose HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59580 - "POST /compose HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59580 - "POST /compose HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59960 - "GET /health HTTP/1.1" 200 OK
-INFO:     Shutting down
-INFO:     Waiting for application shutdown.
-INFO:     Application shutdown complete.
-INFO:     Finished server process [56653]
+INFO:     127.0.0.1:62918 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62945 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62998 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62998 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63152 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63259 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63342 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63630 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63707 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63784 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63862 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63938 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64016 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64092 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64168 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64244 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64320 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64427 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64502 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64580 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64660 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64736 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64820 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64895 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64971 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65047 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65126 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65291 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65371 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65449 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65525 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49228 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49308 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49385 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49461 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49570 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49647 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49722 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49798 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50116 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50371 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50454 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50533 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50610 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50688 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50776 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50854 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50932 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51008 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51086 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51164 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51164 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51340 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51423 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51502 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51581 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51690 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51772 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51848 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51924 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52000 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52077 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52208 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52291 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52371 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52450 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52527 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52603 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52693 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52773 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52851 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52930 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53007 - "POST /compose HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53007 - "POST /compose HTTP/1.1" 200 OK

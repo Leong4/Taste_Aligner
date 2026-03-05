@@ -25,6 +25,7 @@ import {
     createTagNormalizeSkill,
     createMemorySignalSkill,
     createMemoryWeightAdjustSkill,
+    createBuildProfileVectorSkill,
     createVisionDescribeSkill,
     createTesBuilderSkill,
     createFetchRecommendationSkill,
@@ -73,6 +74,7 @@ export function createOrchestrator(config: OrchestratorConfig = {}): Orchestrato
     registry.register(createTagNormalizeSkill(toolClient));
     registry.register(createMemorySignalSkill(toolClient));
     registry.register(createMemoryWeightAdjustSkill(toolClient));
+    registry.register(createBuildProfileVectorSkill());  // no tool client needed — pure computation
     registry.register(createVisionDescribeSkill(toolClient));
     registry.register(createTesBuilderSkill(toolClient));
     registry.register(createFetchRecommendationSkill(toolClient));

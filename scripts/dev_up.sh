@@ -9,6 +9,10 @@
 #   --all            Start core + vision + ontology
 #   --with-vision    Enable vision service (useful after --core)
 #   --with-ontology  Enable ontology service (useful after --core)
+#   --with-llm       Enable real LLM (openai_compat). Reads LLM_API_KEY /
+#                    LLM_BASE_URL / LLM_MODEL from env or .env.local.
+#                    Without this flag the adapter stays mock even if
+#                    .env.local contains LLM_API_KEY (opt-in by design).
 #   --no-verify      Skip the post-start dev_verify step
 #   --logs-dir PATH  Log/PID directory  (default: ./logs)
 #   -h, --help       Show this help
@@ -33,7 +37,9 @@ PIP_BIN="$VENV_DIR/bin/pip"
 LOGS_DIR="$REPO_ROOT/logs"
 START_VISION=true
 START_ONTOLOGY=true
+ENABLE_LLM=false
 RUN_VERIFY=true
+DEV_UP_DEBUG="${DEV_UP_DEBUG:-0}"
 
 # ---------------------------------------------------------------------------
 # Argument parsing  (POSIX-compatible [ ] to avoid bash 3.2 [[]] quirks)
@@ -44,6 +50,7 @@ while [ "$#" -gt 0 ]; do
         --all)           START_VISION=true; START_ONTOLOGY=true ;;
         --with-vision)   START_VISION=true ;;
         --with-ontology) START_ONTOLOGY=true ;;
+        --with-llm)      ENABLE_LLM=true ;;
         --no-verify)     RUN_VERIFY=false ;;
         --logs-dir)
             shift
@@ -61,6 +68,31 @@ while [ "$#" -gt 0 ]; do
     shift
 done
 
+# ---------------------------------------------------------------------------
+# LLM env loading (opt-in)
+# Only load secrets from .env.local when --with-llm is explicitly passed.
+# This prevents accidental API spending.
+# ---------------------------------------------------------------------------
+if [ "$ENABLE_LLM" = "true" ]; then
+    if [ -f "$REPO_ROOT/.env.local" ]; then
+        set -a
+        # shellcheck disable=SC1091
+        . "$REPO_ROOT/.env.local" || true
+        set +a
+    fi
+    # If user didn't set a provider explicitly, default to openai_compat when LLM is enabled.
+    export LLM_PROVIDER="${LLM_PROVIDER:-openai_compat}"
+fi
+
+# ---------------------------------------------------------------------------
+# LLM opt-in enforcement
+# Clear any LLM credentials that may have been loaded from .env.local unless
+# --with-llm was explicitly passed.  This prevents accidental API spending.
+# ---------------------------------------------------------------------------
+if [ "$ENABLE_LLM" = "false" ]; then
+    unset LLM_API_KEY LLM_PROVIDER LLM_BASE_URL LLM_MODEL LLM_MAX_RETRIES 2>/dev/null || true
+fi
+
 PIDS_FILE="$LOGS_DIR/pids.env"
 
 # ---------------------------------------------------------------------------
@@ -69,10 +101,27 @@ PIDS_FILE="$LOGS_DIR/pids.env"
 log()  { echo "[dev_up] $*"; }
 warn() { echo "[dev_up] WARN: $*" >&2; }
 die()  { echo "[dev_up] ERROR: $*" >&2; exit 1; }
+debug() {
+    if [ "$DEV_UP_DEBUG" = "1" ]; then
+        echo "[dev_up][debug] $*" >&2
+    fi
+}
 
-port_in_use() { lsof -ti tcp:"$1" > /dev/null 2>&1; }
-port_pid()    { lsof -ti tcp:"$1" 2>/dev/null | head -1 || true; }
+port_in_use() {
+    debug "check LISTEN port: lsof -nP -tiTCP:$1 -sTCP:LISTEN"
+    lsof -nP -tiTCP:"$1" -sTCP:LISTEN > /dev/null 2>&1
+}
+port_pid() {
+    debug "resolve LISTEN pid: lsof -nP -tiTCP:$1 -sTCP:LISTEN"
+    lsof -nP -tiTCP:"$1" -sTCP:LISTEN 2>/dev/null | head -1 || true
+}
 pid_alive()   { [ -n "${1:-}" ] && kill -0 "$1" 2>/dev/null; }
+pid_listens_on_port() {
+    local pid="$1" port="$2"
+    [ -n "${pid:-}" ] || return 1
+    debug "check pid listens: lsof -nP -a -p $pid -iTCP:$port -sTCP:LISTEN"
+    lsof -nP -a -p "$pid" -iTCP:"$port" -sTCP:LISTEN > /dev/null 2>&1
+}
 
 saved_pid() {
     local key="${1}_PID"
@@ -92,19 +141,47 @@ save_pid() {
     echo "${key}=${pid}" >> "$PIDS_FILE"
 }
 
+clear_saved_pid() {
+    local key="${1}_PID"
+    [ -f "$PIDS_FILE" ] || return 0
+    local tmp="${PIDS_FILE}.tmp"
+    grep -v "^${key}=" "$PIDS_FILE" > "$tmp" 2>/dev/null || true
+    mv "$tmp" "$PIDS_FILE"
+}
+
+port_process_details() {
+    local port="$1"
+    local pid
+    pid="$(port_pid "$port")"
+    [ -n "$pid" ] || return 0
+    ps -p "$pid" -o pid=,command= 2>/dev/null | sed 's/^ *//' || true
+}
+
 # Returns 0 = proceed, 1 = skip (already ours), exits on unknown conflict
 check_port_idempotent() {
     local key="$1" port="$2" label="$3"
     local our_pid
     our_pid="$(saved_pid "$key")"
     if pid_alive "$our_pid"; then
-        log "  -> $label already running (PID=$our_pid, port=$port) -- skipping"
-        return 1
+        if pid_listens_on_port "$our_pid" "$port"; then
+            log "  -> $label already running (PID=$our_pid, port=$port) -- skipping"
+            return 1
+        fi
+        warn "Removing stale PID entry for $label: PID=$our_pid is alive but not listening on port $port"
+        clear_saved_pid "$key"
+    elif [ -n "$our_pid" ]; then
+        warn "Removing stale PID entry for $label: PID=$our_pid is not alive"
+        clear_saved_pid "$key"
     fi
     if port_in_use "$port"; then
         local intruder
+        local details
         intruder="$(port_pid "$port")"
-        die "Port $port is occupied by an unexpected process (PID=$intruder).\n  Stop it first or run:  ./scripts/dev_down.sh"
+        details="$(port_process_details "$port")"
+        die "Port $port is occupied by a LISTEN process (PID=$intruder).
+  Process: ${details:-unknown}
+  Stop it first or run: ./scripts/dev_down.sh
+  Tip: set DEV_UP_DEBUG=1 to print port-check commands."
     fi
     return 0
 }
@@ -141,6 +218,38 @@ wait_tcp() {
     done
     printf "\n"
     die "$label did not accept connections after $((max * delay))s."
+}
+
+tail_service_log() {
+    local logfile="$1"
+    [ -f "$logfile" ] || return 0
+    echo "----- tail -n 30 $logfile -----" >&2
+    tail -n 30 "$logfile" >&2 || true
+    echo "--------------------------------" >&2
+}
+
+health_probe_once() {
+    local label="$1" url="$2" logfile="$3"
+    debug "health probe: curl -sf --connect-timeout 2 --max-time 4 $url"
+    if curl -sf --connect-timeout 2 --max-time 4 "$url" > /dev/null 2>&1; then
+        log "  health OK: $label -> $url"
+        return 0
+    fi
+    warn "$label health check failed: $url"
+    tail_service_log "$logfile"
+    return 1
+}
+
+print_port_snapshot() {
+    local ports="5001 5002 5003 5004 5005 5006 8080 8787"
+    log "-- Port snapshot --"
+    for port in $ports; do
+        if port_in_use "$port"; then
+            log "  port $port -> LISTEN ($(port_process_details "$port"))"
+        else
+            log "  port $port -> free"
+        fi
+    done
 }
 
 # Start a background service and record its PID.
@@ -230,6 +339,13 @@ start_bg PLANNER "planner" 5006 "$LOGS_DIR/planner.log" \
 start_bg GATEWAY "gateway" 8080 "$LOGS_DIR/gateway.log" \
     bash -c "cd \"$REPO_ROOT/gateway\" && mvn -q exec:java -Dexec.mainClass=gateway.GatewayServer"
 
+if [ "$ENABLE_LLM" = "true" ]; then
+    log "  [LLM] ENABLED  provider=${LLM_PROVIDER:-openai_compat}  model=${LLM_MODEL:-gpt-4o-mini}  key=${LLM_API_KEY:+set (hidden)}"
+    [ -n "${LLM_API_KEY:-}" ] || warn "[LLM] --with-llm passed but LLM_API_KEY is not set -- adapter will fall back to mock"
+else
+    log "  [LLM] Mock (default). Use --with-llm to enable real LLM."
+fi
+
 start_bg AGENT_RUNTIME "agent_runtime" 8787 "$LOGS_DIR/agent_runtime.log" \
     bash -c "cd \"$REPO_ROOT/agent_runtime\" && PORT=8787 GATEWAY_BASE_URL=http://localhost:8080 npm run dev"
 
@@ -241,7 +357,7 @@ if [ "$START_VISION" = "true" ]; then
     log "-- Starting vision --"
     [ -f "$REPO_ROOT/services/vision/main.py" ] \
         || die "services/vision/main.py not found. Use ./scripts/dev_up.sh --core if you only want core services."
-    VISION_BACKEND="${VISION_BACKEND:-rule_v0}"
+    VISION_BACKEND="${VISION_BACKEND:-rule_v0}"  # override: VISION_BACKEND=clip_v1 ./scripts/dev_up.sh --with-vision
     if [ "$VISION_BACKEND" = "clip_v1" ] && ! "$PYTHON_BIN" -c "import open_clip" >/dev/null 2>&1; then
         die "VISION_BACKEND=clip_v1 requires open_clip_torch. Install with 'pip install open_clip_torch' or switch to 'VISION_BACKEND=rule_v0'."
     fi
@@ -355,6 +471,18 @@ log ""
 log "  Logs : $LOGS_DIR/"
 log "  PIDs : $PIDS_FILE"
 log "------------------------------------------------------------------------"
+print_port_snapshot
+health_probe_once "memory" "http://localhost:5001/health" "$LOGS_DIR/memory.log" || true
+health_probe_once "embedding" "http://localhost:5004/health" "$LOGS_DIR/embedding.log" || true
+health_probe_once "recommendation" "http://localhost:5005/health" "$LOGS_DIR/recommendation.log" || true
+health_probe_once "planner" "http://localhost:5006/health" "$LOGS_DIR/planner.log" || true
+health_probe_once "gateway" "http://localhost:8080/health" "$LOGS_DIR/gateway.log" || true
+if [ "$START_VISION" = "true" ] && [ -f "$REPO_ROOT/services/vision/main.py" ]; then
+    health_probe_once "vision" "http://localhost:5002/health" "$LOGS_DIR/vision.log" || true
+fi
+if [ "$START_ONTOLOGY" = "true" ] && [ -f "$REPO_ROOT/services/ontology/main.py" ]; then
+    health_probe_once "ontology" "http://localhost:5003/health" "$LOGS_DIR/ontology.log" || true
+fi
 
 # ---------------------------------------------------------------------------
 # Optional post-start verification

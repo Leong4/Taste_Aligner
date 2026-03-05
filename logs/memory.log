@@ -1,77 +1,1295 @@
-INFO:     Started server process [56622]
+INFO:     Started server process [74602]
 INFO:     Waiting for application startup.
-2026-02-26 05:54:22,645 - services.memory.db - INFO - Database initialized at /Volumes/leong4/University_doc/RAG/Taste-Aligner/Taste_Aligner/services/memory/memory.db
-2026-02-26 05:54:22,645 - services.memory.main - INFO - Memory Service started on port 5001
+2026-03-03 00:40:47,554 - services.memory.db - INFO - Database initialized at /Volumes/leong4/University_doc/RAG/Taste-Aligner/Taste_Aligner/services/memory/memory.db
+2026-03-03 00:40:47,554 - services.memory.main - INFO - Memory Service started on port 5001
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:5001 (Press CTRL+C to quit)
-INFO:     127.0.0.1:59514 - "GET /health HTTP/1.1" 200 OK
-2026-02-26 05:54:31,086 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 3, has_embedding: False
-2026-02-26 05:54:31,087 - services.memory.db - INFO - Loaded 1 memories for user u001
-2026-02-26 05:54:31,087 - services.memory.main - INFO - Search returned 1 results
-INFO:     127.0.0.1:59544 - "POST /search HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59614 - "GET /health HTTP/1.1" 200 OK
-2026-02-26 05:54:31,295 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
-2026-02-26 05:54:31,295 - services.memory.db - INFO - Loaded 1 memories for user u001
-2026-02-26 05:54:31,295 - services.memory.main - INFO - Search returned 1 results
-INFO:     127.0.0.1:59616 - "POST /search HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59544 - "POST /search HTTP/1.1" 422 Unprocessable Content
-INFO:     127.0.0.1:59683 - "GET /health HTTP/1.1" 200 OK
-2026-02-26 05:54:31,550 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
-2026-02-26 05:54:31,550 - services.memory.db - INFO - Loaded 1 memories for user u001
-2026-02-26 05:54:31,550 - services.memory.main - INFO - Search returned 1 results
-INFO:     127.0.0.1:59685 - "POST /search HTTP/1.1" 200 OK
-2026-02-26 05:54:31,551 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
-2026-02-26 05:54:31,552 - services.memory.db - INFO - Loaded 1 memories for user u001
-2026-02-26 05:54:31,552 - services.memory.main - INFO - Search returned 1 results
-INFO:     127.0.0.1:59687 - "POST /search HTTP/1.1" 200 OK
-2026-02-26 05:54:31,553 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
-2026-02-26 05:54:31,553 - services.memory.db - INFO - Loaded 1 memories for user u001
-2026-02-26 05:54:31,553 - services.memory.main - INFO - Search returned 1 results
-INFO:     127.0.0.1:59689 - "POST /search HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59544 - "POST /search HTTP/1.1" 422 Unprocessable Content
-INFO:     127.0.0.1:59761 - "GET /health HTTP/1.1" 200 OK
-2026-02-26 05:54:31,837 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
-2026-02-26 05:54:31,837 - services.memory.db - INFO - Loaded 1 memories for user u001
-2026-02-26 05:54:31,837 - services.memory.main - INFO - Search returned 1 results
-INFO:     127.0.0.1:59763 - "POST /search HTTP/1.1" 200 OK
-2026-02-26 05:54:31,838 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
-2026-02-26 05:54:31,839 - services.memory.db - INFO - Loaded 1 memories for user u001
-2026-02-26 05:54:31,839 - services.memory.main - INFO - Search returned 1 results
-INFO:     127.0.0.1:59765 - "POST /search HTTP/1.1" 200 OK
-2026-02-26 05:54:31,840 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
-2026-02-26 05:54:31,840 - services.memory.db - INFO - Loaded 1 memories for user u001
-2026-02-26 05:54:31,840 - services.memory.main - INFO - Search returned 1 results
-INFO:     127.0.0.1:59767 - "POST /search HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59544 - "POST /search HTTP/1.1" 422 Unprocessable Content
-INFO:     127.0.0.1:59863 - "GET /health HTTP/1.1" 200 OK
-2026-02-26 05:54:32,026 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
-2026-02-26 05:54:32,026 - services.memory.db - INFO - Loaded 1 memories for user u001
-2026-02-26 05:54:32,026 - services.memory.main - INFO - Search returned 1 results
-INFO:     127.0.0.1:59865 - "POST /search HTTP/1.1" 200 OK
-2026-02-26 05:54:32,027 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
-2026-02-26 05:54:32,028 - services.memory.db - INFO - Loaded 1 memories for user u001
-2026-02-26 05:54:32,028 - services.memory.main - INFO - Search returned 1 results
-INFO:     127.0.0.1:59867 - "POST /search HTTP/1.1" 200 OK
-2026-02-26 05:54:32,029 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
-2026-02-26 05:54:32,029 - services.memory.db - INFO - Loaded 1 memories for user u001
-2026-02-26 05:54:32,029 - services.memory.main - INFO - Search returned 1 results
-INFO:     127.0.0.1:59869 - "POST /search HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59544 - "POST /search HTTP/1.1" 422 Unprocessable Content
-INFO:     127.0.0.1:59940 - "GET /health HTTP/1.1" 200 OK
-2026-02-26 05:54:32,184 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
-2026-02-26 05:54:32,184 - services.memory.db - INFO - Loaded 1 memories for user u001
-2026-02-26 05:54:32,184 - services.memory.main - INFO - Search returned 1 results
-INFO:     127.0.0.1:59942 - "POST /search HTTP/1.1" 200 OK
-2026-02-26 05:54:32,185 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
-2026-02-26 05:54:32,186 - services.memory.db - INFO - Loaded 1 memories for user u001
-2026-02-26 05:54:32,186 - services.memory.main - INFO - Search returned 1 results
-INFO:     127.0.0.1:59944 - "POST /search HTTP/1.1" 200 OK
-2026-02-26 05:54:32,187 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
-2026-02-26 05:54:32,187 - services.memory.db - INFO - Loaded 1 memories for user u001
-2026-02-26 05:54:32,187 - services.memory.main - INFO - Search returned 1 results
-INFO:     127.0.0.1:59946 - "POST /search HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59954 - "GET /health HTTP/1.1" 200 OK
-INFO:     Shutting down
-INFO:     Waiting for application shutdown.
-INFO:     Application shutdown complete.
-INFO:     Finished server process [56622]
+INFO:     127.0.0.1:62914 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62939 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:41:02,740 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 3, has_embedding: False
+2026-03-03 00:41:02,741 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-03-03 00:41:02,741 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:62962 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63032 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:41:02,962 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-03-03 00:41:02,963 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-03-03 00:41:02,963 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:63034 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62962 - "POST /search HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:63102 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:41:06,194 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-03-03 00:41:06,194 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-03-03 00:41:06,194 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:63104 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:41:06,195 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-03-03 00:41:06,196 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-03-03 00:41:06,196 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:63106 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:41:06,197 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-03-03 00:41:06,197 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-03-03 00:41:06,197 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:63108 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63120 - "POST /search HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:63186 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:41:14,990 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-03-03 00:41:14,990 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-03-03 00:41:14,990 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:63188 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:41:14,991 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-03-03 00:41:14,992 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-03-03 00:41:14,992 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:63190 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:41:14,993 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-03-03 00:41:14,993 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-03-03 00:41:14,993 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:63192 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63227 - "POST /search HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:63293 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:41:21,505 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-03-03 00:41:21,505 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-03-03 00:41:21,506 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:63295 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:41:21,507 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-03-03 00:41:21,507 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-03-03 00:41:21,507 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:63297 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:41:21,508 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-03-03 00:41:21,509 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-03-03 00:41:21,509 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:63299 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63307 - "POST /search HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:63310 - "POST /memory/write HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63376 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:41:28,596 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-03-03 00:41:28,597 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-03-03 00:41:28,597 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:63378 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:41:28,598 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-03-03 00:41:28,598 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-03-03 00:41:28,598 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:63380 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:41:28,599 - services.memory.main - INFO - POST /search - user_id: u001, top_k: 1, has_embedding: False
+2026-03-03 00:41:28,599 - services.memory.db - INFO - Loaded 1 memories for user u001
+2026-03-03 00:41:28,599 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:63382 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63508 - "POST /search HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:63524 - "POST /search HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:63571 - "POST /search HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:63588 - "POST /search HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:63664 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:56:05,139 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:05,139 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:05,139 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:63666 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:56:05,140 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:05,140 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:05,140 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:63668 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:56:05,141 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:05,142 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:05,142 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:63670 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63741 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:56:11,989 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:11,989 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:11,989 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:63743 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:56:11,990 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:11,991 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:11,991 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:63745 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:56:11,992 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:11,992 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:11,992 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:63747 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63818 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:56:19,752 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:19,752 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:19,752 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:63820 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:56:19,753 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:19,754 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:19,754 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:63822 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:56:19,755 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:19,755 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:19,755 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:63824 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63829 - "POST /search HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:63896 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:56:25,826 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:25,827 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:25,827 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:63898 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:56:25,828 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:25,828 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:25,828 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:63900 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:56:25,829 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:25,829 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:25,829 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:63902 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63972 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:56:32,349 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:32,349 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:32,349 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:63974 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:56:32,350 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:32,351 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:32,351 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:63976 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:56:32,351 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:32,352 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:32,352 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:63978 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64050 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:56:39,859 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:39,859 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:39,859 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64052 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:56:39,860 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:39,861 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:39,861 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64054 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:56:39,862 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:39,862 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:39,862 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64056 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64126 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:56:45,356 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:45,357 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:45,357 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64128 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:56:45,358 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:45,358 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:45,358 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64130 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:56:45,359 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:45,360 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:45,360 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64132 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64202 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:56:50,832 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:50,832 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:50,832 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64204 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:56:50,833 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:50,833 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:50,833 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64206 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:56:50,834 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:50,835 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:50,835 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64208 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64211 - "POST /search HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:64278 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:56:56,125 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:56,126 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:56,126 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64280 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:56:56,126 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:56,127 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:56,127 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64282 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:56:56,128 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:56:56,128 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:56:56,128 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64284 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64354 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:57:02,955 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:57:02,956 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:57:02,956 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64356 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:57:02,956 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:57:02,957 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:57:02,957 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64358 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:57:02,958 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:57:02,958 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:57:02,958 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64360 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64391 - "POST /search HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:64461 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:58:38,736 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:58:38,736 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:58:38,736 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64463 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:58:38,737 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:58:38,737 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:58:38,737 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64465 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:58:38,738 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:58:38,738 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:58:38,738 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64467 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64536 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:58:45,181 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:58:45,182 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:58:45,182 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64538 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:58:45,183 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:58:45,183 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:58:45,183 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64540 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:58:45,184 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:58:45,184 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:58:45,184 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64542 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64614 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:58:51,734 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:58:51,734 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:58:51,734 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64616 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:58:51,735 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:58:51,736 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:58:51,736 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64618 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:58:51,737 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:58:51,737 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:58:51,737 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64620 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64627 - "POST /search HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:64694 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:59:01,279 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:59:01,280 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:59:01,280 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64696 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:59:01,281 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:59:01,281 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:59:01,281 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64698 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:59:01,282 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:59:01,282 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:59:01,282 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64700 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64770 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:59:08,838 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:59:08,839 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:59:08,839 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64772 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:59:08,840 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:59:08,840 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:59:08,840 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64774 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:59:08,841 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:59:08,841 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:59:08,841 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64776 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64854 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:59:14,832 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:59:14,833 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:59:14,833 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64856 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:59:14,834 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:59:14,834 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:59:14,834 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64858 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:59:14,835 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:59:14,835 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:59:14,835 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64860 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64929 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:59:20,635 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:59:20,635 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:59:20,635 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64931 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:59:20,636 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:59:20,636 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:59:20,637 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64933 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:59:20,637 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:59:20,638 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:59:20,638 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:64935 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65005 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:59:26,605 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:59:26,605 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:59:26,605 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:65007 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:59:26,606 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:59:26,606 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:59:26,606 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:65009 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:59:26,607 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:59:26,607 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:59:26,607 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:65011 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65014 - "POST /search HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:65081 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:59:35,460 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:59:35,461 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:59:35,461 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:65083 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:59:35,462 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:59:35,462 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:59:35,462 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:65085 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:59:35,463 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:59:35,464 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:59:35,464 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:65087 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65160 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 00:59:42,279 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:59:42,280 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:59:42,280 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:65162 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:59:42,281 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:59:42,281 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:59:42,281 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:65164 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 00:59:42,282 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 00:59:42,282 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 00:59:42,282 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:65166 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65254 - "POST /search HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:65259 - "POST /memory/write HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65325 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:06:15,734 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:06:15,734 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:06:15,735 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:65327 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:06:15,735 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:06:15,736 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:06:15,736 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:65329 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:06:15,737 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:06:15,737 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:06:15,737 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:65331 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65339 - "POST /memory/write HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65405 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:06:23,398 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:06:23,399 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:06:23,399 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:65407 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:06:23,400 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:06:23,400 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:06:23,400 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:65409 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:06:23,401 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:06:23,401 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:06:23,401 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:65411 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65483 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:06:30,182 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:06:30,183 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:06:30,183 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:65485 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:06:30,184 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:06:30,184 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:06:30,184 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:65487 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:06:30,186 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:06:30,186 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:06:30,186 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:65489 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49175 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:06:36,135 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:06:36,135 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:06:36,135 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49177 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:06:36,136 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:06:36,137 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:06:36,137 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49179 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:06:36,138 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:06:36,138 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:06:36,138 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49181 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49193 - "POST /search HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:49196 - "POST /memory/write HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49262 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:06:57,854 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:06:57,854 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:06:57,854 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49264 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:06:57,855 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:06:57,855 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:06:57,855 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49266 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:06:57,856 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:06:57,856 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:06:57,857 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49268 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49276 - "POST /memory/write HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49342 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:07:07,591 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:07:07,591 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:07:07,591 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49344 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:07:07,592 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:07:07,592 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:07:07,593 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49346 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:07:07,593 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:07:07,594 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:07:07,594 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49348 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49419 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:07:14,397 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:07:14,397 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:07:14,397 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49421 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:07:14,398 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:07:14,399 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:07:14,399 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49423 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:07:14,400 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:07:14,400 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:07:14,400 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49425 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49495 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:07:20,975 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:07:20,975 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:07:20,975 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49497 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:07:20,976 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:07:20,977 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:07:20,977 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49499 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:07:20,978 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:07:20,978 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:07:20,978 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49501 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49535 - "POST /search HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:49538 - "POST /memory/write HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49604 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:10:35,066 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:10:35,066 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:10:35,066 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49606 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:10:35,067 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:10:35,067 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:10:35,067 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49608 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:10:35,068 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:10:35,069 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:10:35,069 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49610 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49615 - "POST /memory/write HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49681 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:10:44,592 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:10:44,592 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:10:44,592 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49683 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:10:44,593 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:10:44,594 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:10:44,594 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49685 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:10:44,595 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:10:44,595 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:10:44,595 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49687 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49756 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:10:50,177 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:10:50,177 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:10:50,177 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49758 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:10:50,178 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:10:50,178 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:10:50,178 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49760 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:10:50,179 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:10:50,180 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:10:50,180 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49762 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49832 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:10:56,014 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:10:56,014 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:10:56,014 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49834 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:10:56,015 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:10:56,015 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:10:56,015 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49836 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:10:56,016 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:10:56,016 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:10:56,016 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:49838 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:27:36,524 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:27:36,527 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:27:36,527 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:50073 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50079 - "POST /search HTTP/1.1" 422 Unprocessable Content
+INFO:     127.0.0.1:50084 - "POST /memory/write HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50150 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:27:40,294 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:27:40,294 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:27:40,294 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:50152 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:27:40,295 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:27:40,296 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:27:40,296 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:50154 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:27:40,297 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:27:40,297 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:27:40,297 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:50156 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:33:42,146 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:33:42,147 - services.memory.db - INFO - Loaded 0 memories for user step5_demo_user
+2026-03-03 01:33:42,147 - services.memory.main - INFO - No memories found for user step5_demo_user
+INFO:     127.0.0.1:50336 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:33:42,617 - services.memory.main - INFO - POST /write - user_id: step5_demo_user
+2026-03-03 01:33:42,623 - services.memory.db - INFO - Memory written: 5790cdf4-c215-4f88-8737-34a15f6a3426
+2026-03-03 01:33:42,623 - services.memory.main - INFO - Memory written: 5790cdf4-c215-4f88-8737-34a15f6a3426
+INFO:     127.0.0.1:50339 - "POST /write HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50405 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:33:42,802 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:33:42,802 - services.memory.db - INFO - Loaded 1 memories for user step5_demo_user
+2026-03-03 01:33:42,803 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50407 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:33:42,804 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:33:42,804 - services.memory.db - INFO - Loaded 1 memories for user step5_demo_user
+2026-03-03 01:33:42,804 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50409 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:33:42,805 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:33:42,806 - services.memory.db - INFO - Loaded 1 memories for user step5_demo_user
+2026-03-03 01:33:42,806 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50411 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:33:45,213 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:33:45,214 - services.memory.db - INFO - Loaded 1 memories for user step5_demo_user
+2026-03-03 01:33:45,214 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50414 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:33:45,215 - services.memory.main - INFO - GET /read/5790cdf4-c215-4f88-8737-34a15f6a3426
+INFO:     127.0.0.1:50414 - "GET /read/5790cdf4-c215-4f88-8737-34a15f6a3426 HTTP/1.1" 200 OK
+2026-03-03 01:33:49,111 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:33:49,112 - services.memory.db - INFO - Loaded 1 memories for user step5_demo_user
+2026-03-03 01:33:49,112 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50419 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:33:49,977 - services.memory.main - INFO - POST /write - user_id: step5_demo_user
+2026-03-03 01:33:49,983 - services.memory.db - INFO - Memory written: ab373a3b-9d2e-48cf-830a-bf2187e0a3fe
+2026-03-03 01:33:49,983 - services.memory.main - INFO - Memory written: ab373a3b-9d2e-48cf-830a-bf2187e0a3fe
+INFO:     127.0.0.1:50422 - "POST /write HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50488 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:33:50,173 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:33:50,174 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:33:50,174 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50490 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:33:50,175 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:33:50,176 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:33:50,176 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50492 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:33:50,177 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:33:50,178 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:33:50,178 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50494 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:33:53,806 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:33:53,807 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:33:53,807 - services.memory.main - INFO - Search returned 2 results
+INFO:     127.0.0.1:50496 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:33:53,809 - services.memory.main - INFO - GET /read/ab373a3b-9d2e-48cf-830a-bf2187e0a3fe
+INFO:     127.0.0.1:50496 - "GET /read/ab373a3b-9d2e-48cf-830a-bf2187e0a3fe HTTP/1.1" 200 OK
+2026-03-03 01:33:53,812 - services.memory.main - INFO - GET /read/5790cdf4-c215-4f88-8737-34a15f6a3426
+INFO:     127.0.0.1:50496 - "GET /read/5790cdf4-c215-4f88-8737-34a15f6a3426 HTTP/1.1" 200 OK
+2026-03-03 01:33:56,806 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:33:56,807 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:33:56,807 - services.memory.main - INFO - Search returned 2 results
+INFO:     127.0.0.1:50500 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50567 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:33:56,998 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:33:56,999 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:33:56,999 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50569 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:33:57,000 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:33:57,001 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:33:57,001 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50571 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:33:57,002 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:33:57,003 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:33:57,003 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50573 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:02,141 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:34:02,142 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:02,143 - services.memory.main - INFO - Search returned 2 results
+INFO:     127.0.0.1:50577 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50644 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:34:02,334 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:02,334 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:02,334 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50646 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:02,336 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:02,336 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:02,336 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50648 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:02,338 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:02,338 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:02,338 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50650 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:09,577 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:34:09,578 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:09,578 - services.memory.main - INFO - Search returned 2 results
+INFO:     127.0.0.1:50655 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:34:09,770 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:09,770 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:09,770 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50724 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:09,772 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:09,772 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:09,772 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50726 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:09,773 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:09,774 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:09,774 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50728 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:15,178 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:34:15,179 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:15,180 - services.memory.main - INFO - Search returned 2 results
+INFO:     127.0.0.1:50743 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50810 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:34:15,388 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:15,389 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:15,389 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50812 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:15,390 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:15,391 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:15,391 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50814 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:15,392 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:15,392 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:15,393 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50816 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:21,111 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:34:21,112 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:21,112 - services.memory.main - INFO - Search returned 2 results
+INFO:     127.0.0.1:50821 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50888 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:34:21,310 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:21,310 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:21,311 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50890 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:21,312 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:21,312 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:21,312 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50892 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:21,314 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:21,314 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:21,314 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50894 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:27,602 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:34:27,604 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:27,604 - services.memory.main - INFO - Search returned 2 results
+INFO:     127.0.0.1:50899 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50966 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:34:27,792 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:27,793 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:27,793 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50968 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:27,794 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:27,794 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:27,795 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50970 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:27,796 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:27,796 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:27,796 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:50972 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:33,128 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:34:33,129 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:33,129 - services.memory.main - INFO - Search returned 2 results
+INFO:     127.0.0.1:50975 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51042 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:34:33,336 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:33,336 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:33,336 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51044 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:33,338 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:33,338 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:33,338 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51046 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:33,339 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:33,340 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:33,340 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51048 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:39,479 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:34:39,481 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:39,481 - services.memory.main - INFO - Search returned 2 results
+INFO:     127.0.0.1:51053 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51120 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:34:39,679 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:39,679 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:39,680 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51122 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:39,681 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:39,681 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:39,681 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51124 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:39,682 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:39,683 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:39,683 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51126 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:45,341 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:34:45,342 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:45,342 - services.memory.main - INFO - Search returned 2 results
+INFO:     127.0.0.1:51131 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51198 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:34:45,534 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:45,534 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:45,534 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51200 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:45,536 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:45,536 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:45,536 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51202 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:45,537 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:45,538 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:45,538 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51204 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:49,822 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:34:49,823 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:49,823 - services.memory.main - INFO - Search returned 2 results
+INFO:     127.0.0.1:51131 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51272 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:34:50,023 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:50,023 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:50,023 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51274 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:50,025 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:50,026 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:50,026 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51276 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:34:50,028 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:34:50,028 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:34:50,028 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51278 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:35:20,852 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:35:20,854 - services.memory.db - INFO - Loaded 2 memories for user step5_demo_user
+2026-03-03 01:35:20,854 - services.memory.main - INFO - Search returned 2 results
+INFO:     127.0.0.1:51305 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:35:21,270 - services.memory.main - INFO - POST /write - user_id: step5_demo_user
+2026-03-03 01:35:21,275 - services.memory.db - INFO - Memory written: 3e68dbf0-c27e-4f08-b2bb-e52a65861a97
+2026-03-03 01:35:21,275 - services.memory.main - INFO - Memory written: 3e68dbf0-c27e-4f08-b2bb-e52a65861a97
+INFO:     127.0.0.1:51308 - "POST /write HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51374 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:35:21,452 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:35:21,452 - services.memory.db - INFO - Loaded 3 memories for user step5_demo_user
+2026-03-03 01:35:21,452 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51376 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:35:21,454 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:35:21,454 - services.memory.db - INFO - Loaded 3 memories for user step5_demo_user
+2026-03-03 01:35:21,454 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51378 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:35:21,455 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:35:21,456 - services.memory.db - INFO - Loaded 3 memories for user step5_demo_user
+2026-03-03 01:35:21,456 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51380 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:35:24,024 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:35:24,025 - services.memory.db - INFO - Loaded 3 memories for user step5_demo_user
+2026-03-03 01:35:24,025 - services.memory.main - INFO - Search returned 3 results
+INFO:     127.0.0.1:51382 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:35:24,027 - services.memory.main - INFO - GET /read/3e68dbf0-c27e-4f08-b2bb-e52a65861a97
+INFO:     127.0.0.1:51382 - "GET /read/3e68dbf0-c27e-4f08-b2bb-e52a65861a97 HTTP/1.1" 200 OK
+2026-03-03 01:35:24,029 - services.memory.main - INFO - GET /read/ab373a3b-9d2e-48cf-830a-bf2187e0a3fe
+INFO:     127.0.0.1:51382 - "GET /read/ab373a3b-9d2e-48cf-830a-bf2187e0a3fe HTTP/1.1" 200 OK
+2026-03-03 01:35:24,031 - services.memory.main - INFO - GET /read/5790cdf4-c215-4f88-8737-34a15f6a3426
+INFO:     127.0.0.1:51382 - "GET /read/5790cdf4-c215-4f88-8737-34a15f6a3426 HTTP/1.1" 200 OK
+2026-03-03 01:35:28,505 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:35:28,506 - services.memory.db - INFO - Loaded 3 memories for user step5_demo_user
+2026-03-03 01:35:28,506 - services.memory.main - INFO - Search returned 3 results
+INFO:     127.0.0.1:51388 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:35:29,362 - services.memory.main - INFO - POST /write - user_id: step5_demo_user
+2026-03-03 01:35:29,367 - services.memory.db - INFO - Memory written: b77033ad-b914-40bc-aaec-10d69015ecd0
+2026-03-03 01:35:29,367 - services.memory.main - INFO - Memory written: b77033ad-b914-40bc-aaec-10d69015ecd0
+INFO:     127.0.0.1:51391 - "POST /write HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51457 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:35:29,542 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:35:29,543 - services.memory.db - INFO - Loaded 4 memories for user step5_demo_user
+2026-03-03 01:35:29,543 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51459 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:35:29,544 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:35:29,545 - services.memory.db - INFO - Loaded 4 memories for user step5_demo_user
+2026-03-03 01:35:29,545 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51461 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:35:29,546 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:35:29,547 - services.memory.db - INFO - Loaded 4 memories for user step5_demo_user
+2026-03-03 01:35:29,547 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51463 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:35:32,406 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:35:32,408 - services.memory.db - INFO - Loaded 4 memories for user step5_demo_user
+2026-03-03 01:35:32,408 - services.memory.main - INFO - Search returned 4 results
+INFO:     127.0.0.1:51465 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:35:32,410 - services.memory.main - INFO - GET /read/b77033ad-b914-40bc-aaec-10d69015ecd0
+INFO:     127.0.0.1:51465 - "GET /read/b77033ad-b914-40bc-aaec-10d69015ecd0 HTTP/1.1" 200 OK
+2026-03-03 01:35:32,413 - services.memory.main - INFO - GET /read/3e68dbf0-c27e-4f08-b2bb-e52a65861a97
+INFO:     127.0.0.1:51465 - "GET /read/3e68dbf0-c27e-4f08-b2bb-e52a65861a97 HTTP/1.1" 200 OK
+2026-03-03 01:35:32,415 - services.memory.main - INFO - GET /read/ab373a3b-9d2e-48cf-830a-bf2187e0a3fe
+INFO:     127.0.0.1:51465 - "GET /read/ab373a3b-9d2e-48cf-830a-bf2187e0a3fe HTTP/1.1" 200 OK
+2026-03-03 01:35:32,416 - services.memory.main - INFO - GET /read/5790cdf4-c215-4f88-8737-34a15f6a3426
+INFO:     127.0.0.1:51465 - "GET /read/5790cdf4-c215-4f88-8737-34a15f6a3426 HTTP/1.1" 200 OK
+2026-03-03 01:35:34,979 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:35:34,980 - services.memory.db - INFO - Loaded 4 memories for user step5_demo_user
+2026-03-03 01:35:34,981 - services.memory.main - INFO - Search returned 4 results
+INFO:     127.0.0.1:51469 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51536 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:35:35,177 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:35:35,178 - services.memory.db - INFO - Loaded 4 memories for user step5_demo_user
+2026-03-03 01:35:35,178 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51538 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:35:35,179 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:35:35,180 - services.memory.db - INFO - Loaded 4 memories for user step5_demo_user
+2026-03-03 01:35:35,180 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51540 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:35:35,181 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:35:35,182 - services.memory.db - INFO - Loaded 4 memories for user step5_demo_user
+2026-03-03 01:35:35,182 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51542 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:35:40,968 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:35:40,969 - services.memory.db - INFO - Loaded 4 memories for user step5_demo_user
+2026-03-03 01:35:40,970 - services.memory.main - INFO - Search returned 4 results
+INFO:     127.0.0.1:51548 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51615 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:35:41,166 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:35:41,166 - services.memory.db - INFO - Loaded 4 memories for user step5_demo_user
+2026-03-03 01:35:41,167 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51617 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:35:41,168 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:35:41,168 - services.memory.db - INFO - Loaded 4 memories for user step5_demo_user
+2026-03-03 01:35:41,168 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51619 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:35:41,170 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:35:41,170 - services.memory.db - INFO - Loaded 4 memories for user step5_demo_user
+2026-03-03 01:35:41,170 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51621 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:37:11,033 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:37:11,035 - services.memory.db - INFO - Loaded 4 memories for user step5_demo_user
+2026-03-03 01:37:11,035 - services.memory.main - INFO - Search returned 4 results
+INFO:     127.0.0.1:51655 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:37:11,448 - services.memory.main - INFO - POST /write - user_id: step5_demo_user
+2026-03-03 01:37:11,454 - services.memory.db - INFO - Memory written: 449e4473-a351-420f-aff8-2c31b75b7816
+2026-03-03 01:37:11,454 - services.memory.main - INFO - Memory written: 449e4473-a351-420f-aff8-2c31b75b7816
+INFO:     127.0.0.1:51658 - "POST /write HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51724 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:37:11,640 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:37:11,640 - services.memory.db - INFO - Loaded 5 memories for user step5_demo_user
+2026-03-03 01:37:11,640 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51726 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:37:11,642 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:37:11,643 - services.memory.db - INFO - Loaded 5 memories for user step5_demo_user
+2026-03-03 01:37:11,643 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51728 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:37:11,645 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:37:11,645 - services.memory.db - INFO - Loaded 5 memories for user step5_demo_user
+2026-03-03 01:37:11,645 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51730 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:37:15,782 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:37:15,782 - services.memory.db - INFO - Loaded 5 memories for user step5_demo_user
+2026-03-03 01:37:15,782 - services.memory.main - INFO - Search returned 5 results
+INFO:     127.0.0.1:51734 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:37:15,783 - services.memory.main - INFO - GET /read/449e4473-a351-420f-aff8-2c31b75b7816
+INFO:     127.0.0.1:51734 - "GET /read/449e4473-a351-420f-aff8-2c31b75b7816 HTTP/1.1" 200 OK
+2026-03-03 01:37:15,785 - services.memory.main - INFO - GET /read/b77033ad-b914-40bc-aaec-10d69015ecd0
+INFO:     127.0.0.1:51734 - "GET /read/b77033ad-b914-40bc-aaec-10d69015ecd0 HTTP/1.1" 200 OK
+2026-03-03 01:37:15,787 - services.memory.main - INFO - GET /read/3e68dbf0-c27e-4f08-b2bb-e52a65861a97
+INFO:     127.0.0.1:51734 - "GET /read/3e68dbf0-c27e-4f08-b2bb-e52a65861a97 HTTP/1.1" 200 OK
+2026-03-03 01:37:15,788 - services.memory.main - INFO - GET /read/ab373a3b-9d2e-48cf-830a-bf2187e0a3fe
+INFO:     127.0.0.1:51734 - "GET /read/ab373a3b-9d2e-48cf-830a-bf2187e0a3fe HTTP/1.1" 200 OK
+2026-03-03 01:37:15,789 - services.memory.main - INFO - GET /read/5790cdf4-c215-4f88-8737-34a15f6a3426
+INFO:     127.0.0.1:51734 - "GET /read/5790cdf4-c215-4f88-8737-34a15f6a3426 HTTP/1.1" 200 OK
+2026-03-03 01:37:19,908 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:37:19,910 - services.memory.db - INFO - Loaded 5 memories for user step5_demo_user
+2026-03-03 01:37:19,910 - services.memory.main - INFO - Search returned 5 results
+INFO:     127.0.0.1:51737 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:37:20,801 - services.memory.main - INFO - POST /write - user_id: step5_demo_user
+2026-03-03 01:37:20,806 - services.memory.db - INFO - Memory written: e1c7cbe1-8c79-4975-8f52-98075039fa69
+2026-03-03 01:37:20,806 - services.memory.main - INFO - Memory written: e1c7cbe1-8c79-4975-8f52-98075039fa69
+INFO:     127.0.0.1:51740 - "POST /write HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51806 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:37:20,981 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:37:20,982 - services.memory.db - INFO - Loaded 6 memories for user step5_demo_user
+2026-03-03 01:37:20,982 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51808 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:37:20,983 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:37:20,984 - services.memory.db - INFO - Loaded 6 memories for user step5_demo_user
+2026-03-03 01:37:20,984 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51810 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:37:20,985 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:37:20,986 - services.memory.db - INFO - Loaded 6 memories for user step5_demo_user
+2026-03-03 01:37:20,986 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51812 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:37:23,729 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:37:23,730 - services.memory.db - INFO - Loaded 6 memories for user step5_demo_user
+2026-03-03 01:37:23,730 - services.memory.main - INFO - Search returned 6 results
+INFO:     127.0.0.1:51814 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:37:23,732 - services.memory.main - INFO - GET /read/e1c7cbe1-8c79-4975-8f52-98075039fa69
+INFO:     127.0.0.1:51814 - "GET /read/e1c7cbe1-8c79-4975-8f52-98075039fa69 HTTP/1.1" 200 OK
+2026-03-03 01:37:23,735 - services.memory.main - INFO - GET /read/449e4473-a351-420f-aff8-2c31b75b7816
+INFO:     127.0.0.1:51814 - "GET /read/449e4473-a351-420f-aff8-2c31b75b7816 HTTP/1.1" 200 OK
+2026-03-03 01:37:23,736 - services.memory.main - INFO - GET /read/b77033ad-b914-40bc-aaec-10d69015ecd0
+INFO:     127.0.0.1:51814 - "GET /read/b77033ad-b914-40bc-aaec-10d69015ecd0 HTTP/1.1" 200 OK
+2026-03-03 01:37:23,738 - services.memory.main - INFO - GET /read/3e68dbf0-c27e-4f08-b2bb-e52a65861a97
+INFO:     127.0.0.1:51814 - "GET /read/3e68dbf0-c27e-4f08-b2bb-e52a65861a97 HTTP/1.1" 200 OK
+2026-03-03 01:37:23,739 - services.memory.main - INFO - GET /read/ab373a3b-9d2e-48cf-830a-bf2187e0a3fe
+INFO:     127.0.0.1:51814 - "GET /read/ab373a3b-9d2e-48cf-830a-bf2187e0a3fe HTTP/1.1" 200 OK
+2026-03-03 01:37:23,740 - services.memory.main - INFO - GET /read/5790cdf4-c215-4f88-8737-34a15f6a3426
+INFO:     127.0.0.1:51814 - "GET /read/5790cdf4-c215-4f88-8737-34a15f6a3426 HTTP/1.1" 200 OK
+2026-03-03 01:37:25,876 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:37:25,878 - services.memory.db - INFO - Loaded 6 memories for user step5_demo_user
+2026-03-03 01:37:25,878 - services.memory.main - INFO - Search returned 6 results
+INFO:     127.0.0.1:51816 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51882 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:37:26,075 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:37:26,076 - services.memory.db - INFO - Loaded 6 memories for user step5_demo_user
+2026-03-03 01:37:26,076 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51884 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:37:26,077 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:37:26,078 - services.memory.db - INFO - Loaded 6 memories for user step5_demo_user
+2026-03-03 01:37:26,078 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51886 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:37:26,079 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:37:26,080 - services.memory.db - INFO - Loaded 6 memories for user step5_demo_user
+2026-03-03 01:37:26,080 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51888 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:37:31,590 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:37:31,592 - services.memory.db - INFO - Loaded 6 memories for user step5_demo_user
+2026-03-03 01:37:31,593 - services.memory.main - INFO - Search returned 6 results
+INFO:     127.0.0.1:51891 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51958 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:37:31,787 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:37:31,788 - services.memory.db - INFO - Loaded 6 memories for user step5_demo_user
+2026-03-03 01:37:31,788 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51960 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:37:31,789 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:37:31,790 - services.memory.db - INFO - Loaded 6 memories for user step5_demo_user
+2026-03-03 01:37:31,790 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51962 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:37:31,792 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:37:31,793 - services.memory.db - INFO - Loaded 6 memories for user step5_demo_user
+2026-03-03 01:37:31,793 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:51964 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:37:37,242 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:37:37,243 - services.memory.db - INFO - Loaded 6 memories for user step5_demo_user
+2026-03-03 01:37:37,243 - services.memory.main - INFO - Search returned 6 results
+INFO:     127.0.0.1:51967 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52034 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:37:37,431 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:37:37,431 - services.memory.db - INFO - Loaded 6 memories for user step5_demo_user
+2026-03-03 01:37:37,431 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52036 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:37:37,433 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:37:37,433 - services.memory.db - INFO - Loaded 6 memories for user step5_demo_user
+2026-03-03 01:37:37,433 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52038 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:37:37,435 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:37:37,435 - services.memory.db - INFO - Loaded 6 memories for user step5_demo_user
+2026-03-03 01:37:37,435 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52040 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:37:42,958 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:37:42,959 - services.memory.db - INFO - Loaded 6 memories for user step5_demo_user
+2026-03-03 01:37:42,960 - services.memory.main - INFO - Search returned 6 results
+INFO:     127.0.0.1:52044 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52111 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:37:43,148 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:37:43,149 - services.memory.db - INFO - Loaded 6 memories for user step5_demo_user
+2026-03-03 01:37:43,149 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52113 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:37:43,150 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:37:43,151 - services.memory.db - INFO - Loaded 6 memories for user step5_demo_user
+2026-03-03 01:37:43,151 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52115 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:37:43,152 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:37:43,153 - services.memory.db - INFO - Loaded 6 memories for user step5_demo_user
+2026-03-03 01:37:43,153 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52117 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:40:56,938 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:40:56,940 - services.memory.db - INFO - Loaded 6 memories for user step5_demo_user
+2026-03-03 01:40:56,940 - services.memory.main - INFO - Search returned 6 results
+INFO:     127.0.0.1:52173 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:40:57,527 - services.memory.main - INFO - POST /write - user_id: step5_demo_user
+2026-03-03 01:40:57,533 - services.memory.db - INFO - Memory written: 04b83665-7c26-4756-bc84-13fb3295c747
+2026-03-03 01:40:57,533 - services.memory.main - INFO - Memory written: 04b83665-7c26-4756-bc84-13fb3295c747
+INFO:     127.0.0.1:52176 - "POST /write HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52242 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:40:57,709 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:40:57,710 - services.memory.db - INFO - Loaded 7 memories for user step5_demo_user
+2026-03-03 01:40:57,710 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52244 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:40:57,711 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:40:57,712 - services.memory.db - INFO - Loaded 7 memories for user step5_demo_user
+2026-03-03 01:40:57,712 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52246 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:40:57,713 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:40:57,714 - services.memory.db - INFO - Loaded 7 memories for user step5_demo_user
+2026-03-03 01:40:57,714 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52248 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:41:00,716 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:41:00,717 - services.memory.db - INFO - Loaded 7 memories for user step5_demo_user
+2026-03-03 01:41:00,718 - services.memory.main - INFO - Search returned 7 results
+INFO:     127.0.0.1:52251 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:41:00,720 - services.memory.main - INFO - GET /read/04b83665-7c26-4756-bc84-13fb3295c747
+INFO:     127.0.0.1:52251 - "GET /read/04b83665-7c26-4756-bc84-13fb3295c747 HTTP/1.1" 200 OK
+2026-03-03 01:41:00,721 - services.memory.main - INFO - GET /read/e1c7cbe1-8c79-4975-8f52-98075039fa69
+INFO:     127.0.0.1:52251 - "GET /read/e1c7cbe1-8c79-4975-8f52-98075039fa69 HTTP/1.1" 200 OK
+2026-03-03 01:41:00,724 - services.memory.main - INFO - GET /read/449e4473-a351-420f-aff8-2c31b75b7816
+INFO:     127.0.0.1:52251 - "GET /read/449e4473-a351-420f-aff8-2c31b75b7816 HTTP/1.1" 200 OK
+2026-03-03 01:41:00,725 - services.memory.main - INFO - GET /read/b77033ad-b914-40bc-aaec-10d69015ecd0
+INFO:     127.0.0.1:52251 - "GET /read/b77033ad-b914-40bc-aaec-10d69015ecd0 HTTP/1.1" 200 OK
+2026-03-03 01:41:00,726 - services.memory.main - INFO - GET /read/3e68dbf0-c27e-4f08-b2bb-e52a65861a97
+INFO:     127.0.0.1:52251 - "GET /read/3e68dbf0-c27e-4f08-b2bb-e52a65861a97 HTTP/1.1" 200 OK
+2026-03-03 01:41:00,728 - services.memory.main - INFO - GET /read/ab373a3b-9d2e-48cf-830a-bf2187e0a3fe
+INFO:     127.0.0.1:52251 - "GET /read/ab373a3b-9d2e-48cf-830a-bf2187e0a3fe HTTP/1.1" 200 OK
+2026-03-03 01:41:00,730 - services.memory.main - INFO - GET /read/5790cdf4-c215-4f88-8737-34a15f6a3426
+INFO:     127.0.0.1:52251 - "GET /read/5790cdf4-c215-4f88-8737-34a15f6a3426 HTTP/1.1" 200 OK
+2026-03-03 01:41:07,578 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:41:07,579 - services.memory.db - INFO - Loaded 7 memories for user step5_demo_user
+2026-03-03 01:41:07,579 - services.memory.main - INFO - Search returned 7 results
+INFO:     127.0.0.1:52255 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:41:08,451 - services.memory.main - INFO - POST /write - user_id: step5_demo_user
+2026-03-03 01:41:08,456 - services.memory.db - INFO - Memory written: a304eff3-bc98-4b47-85a3-ce9275470fbf
+2026-03-03 01:41:08,456 - services.memory.main - INFO - Memory written: a304eff3-bc98-4b47-85a3-ce9275470fbf
+INFO:     127.0.0.1:52259 - "POST /write HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52325 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:41:08,636 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:41:08,637 - services.memory.db - INFO - Loaded 8 memories for user step5_demo_user
+2026-03-03 01:41:08,638 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52327 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:41:08,639 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:41:08,639 - services.memory.db - INFO - Loaded 8 memories for user step5_demo_user
+2026-03-03 01:41:08,639 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52329 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:41:08,641 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:41:08,642 - services.memory.db - INFO - Loaded 8 memories for user step5_demo_user
+2026-03-03 01:41:08,642 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52331 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:41:11,567 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:41:11,569 - services.memory.db - INFO - Loaded 8 memories for user step5_demo_user
+2026-03-03 01:41:11,569 - services.memory.main - INFO - Search returned 8 results
+INFO:     127.0.0.1:52335 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:41:11,571 - services.memory.main - INFO - GET /read/a304eff3-bc98-4b47-85a3-ce9275470fbf
+INFO:     127.0.0.1:52335 - "GET /read/a304eff3-bc98-4b47-85a3-ce9275470fbf HTTP/1.1" 200 OK
+2026-03-03 01:41:11,574 - services.memory.main - INFO - GET /read/04b83665-7c26-4756-bc84-13fb3295c747
+INFO:     127.0.0.1:52335 - "GET /read/04b83665-7c26-4756-bc84-13fb3295c747 HTTP/1.1" 200 OK
+2026-03-03 01:41:11,577 - services.memory.main - INFO - GET /read/e1c7cbe1-8c79-4975-8f52-98075039fa69
+INFO:     127.0.0.1:52335 - "GET /read/e1c7cbe1-8c79-4975-8f52-98075039fa69 HTTP/1.1" 200 OK
+2026-03-03 01:41:11,580 - services.memory.main - INFO - GET /read/449e4473-a351-420f-aff8-2c31b75b7816
+INFO:     127.0.0.1:52335 - "GET /read/449e4473-a351-420f-aff8-2c31b75b7816 HTTP/1.1" 200 OK
+2026-03-03 01:41:11,581 - services.memory.main - INFO - GET /read/b77033ad-b914-40bc-aaec-10d69015ecd0
+INFO:     127.0.0.1:52335 - "GET /read/b77033ad-b914-40bc-aaec-10d69015ecd0 HTTP/1.1" 200 OK
+2026-03-03 01:41:11,582 - services.memory.main - INFO - GET /read/3e68dbf0-c27e-4f08-b2bb-e52a65861a97
+INFO:     127.0.0.1:52335 - "GET /read/3e68dbf0-c27e-4f08-b2bb-e52a65861a97 HTTP/1.1" 200 OK
+2026-03-03 01:41:11,584 - services.memory.main - INFO - GET /read/ab373a3b-9d2e-48cf-830a-bf2187e0a3fe
+INFO:     127.0.0.1:52335 - "GET /read/ab373a3b-9d2e-48cf-830a-bf2187e0a3fe HTTP/1.1" 200 OK
+2026-03-03 01:41:11,585 - services.memory.main - INFO - GET /read/5790cdf4-c215-4f88-8737-34a15f6a3426
+INFO:     127.0.0.1:52335 - "GET /read/5790cdf4-c215-4f88-8737-34a15f6a3426 HTTP/1.1" 200 OK
+2026-03-03 01:41:13,923 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:41:13,925 - services.memory.db - INFO - Loaded 8 memories for user step5_demo_user
+2026-03-03 01:41:13,925 - services.memory.main - INFO - Search returned 8 results
+INFO:     127.0.0.1:52338 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52405 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:41:14,124 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:41:14,125 - services.memory.db - INFO - Loaded 8 memories for user step5_demo_user
+2026-03-03 01:41:14,125 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52407 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:41:14,127 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:41:14,127 - services.memory.db - INFO - Loaded 8 memories for user step5_demo_user
+2026-03-03 01:41:14,128 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52409 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:41:14,129 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:41:14,130 - services.memory.db - INFO - Loaded 8 memories for user step5_demo_user
+2026-03-03 01:41:14,130 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52411 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:41:20,734 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:41:20,736 - services.memory.db - INFO - Loaded 8 memories for user step5_demo_user
+2026-03-03 01:41:20,736 - services.memory.main - INFO - Search returned 8 results
+INFO:     127.0.0.1:52417 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52484 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:41:20,931 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:41:20,932 - services.memory.db - INFO - Loaded 8 memories for user step5_demo_user
+2026-03-03 01:41:20,932 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52486 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:41:20,933 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:41:20,934 - services.memory.db - INFO - Loaded 8 memories for user step5_demo_user
+2026-03-03 01:41:20,934 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52488 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:41:20,935 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:41:20,936 - services.memory.db - INFO - Loaded 8 memories for user step5_demo_user
+2026-03-03 01:41:20,936 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52490 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:41:26,826 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:41:26,827 - services.memory.db - INFO - Loaded 8 memories for user step5_demo_user
+2026-03-03 01:41:26,827 - services.memory.main - INFO - Search returned 8 results
+INFO:     127.0.0.1:52494 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52561 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:41:27,022 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:41:27,022 - services.memory.db - INFO - Loaded 8 memories for user step5_demo_user
+2026-03-03 01:41:27,022 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52563 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:41:27,024 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:41:27,024 - services.memory.db - INFO - Loaded 8 memories for user step5_demo_user
+2026-03-03 01:41:27,024 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52565 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:41:27,026 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:41:27,026 - services.memory.db - INFO - Loaded 8 memories for user step5_demo_user
+2026-03-03 01:41:27,026 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52567 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:41:32,404 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:41:32,405 - services.memory.db - INFO - Loaded 8 memories for user step5_demo_user
+2026-03-03 01:41:32,406 - services.memory.main - INFO - Search returned 8 results
+INFO:     127.0.0.1:52570 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52637 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:41:32,600 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:41:32,601 - services.memory.db - INFO - Loaded 8 memories for user step5_demo_user
+2026-03-03 01:41:32,601 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52639 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:41:32,602 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:41:32,603 - services.memory.db - INFO - Loaded 8 memories for user step5_demo_user
+2026-03-03 01:41:32,603 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52641 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:41:32,605 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:41:32,605 - services.memory.db - INFO - Loaded 8 memories for user step5_demo_user
+2026-03-03 01:41:32,605 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52643 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:42:34,926 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:42:34,928 - services.memory.db - INFO - Loaded 8 memories for user step5_demo_user
+2026-03-03 01:42:34,928 - services.memory.main - INFO - Search returned 8 results
+INFO:     127.0.0.1:52658 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:42:35,349 - services.memory.main - INFO - POST /write - user_id: step5_demo_user
+2026-03-03 01:42:35,354 - services.memory.db - INFO - Memory written: 65e89e4a-d9fc-4962-a502-f89ca1ed6f1f
+2026-03-03 01:42:35,354 - services.memory.main - INFO - Memory written: 65e89e4a-d9fc-4962-a502-f89ca1ed6f1f
+INFO:     127.0.0.1:52661 - "POST /write HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52727 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:42:35,535 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:42:35,535 - services.memory.db - INFO - Loaded 9 memories for user step5_demo_user
+2026-03-03 01:42:35,536 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52729 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:42:35,537 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:42:35,537 - services.memory.db - INFO - Loaded 9 memories for user step5_demo_user
+2026-03-03 01:42:35,538 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52731 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:42:35,539 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:42:35,539 - services.memory.db - INFO - Loaded 9 memories for user step5_demo_user
+2026-03-03 01:42:35,540 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52733 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:42:37,802 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:42:37,803 - services.memory.db - INFO - Loaded 9 memories for user step5_demo_user
+2026-03-03 01:42:37,804 - services.memory.main - INFO - Search returned 9 results
+INFO:     127.0.0.1:52735 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:42:37,806 - services.memory.main - INFO - GET /read/65e89e4a-d9fc-4962-a502-f89ca1ed6f1f
+INFO:     127.0.0.1:52735 - "GET /read/65e89e4a-d9fc-4962-a502-f89ca1ed6f1f HTTP/1.1" 200 OK
+2026-03-03 01:42:37,808 - services.memory.main - INFO - GET /read/a304eff3-bc98-4b47-85a3-ce9275470fbf
+INFO:     127.0.0.1:52735 - "GET /read/a304eff3-bc98-4b47-85a3-ce9275470fbf HTTP/1.1" 200 OK
+2026-03-03 01:42:37,810 - services.memory.main - INFO - GET /read/04b83665-7c26-4756-bc84-13fb3295c747
+INFO:     127.0.0.1:52735 - "GET /read/04b83665-7c26-4756-bc84-13fb3295c747 HTTP/1.1" 200 OK
+2026-03-03 01:42:37,812 - services.memory.main - INFO - GET /read/e1c7cbe1-8c79-4975-8f52-98075039fa69
+INFO:     127.0.0.1:52735 - "GET /read/e1c7cbe1-8c79-4975-8f52-98075039fa69 HTTP/1.1" 200 OK
+2026-03-03 01:42:37,813 - services.memory.main - INFO - GET /read/449e4473-a351-420f-aff8-2c31b75b7816
+INFO:     127.0.0.1:52735 - "GET /read/449e4473-a351-420f-aff8-2c31b75b7816 HTTP/1.1" 200 OK
+2026-03-03 01:42:37,815 - services.memory.main - INFO - GET /read/b77033ad-b914-40bc-aaec-10d69015ecd0
+INFO:     127.0.0.1:52735 - "GET /read/b77033ad-b914-40bc-aaec-10d69015ecd0 HTTP/1.1" 200 OK
+2026-03-03 01:42:37,816 - services.memory.main - INFO - GET /read/3e68dbf0-c27e-4f08-b2bb-e52a65861a97
+INFO:     127.0.0.1:52735 - "GET /read/3e68dbf0-c27e-4f08-b2bb-e52a65861a97 HTTP/1.1" 200 OK
+2026-03-03 01:42:37,818 - services.memory.main - INFO - GET /read/ab373a3b-9d2e-48cf-830a-bf2187e0a3fe
+INFO:     127.0.0.1:52735 - "GET /read/ab373a3b-9d2e-48cf-830a-bf2187e0a3fe HTTP/1.1" 200 OK
+2026-03-03 01:42:37,819 - services.memory.main - INFO - GET /read/5790cdf4-c215-4f88-8737-34a15f6a3426
+INFO:     127.0.0.1:52735 - "GET /read/5790cdf4-c215-4f88-8737-34a15f6a3426 HTTP/1.1" 200 OK
+2026-03-03 01:42:42,487 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:42:42,488 - services.memory.db - INFO - Loaded 9 memories for user step5_demo_user
+2026-03-03 01:42:42,488 - services.memory.main - INFO - Search returned 9 results
+INFO:     127.0.0.1:52738 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:42:43,394 - services.memory.main - INFO - POST /write - user_id: step5_demo_user
+2026-03-03 01:42:43,400 - services.memory.db - INFO - Memory written: 8202ae5c-ea2d-499f-a205-d6e80882bbe6
+2026-03-03 01:42:43,400 - services.memory.main - INFO - Memory written: 8202ae5c-ea2d-499f-a205-d6e80882bbe6
+INFO:     127.0.0.1:52741 - "POST /write HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52807 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:42:43,578 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:42:43,578 - services.memory.db - INFO - Loaded 10 memories for user step5_demo_user
+2026-03-03 01:42:43,579 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52809 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:42:43,580 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:42:43,580 - services.memory.db - INFO - Loaded 10 memories for user step5_demo_user
+2026-03-03 01:42:43,580 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52811 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:42:43,582 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:42:43,583 - services.memory.db - INFO - Loaded 10 memories for user step5_demo_user
+2026-03-03 01:42:43,583 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52813 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:42:47,130 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:42:47,133 - services.memory.db - INFO - Loaded 10 memories for user step5_demo_user
+2026-03-03 01:42:47,133 - services.memory.main - INFO - Search returned 10 results
+INFO:     127.0.0.1:52815 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:42:47,135 - services.memory.main - INFO - GET /read/8202ae5c-ea2d-499f-a205-d6e80882bbe6
+INFO:     127.0.0.1:52815 - "GET /read/8202ae5c-ea2d-499f-a205-d6e80882bbe6 HTTP/1.1" 200 OK
+2026-03-03 01:42:47,136 - services.memory.main - INFO - GET /read/65e89e4a-d9fc-4962-a502-f89ca1ed6f1f
+INFO:     127.0.0.1:52815 - "GET /read/65e89e4a-d9fc-4962-a502-f89ca1ed6f1f HTTP/1.1" 200 OK
+2026-03-03 01:42:47,139 - services.memory.main - INFO - GET /read/a304eff3-bc98-4b47-85a3-ce9275470fbf
+INFO:     127.0.0.1:52815 - "GET /read/a304eff3-bc98-4b47-85a3-ce9275470fbf HTTP/1.1" 200 OK
+2026-03-03 01:42:47,140 - services.memory.main - INFO - GET /read/04b83665-7c26-4756-bc84-13fb3295c747
+INFO:     127.0.0.1:52815 - "GET /read/04b83665-7c26-4756-bc84-13fb3295c747 HTTP/1.1" 200 OK
+2026-03-03 01:42:47,142 - services.memory.main - INFO - GET /read/e1c7cbe1-8c79-4975-8f52-98075039fa69
+INFO:     127.0.0.1:52815 - "GET /read/e1c7cbe1-8c79-4975-8f52-98075039fa69 HTTP/1.1" 200 OK
+2026-03-03 01:42:47,143 - services.memory.main - INFO - GET /read/449e4473-a351-420f-aff8-2c31b75b7816
+INFO:     127.0.0.1:52815 - "GET /read/449e4473-a351-420f-aff8-2c31b75b7816 HTTP/1.1" 200 OK
+2026-03-03 01:42:47,144 - services.memory.main - INFO - GET /read/b77033ad-b914-40bc-aaec-10d69015ecd0
+INFO:     127.0.0.1:52815 - "GET /read/b77033ad-b914-40bc-aaec-10d69015ecd0 HTTP/1.1" 200 OK
+2026-03-03 01:42:47,146 - services.memory.main - INFO - GET /read/3e68dbf0-c27e-4f08-b2bb-e52a65861a97
+INFO:     127.0.0.1:52815 - "GET /read/3e68dbf0-c27e-4f08-b2bb-e52a65861a97 HTTP/1.1" 200 OK
+2026-03-03 01:42:47,147 - services.memory.main - INFO - GET /read/ab373a3b-9d2e-48cf-830a-bf2187e0a3fe
+INFO:     127.0.0.1:52815 - "GET /read/ab373a3b-9d2e-48cf-830a-bf2187e0a3fe HTTP/1.1" 200 OK
+2026-03-03 01:42:47,148 - services.memory.main - INFO - GET /read/5790cdf4-c215-4f88-8737-34a15f6a3426
+INFO:     127.0.0.1:52815 - "GET /read/5790cdf4-c215-4f88-8737-34a15f6a3426 HTTP/1.1" 200 OK
+2026-03-03 01:42:49,101 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:42:49,102 - services.memory.db - INFO - Loaded 10 memories for user step5_demo_user
+2026-03-03 01:42:49,103 - services.memory.main - INFO - Search returned 10 results
+INFO:     127.0.0.1:52818 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52885 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:42:49,292 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:42:49,293 - services.memory.db - INFO - Loaded 10 memories for user step5_demo_user
+2026-03-03 01:42:49,293 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52887 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:42:49,294 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:42:49,295 - services.memory.db - INFO - Loaded 10 memories for user step5_demo_user
+2026-03-03 01:42:49,295 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52889 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:42:49,296 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:42:49,297 - services.memory.db - INFO - Loaded 10 memories for user step5_demo_user
+2026-03-03 01:42:49,297 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52891 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:42:54,276 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:42:54,278 - services.memory.db - INFO - Loaded 10 memories for user step5_demo_user
+2026-03-03 01:42:54,278 - services.memory.main - INFO - Search returned 10 results
+INFO:     127.0.0.1:52897 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52964 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:42:54,469 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:42:54,470 - services.memory.db - INFO - Loaded 10 memories for user step5_demo_user
+2026-03-03 01:42:54,470 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52966 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:42:54,471 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:42:54,472 - services.memory.db - INFO - Loaded 10 memories for user step5_demo_user
+2026-03-03 01:42:54,472 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52968 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:42:54,473 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:42:54,474 - services.memory.db - INFO - Loaded 10 memories for user step5_demo_user
+2026-03-03 01:42:54,474 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:52970 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:42:59,995 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:42:59,997 - services.memory.db - INFO - Loaded 10 memories for user step5_demo_user
+2026-03-03 01:42:59,997 - services.memory.main - INFO - Search returned 10 results
+INFO:     127.0.0.1:52974 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53041 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:43:00,192 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:43:00,192 - services.memory.db - INFO - Loaded 10 memories for user step5_demo_user
+2026-03-03 01:43:00,192 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:53043 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:43:00,194 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:43:00,194 - services.memory.db - INFO - Loaded 10 memories for user step5_demo_user
+2026-03-03 01:43:00,195 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:53045 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:43:00,196 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:43:00,197 - services.memory.db - INFO - Loaded 10 memories for user step5_demo_user
+2026-03-03 01:43:00,197 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:53047 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:43:04,800 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 10, has_embedding: False
+2026-03-03 01:43:04,802 - services.memory.db - INFO - Loaded 10 memories for user step5_demo_user
+2026-03-03 01:43:04,802 - services.memory.main - INFO - Search returned 10 results
+INFO:     127.0.0.1:52974 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53113 - "GET /health HTTP/1.1" 200 OK
+2026-03-03 01:43:04,994 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:43:04,994 - services.memory.db - INFO - Loaded 10 memories for user step5_demo_user
+2026-03-03 01:43:04,995 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:53115 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:43:04,996 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:43:04,997 - services.memory.db - INFO - Loaded 10 memories for user step5_demo_user
+2026-03-03 01:43:04,997 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:53117 - "POST /search HTTP/1.1" 200 OK
+2026-03-03 01:43:04,998 - services.memory.main - INFO - POST /search - user_id: step5_demo_user, top_k: 1, has_embedding: False
+2026-03-03 01:43:04,999 - services.memory.db - INFO - Loaded 10 memories for user step5_demo_user
+2026-03-03 01:43:04,999 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:53119 - "POST /search HTTP/1.1" 200 OK

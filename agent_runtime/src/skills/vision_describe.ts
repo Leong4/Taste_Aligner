@@ -75,6 +75,7 @@ function buildTrace(
     backend: string | undefined,
     modelId: string | null | undefined,
     device: string | undefined,
+    visionType: "food" | "scenery" | "unknown" | undefined,
     tagsCount: number,
     latencyMs: number | undefined,
     fallbackUsed: boolean,
@@ -92,6 +93,7 @@ function buildTrace(
     if (backend !== undefined) trace.backend = backend;
     if (modelId !== undefined) trace.model_id = modelId;
     if (device !== undefined) trace.device = device;
+    if (visionType !== undefined) trace.vision_type = visionType;
     if (latencyMs !== undefined) trace.latency_ms = latencyMs;
     if (fallbackReason !== undefined) trace.fallback_reason = fallbackReason;
     return trace;
@@ -103,7 +105,7 @@ function buildFallback(
     inputSummary: VisionDescribeDecisionTrace["input_summary"]
 ): SkillResult<VisionDescribeOutput> {
     const trace = buildTrace(
-        false, undefined, undefined, undefined, 0, latencyMs,
+        false, undefined, undefined, undefined, undefined, 0, latencyMs,
         true, fallbackReason, inputSummary
     );
     const output: VisionDescribeOutput = {
@@ -181,12 +183,17 @@ export function createVisionDescribeSkill(
             }
 
             const payload = asObject(observation.output);
-            if (!payload || !Array.isArray(payload.tags)) {
+            // Accept new schema (cues) or legacy schema (tags); at least one must be an array.
+            if (!payload || (!Array.isArray(payload.cues) && !Array.isArray(payload.tags))) {
                 return buildFallback("invalid_output", latencyMs, inputSummary);
             }
 
             // ── Normalise output ─────────────────────────────────────────────
-            const normalizedTags = normalizeTags(payload.tags);
+            // Merge cues (V1 schema) + tags (legacy/backward compat), then dedup + sort.
+            const rawCues = Array.isArray(payload.cues) ? payload.cues : [];
+            const rawTags = Array.isArray(payload.tags) ? payload.tags : [];
+            const normalizedTags = normalizeTags([...rawCues, ...rawTags]);
+
             const backend =
                 typeof payload.backend === "string" ? payload.backend : undefined;
             const modelId =
@@ -195,9 +202,15 @@ export function createVisionDescribeSkill(
                     : undefined;
             const device =
                 typeof payload.device === "string" ? payload.device : undefined;
+            // Extract vision type classification (V1 schema, optional).
+            const rawType = payload.type;
+            const visionType: "food" | "scenery" | "unknown" | undefined =
+                rawType === "food" || rawType === "scenery" || rawType === "unknown"
+                    ? rawType
+                    : undefined;
 
             const trace = buildTrace(
-                true, backend, modelId, device,
+                true, backend, modelId, device, visionType,
                 normalizedTags.length, latencyMs, false, undefined, inputSummary
             );
 

@@ -5,6 +5,9 @@
  * returns a validated 512-dim TES vector with deterministic guards.
  */
 
+import http from "http";
+import https from "https";
+import { URL } from "url";
 import {
     Skill,
     SkillResult,
@@ -26,6 +29,7 @@ const NORM_UPPER = 1.01;
 
 type FallbackReason = "no_tags" | "tool_error" | "invalid_output" | "invalid_vector";
 type TagSource = "anchor_tags" | "normalized_tags_fallback" | "none";
+type MemoryWriteTimestampSource = "input_timestamp" | "context_request_ts" | "fixed_epoch";
 
 function asObject(value: unknown): Record<string, unknown> | null {
     if (!value || typeof value !== "object" || Array.isArray(value)) {
@@ -73,6 +77,22 @@ function resolveRequestTs(value: unknown, context: ExecutionContext): number {
     return context.request_ts;
 }
 
+function resolveMemoryWriteTimestamp(
+    context: ExecutionContext
+): { timestamp: string; source: MemoryWriteTimestampSource } {
+    const input = context.input as typeof context.input & { timestamp?: unknown };
+    if (typeof input.timestamp === "string" && input.timestamp.trim().length > 0) {
+        return { timestamp: input.timestamp.trim(), source: "input_timestamp" };
+    }
+    if (typeof context.request_ts === "number" && Number.isFinite(context.request_ts)) {
+        return {
+            timestamp: new Date(Math.trunc(context.request_ts)).toISOString(),
+            source: "context_request_ts",
+        };
+    }
+    return { timestamp: "1970-01-01T00:00:00Z", source: "fixed_epoch" };
+}
+
 function createZeroVector(): number[] {
     return Array.from({ length: DIM_EXPECTED }, () => 0);
 }
@@ -89,6 +109,17 @@ function computeNorm(vector: number[]): number | null {
         sum += v * v;
     }
     return Math.sqrt(sum);
+}
+
+function hasUploadImageSignal(context: ExecutionContext): boolean {
+    const root = context as ExecutionContext & { image?: unknown };
+    const input = context.input as typeof context.input & { image?: unknown };
+    return !!(
+        root.image ||
+        input?.image ||
+        (typeof input?.image_url === "string" && input.image_url.trim()) ||
+        (typeof input?.image_base64 === "string" && input.image_base64.trim())
+    );
 }
 
 function buildTrace(
@@ -128,6 +159,9 @@ function buildTrace(
         latency_ms: latencyMs,
         vector_checks: vectorChecks,
         fallback_used: fallbackUsed,
+        // Always present: deterministic evidence of keys forwarded to embedding.tes_build.
+        // Kept in buildTrace (not just success path) so fallback traces also include it.
+        tes_build_payload_keys: ["normalize", "tags", "vision_features"],
     };
     if (fallbackReason !== undefined) {
         trace.fallback_reason = fallbackReason;
@@ -200,6 +234,67 @@ function buildFallbackOutput(
 
     return { output, trace: traceNode };
 }
+
+// ---------------------------------------------------------------------------
+// Memory write side effect — fire-and-resolve, never throws
+// ---------------------------------------------------------------------------
+
+/**
+ * POST a memory record to the memory service (upload flow only).
+ * Reads MEMORY_SERVICE_URL at call time so tests can override it.
+ * Returns "ok" on 2xx, "failed" on any error or non-2xx.
+ */
+async function writeMemoryRecord(body: Record<string, unknown>): Promise<"ok" | "failed"> {
+    const baseUrl = (process.env.MEMORY_SERVICE_URL ?? "http://localhost:5001").replace(/\/$/, "");
+    const url = new URL(`${baseUrl}/write`);
+    const payload = JSON.stringify({ data: body });
+    const mod = url.protocol === "https:" ? https : http;
+    return new Promise((resolve) => {
+        try {
+            const req = mod.request(
+                {
+                    hostname: url.hostname,
+                    port: Number(url.port) || (url.protocol === "https:" ? 443 : 80),
+                    path: url.pathname,
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Content-Length": Buffer.byteLength(payload),
+                    },
+                    timeout: 2000,
+                },
+                (res) => {
+                    res.resume(); // drain response body
+                    if (res.statusCode !== undefined && res.statusCode >= 200 && res.statusCode < 300) {
+                        resolve("ok");
+                    } else {
+                        console.warn(`[tes_builder] memory.write HTTP ${res.statusCode}`);
+                        resolve("failed");
+                    }
+                }
+            );
+            req.on("timeout", () => {
+                req.destroy();
+                console.warn("[tes_builder] memory.write timed out");
+                resolve("failed");
+            });
+            req.on("error", (err: Error) => {
+                console.warn(`[tes_builder] memory.write error: ${err.message}`);
+                resolve("failed");
+            });
+            req.write(payload);
+            req.end();
+        } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : String(err);
+            console.warn(`[tes_builder] memory.write exception: ${msg}`);
+            resolve("failed");
+        }
+    });
+}
+
+// ---------------------------------------------------------------------------
+// Skill factory
+// ---------------------------------------------------------------------------
 
 export function createTesBuilderSkill(
     toolClient: ToolClient
@@ -408,6 +503,35 @@ export function createTesBuilderSkill(
                     modelId,
                     device
                 );
+
+                // Upload flow: persist embedding to memory service as a side effect.
+                // Triggered only when the original request carried an image (explicit signal).
+                // Never throws; result only affects trace, not recommendation output.
+                const isUploadFlow = hasUploadImageSignal(context);
+                traceNode.memory_persisted = isUploadFlow;
+                if (isUploadFlow) {
+                    const writeTimestamp = resolveMemoryWriteTimestamp(context);
+                    const writeTags = tagsForTes.length > 0 ? tagsForTes : [];
+                    const writeNormalizedTags =
+                        normalizedTags.length > 0 ? normalizedTags : writeTags;
+                    const writeBody: Record<string, unknown> = {
+                        user_id: context.input.user_id ?? "demo_user",
+                        timestamp: writeTimestamp.timestamp,
+                        raw_tags: writeTags,
+                        normalized_tags: writeNormalizedTags,
+                        embedding: numericVector,
+                        source: "upload",
+                        sentiment: 0.0,
+                    };
+                    if (typeof input.user_city === "string" && input.user_city.length > 0) {
+                        writeBody.city = input.user_city;
+                    }
+                    // Fire-and-forget: do not block the pipeline.
+                    // Status is set to "queued" deterministically; actual result is discarded.
+                    traceNode.timestamp_source = writeTimestamp.source;
+                    traceNode.memory_write_status = "queued";
+                    writeMemoryRecord(writeBody).catch(() => void 0);
+                }
 
                 const mergedDecisionTrace = deepMergeTrace(
                     upstreamDecisionTrace,

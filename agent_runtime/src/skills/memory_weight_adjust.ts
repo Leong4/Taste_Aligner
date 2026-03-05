@@ -77,6 +77,25 @@ function normalizeTopK(value: unknown): number {
     return intValue;
 }
 
+function resolveNowTsIso(value: unknown, context: ExecutionContext): string | undefined {
+    if (typeof value === "number" && Number.isFinite(value)) {
+        return new Date(Math.trunc(value)).toISOString();
+    }
+    if (typeof value === "string") {
+        const trimmed = value.trim();
+        if (!trimmed) return undefined;
+        const numeric = Number(trimmed);
+        if (Number.isFinite(numeric)) {
+            return new Date(Math.trunc(numeric)).toISOString();
+        }
+        return trimmed;
+    }
+    if (typeof context.request_ts === "number" && Number.isFinite(context.request_ts)) {
+        return new Date(Math.trunc(context.request_ts)).toISOString();
+    }
+    return undefined;
+}
+
 function asObject(value: unknown): Record<string, unknown> | null {
     if (!value || typeof value !== "object" || Array.isArray(value)) return null;
     return value as Record<string, unknown>;
@@ -207,10 +226,8 @@ export function createMemoryWeightAdjustSkill(
             const topK = normalizeTopK(input.top_k);
 
             // Determine now_ts: use input.now_ts, fall back to context.request_ts, else omit
-            const rawNowTs = typeof input.now_ts === "number" && Number.isFinite(input.now_ts)
-                ? input.now_ts
-                : (context.request_ts && Number.isFinite(context.request_ts) ? context.request_ts : undefined);
-            const nowTsPresent = rawNowTs !== undefined;
+            const resolvedNowTs = resolveNowTsIso(input.now_ts, context);
+            const nowTsPresent = resolvedNowTs !== undefined;
 
             // Fallback: no tags
             if (tags.length === 0) {
@@ -224,7 +241,7 @@ export function createMemoryWeightAdjustSkill(
                 top_k: topK,
             };
             if (city !== undefined) payload.city = city;
-            if (rawNowTs !== undefined) payload.now_ts = rawNowTs;
+            if (resolvedNowTs !== undefined) payload.now_ts = resolvedNowTs;
 
             // Call tool
             const startedAt = Date.now();

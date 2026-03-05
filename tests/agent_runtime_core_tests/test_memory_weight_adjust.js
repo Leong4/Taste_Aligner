@@ -81,7 +81,7 @@ async function runAll() {
             assert.deepStrictEqual(action.input.data.query_tags, ["food", "sushi"]);
             assert.strictEqual(action.input.data.city, "tokyo");
             assert.strictEqual(action.input.data.top_k, 10);
-            assert.strictEqual(action.input.data.now_ts, 1704067200000);
+            assert.strictEqual(action.input.data.now_ts, "2024-01-01T00:00:00.000Z");
 
             return {
                 ok: true,

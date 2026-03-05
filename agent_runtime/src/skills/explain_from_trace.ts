@@ -22,10 +22,102 @@ import {
     ExplainFromTraceOutput,
 } from "../core/types";
 import { LLMAdapter, LLMCallTrace } from "../llm/llm_adapter";
+import {
+    PROMPT_VERSION,
+    SYSTEM_PROMPT,
+    buildUserPrompt as buildExplainUserPrompt,
+    OUTPUT_JSON_SCHEMA,
+    LIMITS,
+} from "../llm/prompts/explain_from_trace_v1";
+
+// ---------------------------------------------------------------------------
+// Deterministic inputs_used order — matches compactTrace output keys
+// ---------------------------------------------------------------------------
+
+// "profile" maps to compact.profile (from decision_trace.profile_vector_node).
+// Explain reads ONLY the unified profile_vector_node — no raw memory weights
+// must be re-read or recomputed from other trace keys.
+const INPUT_ORDER = ["intent", "recall", "rerank", "mix_policy", "profile", "planner"] as const;
+
+// ---------------------------------------------------------------------------
+// Compaction limits
+// ---------------------------------------------------------------------------
+
+const MAX_CARDS = 6;
+const MAX_ITEMS_PER_CARD = 3;
+const MAX_TAGS_PER_ITEM = 5;
+const MAX_COMPACT_JSON_BYTES = 8 * 1024; // 8 KB
+
+/**
+ * Token budget guard: if usage.total_tokens exceeds this threshold the skill
+ * falls back deterministically with reason "token_budget_exceeded".
+ * Configurable via EXPLAIN_MAX_TOTAL_TOKENS env var (default from LIMITS).
+ */
+const EXPLAIN_MAX_TOTAL_TOKENS = parseInt(
+    process.env.EXPLAIN_MAX_TOTAL_TOKENS ?? String(LIMITS.max_total_tokens),
+    10
+);
+
+// ---------------------------------------------------------------------------
+// Output validation
+// ---------------------------------------------------------------------------
+
+interface ExplainLLMOutput {
+    explanation: string;
+    bullets: string[];
+    disclaimer?: string;
+}
+
+function isValidOutput(data: unknown): data is ExplainLLMOutput {
+    if (!data || typeof data !== "object") return false;
+    const d = data as Record<string, unknown>;
+    if (typeof d.explanation !== "string" || d.explanation.trim().length === 0) return false;
+    if (!Array.isArray(d.bullets)) return false;
+    if (d.bullets.length < 3 || d.bullets.length > 5) return false;
+    if (!d.bullets.every((b) => typeof b === "string" && b.trim().length > 0)) return false;
+    return true;
+}
+
+// ---------------------------------------------------------------------------
+// Local fallback output — deterministic, no LLM required
+// ---------------------------------------------------------------------------
+
+function buildLocalFallback(compact: Record<string, unknown>): { explanation: string; bullets: string[] } {
+    const intent = compact.intent as Record<string, unknown> | undefined;
+    const city = typeof intent?.city === "string" ? intent.city : "your city";
+    const type = typeof intent?.type === "string" ? intent.type : "food";
+
+    return {
+        explanation: `Based on your preferences, we selected ${type} options in ${city} matching your taste profile.`,
+        bullets: [
+            "Location matched from your input",
+            "Candidates ranked by affinity score",
+            "Mix policy applied for variety",
+        ],
+    };
+}
 
 // ---------------------------------------------------------------------------
 // Trace compaction — extract salient fields for the prompt
 // ---------------------------------------------------------------------------
+
+function capArray<T>(arr: T[], max: number): T[] {
+    return arr.length <= max ? arr : arr.slice(0, max);
+}
+
+function capItemFields(item: Record<string, unknown>): Record<string, unknown> {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(item)) {
+        if (Array.isArray(v)) {
+            out[k] = capArray(v as unknown[], MAX_TAGS_PER_ITEM);
+        } else if (typeof v === "string" && v.length > 120) {
+            // Drop long text fields silently
+        } else {
+            out[k] = v;
+        }
+    }
+    return out;
+}
 
 function compactTrace(trace: Record<string, unknown>): Record<string, unknown> {
     const compact: Record<string, unknown> = {};
@@ -37,7 +129,7 @@ function compactTrace(trace: Record<string, unknown>): Record<string, unknown> {
         compact.intent = {
             city: ei.city,
             type: ei.type,
-            tags: ei.tags,
+            tags: Array.isArray(ei.tags) ? capArray(ei.tags as unknown[], MAX_TAGS_PER_ITEM) : ei.tags,
             confidence: ei.confidence,
         };
     }
@@ -63,8 +155,7 @@ function compactTrace(trace: Record<string, unknown>): Record<string, unknown> {
         const topItems = r.top_items;
         let topIds: unknown[] = [];
         if (Array.isArray(topItems)) {
-            topIds = topItems
-                .slice(0, 5)
+            topIds = capArray(topItems as unknown[], MAX_ITEMS_PER_CARD)
                 .map((item) => {
                     if (typeof item === "object" && item !== null) {
                         const it = item as Record<string, unknown>;
@@ -91,7 +182,20 @@ function compactTrace(trace: Record<string, unknown>): Record<string, unknown> {
         };
     }
 
-    // planner / build_cards summary
+    // profile_vector_node summary — P4 dynamic weighting unification.
+    // explain_from_trace reads ONLY this unified structure; raw memory.search
+    // weighting fields must NOT be re-read from other trace keys here.
+    const pvn = trace.profile_vector_node;
+    if (pvn && typeof pvn === "object" && !Array.isArray(pvn)) {
+        const p = pvn as Record<string, unknown>;
+        compact.profile = {
+            anchors_count: Array.isArray(p.anchors) ? (p.anchors as unknown[]).length : 0,
+            weights_summary: p.weights_summary,
+            total_memories_considered: p.total_memories_considered,
+        };
+    }
+
+    // planner / build_cards summary — cap cards and items per card
     for (const key of ["planner", "build_cards"]) {
         const node = trace[key];
         if (node && typeof node === "object") {
@@ -105,61 +209,69 @@ function compactTrace(trace: Record<string, unknown>): Record<string, unknown> {
             if (n.ez_fill_reason !== undefined) plannerCompact.ez_fill_reason = n.ez_fill_reason;
             if (n.ez_fill_source !== undefined) plannerCompact.ez_fill_source = n.ez_fill_source;
             if (n.ez_fill !== undefined) plannerCompact.ez_fill = n.ez_fill;
+
+            // Cap cards array
+            if (Array.isArray(n.cards)) {
+                plannerCompact.cards = capArray(n.cards as unknown[], MAX_CARDS).map((card) => {
+                    if (card && typeof card === "object") {
+                        const c = card as Record<string, unknown>;
+                        const cappedCard: Record<string, unknown> = {};
+                        for (const [k, v] of Object.entries(c)) {
+                            if (Array.isArray(v)) {
+                                // Cap items per card, then cap tags per item
+                                cappedCard[k] = capArray(v as unknown[], MAX_ITEMS_PER_CARD).map((item) => {
+                                    if (item && typeof item === "object") {
+                                        return capItemFields(item as Record<string, unknown>);
+                                    }
+                                    return item;
+                                });
+                            } else if (typeof v === "string" && v.length > 120) {
+                                // Drop long text fields
+                            } else {
+                                cappedCard[k] = v;
+                            }
+                        }
+                        return cappedCard;
+                    }
+                    return card;
+                });
+            }
+
             compact.planner = plannerCompact;
             break;
         }
     }
 
-    return compact;
+    // 8 KB hard cap — deterministically remove largest fields first
+    const enforceByteLimit = (obj: Record<string, unknown>): Record<string, unknown> => {
+        if (JSON.stringify(obj).length <= MAX_COMPACT_JSON_BYTES) return obj;
+        // Priority order to drop: planner.cards first, then rerank.top_items_preview, then recall
+        const result = { ...obj };
+        const planner = result.planner as Record<string, unknown> | undefined;
+        if (planner && planner.cards !== undefined) {
+            const { cards: _cards, ...plannerWithout } = planner;
+            result.planner = plannerWithout;
+            if (JSON.stringify(result).length <= MAX_COMPACT_JSON_BYTES) return result;
+        }
+        const rerank = result.rerank as Record<string, unknown> | undefined;
+        if (rerank && rerank.top_items_preview !== undefined) {
+            const { top_items_preview: _tip, ...rerankWithout } = rerank;
+            result.rerank = rerankWithout;
+            if (JSON.stringify(result).length <= MAX_COMPACT_JSON_BYTES) return result;
+        }
+        if (result.recall !== undefined) {
+            const { recall: _recall, ...withoutRecall } = result;
+            if (JSON.stringify(withoutRecall).length <= MAX_COMPACT_JSON_BYTES) return withoutRecall;
+        }
+        return result;
+    };
+
+    return enforceByteLimit(compact);
 }
-
-// ---------------------------------------------------------------------------
-// Prompt construction
-// ---------------------------------------------------------------------------
-
-const SYSTEM_PROMPT =
-    "You are a recommendation explanation assistant. Given a JSON summary of " +
-    "how a food/travel recommendation was produced, write a clear, friendly " +
-    "explanation for the end user. Return structured JSON only.";
-
-function buildUserPrompt(
-    compactTrace: Record<string, unknown>,
-    locale: string,
-    style: string,
-    userText?: string
-): string {
-    const parts: string[] = [];
-
-    if (userText) {
-        parts.push(`User query: "${userText}"`);
-    }
-
-    parts.push(`Decision summary:\n${JSON.stringify(compactTrace, null, 2)}`);
-    parts.push(`Locale: ${locale}`);
-    parts.push(`Style: ${style}`);
-    parts.push(
-        "Respond with JSON: { \"explanation\": \"...\", \"bullets\": [\"...\", ...] }. " +
-        `Provide 3-6 bullet points. Language: ${locale === "zh" ? "Chinese" : "English"}.`
-    );
-
-    return parts.join("\n\n");
-}
-
-/** JSON schema descriptor for the structured output. */
-const OUTPUT_SCHEMA = {
-    type: "object",
-    properties: {
-        explanation: { type: "string" },
-        bullets: { type: "array", items: { type: "string" }, minItems: 3, maxItems: 6 },
-    },
-    required: ["explanation", "bullets"],
-};
 
 // ---------------------------------------------------------------------------
 // Skill factory
 // ---------------------------------------------------------------------------
-
-const PROMPT_VERSION = "explain_v1";
 
 export function createExplainFromTraceSkill(
     adapter: LLMAdapter
@@ -194,7 +306,7 @@ export function createExplainFromTraceSkill(
                     : _context.decision_trace;
 
             const compact = compactTrace(traceSource);
-            const userPrompt = buildUserPrompt(compact, locale, style, input.user_text);
+            const userPrompt = buildExplainUserPrompt(compact, locale, style, input.user_text);
 
             let explanation: string;
             let bullets: string[];
@@ -203,24 +315,37 @@ export function createExplainFromTraceSkill(
             let fallbackReason = "";
 
             try {
-                const result = await adapter.generateStructuredJSON<{
-                    explanation: string;
-                    bullets: string[];
-                }>({
+                const result = await adapter.generateStructuredJSON<ExplainLLMOutput>({
                     systemPrompt: SYSTEM_PROMPT,
                     userPrompt,
-                    schema: OUTPUT_SCHEMA,
-                    temperature: 0.3,
+                    schema: OUTPUT_JSON_SCHEMA,
+                    temperature: LIMITS.temperature,
                     promptVersion: PROMPT_VERSION,
                     traceContext: compact,
                 });
 
-                explanation = result.data.explanation;
-                bullets = result.data.bullets;
                 callTrace = result.callTrace;
-                if (callTrace.fallback_used || adapter.fallbackReason) {
+
+                // Token budget guardrail
+                if (callTrace.usage.total_tokens > EXPLAIN_MAX_TOTAL_TOKENS) {
                     fallbackUsed = true;
-                    fallbackReason = callTrace.fallback_reason ?? adapter.fallbackReason ?? "adapter_error";
+                    fallbackReason = "token_budget_exceeded";
+                    const local = buildLocalFallback(compact);
+                    explanation = local.explanation;
+                    bullets = local.bullets;
+                } else if (!isValidOutput(result.data)) {
+                    // Output schema validation
+                    fallbackUsed = true;
+                    fallbackReason = "invalid_output";
+                    explanation = "Explanation unavailable.";
+                    bullets = [];
+                } else {
+                    explanation = result.data.explanation;
+                    bullets = result.data.bullets;
+                    if (callTrace.fallback_used || adapter.fallbackReason) {
+                        fallbackUsed = true;
+                        fallbackReason = callTrace.fallback_reason ?? adapter.fallbackReason ?? "adapter_error";
+                    }
                 }
             } catch (err: unknown) {
                 // Graceful fallback — never throw from this skill
@@ -232,7 +357,7 @@ export function createExplainFromTraceSkill(
 
                 callTrace = {
                     model: adapter.modelInfo,
-                    temperature: 0.3,
+                    temperature: LIMITS.temperature,
                     prompt_version: PROMPT_VERSION,
                     latency_ms: 0,
                     usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
@@ -253,7 +378,7 @@ export function createExplainFromTraceSkill(
 
             const trace: Record<string, unknown> = {
                 schema_version: PROMPT_VERSION,
-                inputs_used: Object.keys(compact),
+                inputs_used: INPUT_ORDER.filter((k) => compact[k] != null),
                 locale,
                 style,
                 fallback_used: fallbackUsed,

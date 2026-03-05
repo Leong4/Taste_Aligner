@@ -259,6 +259,8 @@ export interface VisionDescribeDecisionTrace extends Record<string, unknown> {
     backend?: string;
     model_id?: string | null;
     device?: string;
+    /** Image type classification from vision backend (clip_v1 V1 schema). */
+    vision_type?: "food" | "scenery" | "unknown";
     tags_count: number;
     latency_ms?: number;
     fallback_used: boolean;
@@ -300,6 +302,7 @@ export interface TesBuilderDecisionTrace extends Record<string, unknown> {
     rule_id: "tes_builder_v1";
     schema_version: "1.0";
     request_ts: number;
+    timestamp_source?: "input_timestamp" | "context_request_ts" | "fixed_epoch";
     input_summary: {
         anchor_tag_count: number;
         normalized_tag_count?: number;
@@ -655,6 +658,92 @@ export interface MemoryWeightAdjustDecisionTrace extends Record<string, unknown>
     fallback_reason?: "no_tags" | "tool_error" | "invalid_output" | "empty_results";
     error_message?: string;
     latency_ms?: number;
+}
+
+// ---------------------------------------------------------------------------
+// build_profile_vector types (P4 dynamic weighting unification)
+// ---------------------------------------------------------------------------
+
+/**
+ * A single memory record consumed by build_profile_vector.
+ * Extends MemoryWeightedResult with an optional raw embedding field.
+ * The embedding enables the weighted-average profile vector computation.
+ * When absent the skill returns a deterministic 512-dim zero vector.
+ */
+export interface MemoryUnit extends MemoryWeightedResult {
+    /** Optional 512-dim L2 embedding from the memory store. */
+    embedding?: number[];
+}
+
+/**
+ * A memory included in the profile vector anchors list.
+ * All float fields are rounded to 6 decimal places.
+ */
+export interface TopKMemory {
+    memory_id: string;
+    cosine: number;
+    /** exp(-LAMBDA_TIME * delta_days) — recomputed by build_profile_vector. */
+    w_time: number;
+    /** clamp(1 + ALPHA_SENT * sentiment, 0.5, 2.0) — recomputed by build_profile_vector. */
+    w_sent: number;
+    /** Passed through from memory.search. */
+    w_context: number;
+    /** cosine * w_time * w_sent * w_context */
+    final_weight: number;
+}
+
+/** Per-memory weight list + aggregate summary. */
+export interface ProfileVectorWeights {
+    /** Sorted by final_weight desc, memory_id asc. */
+    per_memory: TopKMemory[];
+    summary: {
+        /** Factor with greatest deviation from 1.0, or "balanced". */
+        dominant_reason: string;
+        time_bias: number;
+        sentiment_bias: number;
+        context_bias: number;
+    };
+}
+
+/** Input to the build_profile_vector skill. */
+export interface BuildProfileVectorInput {
+    /** Weighted results from memory_weight_adjust (used as MemoryUnit[]). */
+    weighted_results?: MemoryWeightedResult[];
+    /** Reference timestamp in ms epoch (from input.request_ts or context). */
+    now_ts?: number;
+    /** Pass-through upstream decision trace (not required). */
+    decision_trace?: Record<string, unknown>;
+}
+
+/** Output of the build_profile_vector skill. */
+export interface BuildProfileVectorOutput {
+    /** 512-dim weighted-average embedding. Zero vector when no embeddings available. */
+    profile_vector: number[];
+    /** Top-K memories sorted by final_weight desc, memory_id asc. */
+    anchors: TopKMemory[];
+    total_memories_considered: number;
+    weights: ProfileVectorWeights;
+    decision_trace: { profile_vector_node: ProfileVectorDecisionTrace };
+}
+
+/** Decision trace for the build_profile_vector skill. */
+export interface ProfileVectorDecisionTrace extends Record<string, unknown> {
+    rule_id: "profile_vector_v1";
+    schema_version: "1.0";
+    now_source?: "input_now_ts" | "context_request_ts" | "fixed_epoch";
+    anchors: TopKMemory[];
+    weights_summary: {
+        dominant_reason: string;
+        time_bias: number;
+        sentiment_bias: number;
+        context_bias: number;
+    };
+    total_memories_considered: number;
+    profile_vector_dim: number;
+    /** True when at least one memory provided an embedding for vector computation. */
+    has_embeddings: boolean;
+    fallback_used: boolean;
+    fallback_reason?: "empty_input";
 }
 
 /** Input to the build_cards skill. */

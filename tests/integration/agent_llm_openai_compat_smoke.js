@@ -149,6 +149,112 @@ function assertNoForbiddenTraceKeys(obj, basePath, forbiddenKeys) {
     return hits;
 }
 
+function collectLLMCallScopes(body) {
+    const scopes = [];
+    const pushScope = (path, value) => {
+        if (value && typeof value === "object" && !Array.isArray(value)) {
+            scopes.push({ path, value });
+        }
+    };
+
+    const dt = body && body.decision_trace && typeof body.decision_trace === "object"
+        ? body.decision_trace
+        : null;
+    if (dt) {
+        pushScope("decision_trace.tag_expand.llm_call", dt.tag_expand && dt.tag_expand.llm_call);
+        pushScope(
+            "decision_trace.explain_from_trace.llm_call",
+            dt.explain_from_trace && dt.explain_from_trace.llm_call
+        );
+    }
+
+    const bundle = body && body.decision_trace_bundle && typeof body.decision_trace_bundle === "object"
+        ? body.decision_trace_bundle
+        : null;
+    if (bundle) {
+        pushScope("decision_trace_bundle.tag_expand.llm_call", bundle.tag_expand && bundle.tag_expand.llm_call);
+        pushScope(
+            "decision_trace_bundle.explain_from_trace.llm_call",
+            bundle.explain_from_trace && bundle.explain_from_trace.llm_call
+        );
+        if (bundle.decision_trace && typeof bundle.decision_trace === "object") {
+            pushScope(
+                "decision_trace_bundle.decision_trace.tag_expand.llm_call",
+                bundle.decision_trace.tag_expand && bundle.decision_trace.tag_expand.llm_call
+            );
+            pushScope(
+                "decision_trace_bundle.decision_trace.explain_from_trace.llm_call",
+                bundle.decision_trace.explain_from_trace && bundle.decision_trace.explain_from_trace.llm_call
+            );
+        }
+    }
+
+    return scopes;
+}
+
+function normalizeLLMNodeForDeterminism(value) {
+    const volatileKeys = new Set([
+        "usage",
+        "latency_ms",
+        "timestamp",
+        "request_id",
+        "created_at",
+        "time",
+        "date",
+    ]);
+
+    function walk(node) {
+        if (Array.isArray(node)) {
+            return node.map(walk);
+        }
+        if (!node || typeof node !== "object") {
+            return node;
+        }
+        const out = {};
+        for (const key of Object.keys(node)) {
+            if (volatileKeys.has(key)) continue;
+            out[key] = walk(node[key]);
+        }
+        return out;
+    }
+
+    return walk(value);
+}
+
+function findFirstDifferencePath(a, b, path) {
+    path = path || "";
+    if (Object.is(a, b)) return null;
+
+    const aIsArray = Array.isArray(a);
+    const bIsArray = Array.isArray(b);
+    if (aIsArray || bIsArray) {
+        if (!aIsArray || !bIsArray) return path || "(root)";
+        if (a.length !== b.length) return `${path || "(root)"}.length`;
+        for (let i = 0; i < a.length; i++) {
+            const diff = findFirstDifferencePath(a[i], b[i], `${path}[${i}]`);
+            if (diff) return diff;
+        }
+        return null;
+    }
+
+    const aIsObject = a !== null && typeof a === "object";
+    const bIsObject = b !== null && typeof b === "object";
+    if (aIsObject || bIsObject) {
+        if (!aIsObject || !bIsObject) return path || "(root)";
+        const keys = Array.from(new Set([...Object.keys(a), ...Object.keys(b)])).sort();
+        for (const key of keys) {
+            if (!Object.prototype.hasOwnProperty.call(a, key) || !Object.prototype.hasOwnProperty.call(b, key)) {
+                return path ? `${path}.${key}` : key;
+            }
+            const diff = findFirstDifferencePath(a[key], b[key], path ? `${path}.${key}` : key);
+            if (diff) return diff;
+        }
+        return null;
+    }
+
+    return path || "(root)";
+}
+
 /** Assert an llm_call trace node is present and strict-valid for openai_compat integration. */
 function assertLLMCall(llmCall, nodeName, raw, runUrl) {
     if (!llmCall || typeof llmCall !== "object") {
@@ -243,23 +349,6 @@ async function main() {
         warn('response body text contains "NaN" or "Infinity" token (diagnostic only)');
     }
 
-    // Structured parsed-value walk (hard gate) scoped to trace payload only.
-    const traceScope = {
-        decision_trace: (resp.body && typeof resp.body === "object") ? resp.body.decision_trace : null,
-        decision_trace_bundle:
-            (resp.body.decision_trace_bundle && typeof resp.body.decision_trace_bundle === "object")
-                ? resp.body.decision_trace_bundle
-                : null,
-    };
-    const nonFinitePath = findNonFinite(traceScope);
-    if (nonFinitePath) {
-        fail(`trace payload contains non-finite number: ${nonFinitePath}`, {
-            url: runUrl,
-            status: resp.status,
-            bodyPreview: resp.raw.slice(0, 500),
-        });
-    }
-
     // ── decision_trace ────────────────────────────────────────────────────────
 
     const dt = resp.body.decision_trace;
@@ -279,22 +368,27 @@ async function main() {
         "time",
         "date",
     ]);
-    const forbiddenHits = [
-        ...assertNoForbiddenTraceKeys(dt, "decision_trace", forbiddenTraceKeys),
-        ...assertNoForbiddenTraceKeys(
-            (resp.body.decision_trace_bundle && typeof resp.body.decision_trace_bundle === "object")
-                ? resp.body.decision_trace_bundle
-                : null,
-            "decision_trace_bundle",
-            forbiddenTraceKeys
-        ),
-    ];
+    const llmCallScopes = collectLLMCallScopes(resp.body);
+    const forbiddenHits = llmCallScopes.flatMap((scope) =>
+        assertNoForbiddenTraceKeys(scope.value, scope.path, forbiddenTraceKeys)
+    );
     if (forbiddenHits.length > 0) {
-        fail(`forbidden trace keys found: ${forbiddenHits.join(", ")}`, {
+        fail(`forbidden keys found in LLM llm_call trace: ${forbiddenHits.join(", ")}`, {
             url: runUrl,
             status: resp.status,
             bodyPreview: String(resp.raw || "").slice(0, 500),
         });
+    }
+
+    for (const scope of llmCallScopes) {
+        const nonFinitePath = findNonFinite(scope.value, scope.path);
+        if (nonFinitePath) {
+            fail(`non-finite number found in LLM llm_call trace: ${nonFinitePath}`, {
+                url: runUrl,
+                status: resp.status,
+                bodyPreview: resp.raw.slice(0, 500),
+            });
+        }
     }
 
     // ── tag_expand ────────────────────────────────────────────────────────────
@@ -314,6 +408,21 @@ async function main() {
             `decision_trace.tag_expand.fallback_used expected false when present, got ${tagExpand.fallback_used}`,
             { url: runUrl, bodyPreview: String(resp.raw || "").slice(0, 500) }
         );
+    }
+
+    // ── Cost guardrail: tag_expand must not exceed token budget ───────────────
+    const TAG_EXPAND_TOKEN_LIMIT = Number(process.env.TAG_EXPAND_MAX_TOTAL_TOKENS || 800);
+    if (tagExpand.llm_call && tagExpand.llm_call.usage) {
+        const totalTokens = tagExpand.llm_call.usage.total_tokens;
+        if (typeof totalTokens === "number" && totalTokens > TAG_EXPAND_TOKEN_LIMIT) {
+            fail(
+                `tag_expand.llm_call.usage.total_tokens=${totalTokens} exceeds cost guardrail (${TAG_EXPAND_TOKEN_LIMIT}). ` +
+                "Increase TAG_EXPAND_MAX_TOTAL_TOKENS or shrink the prompt.",
+                { url: runUrl, bodyPreview: String(resp.raw || "").slice(0, 500) }
+            );
+        }
+    } else {
+        warn("tag_expand.llm_call.usage absent — cannot verify cost guardrail");
     }
 
     // ── explain_from_trace ────────────────────────────────────────────────────
@@ -372,22 +481,36 @@ async function main() {
             bodyPreview: String(resp2.raw || "").slice(0, 500),
         });
     }
+    const normalizedTagExpand1 = normalizeLLMNodeForDeterminism(tagExpand);
+    const normalizedTagExpand2 = normalizeLLMNodeForDeterminism(dt2.tag_expand);
     try {
-        assert.deepStrictEqual(tagExpand, dt2.tag_expand);
+        assert.deepStrictEqual(normalizedTagExpand1, normalizedTagExpand2);
     } catch (err) {
+        const diffPath = findFirstDifferencePath(
+            normalizedTagExpand1,
+            normalizedTagExpand2,
+            "decision_trace.tag_expand"
+        );
         fail("determinism gate failed for decision_trace.tag_expand across two /run calls", {
             url: runUrl,
             bodyPreview: String(resp2.raw || "").slice(0, 500),
-            errorMessage: err instanceof Error ? err.message : String(err),
+            errorMessage: `${err instanceof Error ? err.message : String(err)}; first_diff=${diffPath}`,
         });
     }
+    const normalizedExplain1 = normalizeLLMNodeForDeterminism(explain);
+    const normalizedExplain2 = normalizeLLMNodeForDeterminism(dt2.explain_from_trace);
     try {
-        assert.deepStrictEqual(explain, dt2.explain_from_trace);
+        assert.deepStrictEqual(normalizedExplain1, normalizedExplain2);
     } catch (err) {
+        const diffPath = findFirstDifferencePath(
+            normalizedExplain1,
+            normalizedExplain2,
+            "decision_trace.explain_from_trace"
+        );
         fail("determinism gate failed for decision_trace.explain_from_trace across two /run calls", {
             url: runUrl,
             bodyPreview: String(resp2.raw || "").slice(0, 500),
-            errorMessage: err instanceof Error ? err.message : String(err),
+            errorMessage: `${err instanceof Error ? err.message : String(err)}; first_diff=${diffPath}`,
         });
     }
 
@@ -404,7 +527,7 @@ async function main() {
     console.log(`    tag_expand.llm_call.fallback_used=${tagExpand.llm_call.fallback_used}`);
     if (tagExpand.llm_call.usage) {
         const u = tagExpand.llm_call.usage;
-        console.log(`    tag_expand.llm_call.usage={prompt:${u.prompt_tokens}, completion:${u.completion_tokens}, total:${u.total_tokens}}`);
+        console.log(`    tag_expand.llm_call.usage={prompt:${u.prompt_tokens}, completion:${u.completion_tokens}, total:${u.total_tokens}} (limit=${TAG_EXPAND_TOKEN_LIMIT})`);
     } else {
         console.log("    tag_expand.llm_call.usage=(absent)");
     }

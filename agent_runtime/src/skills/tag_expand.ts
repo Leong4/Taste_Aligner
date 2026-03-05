@@ -13,42 +13,26 @@ import {
     TagExpansionCandidate,
 } from "../core/types";
 import { LLMAdapter, LLMCallTrace } from "../llm/llm_adapter";
+import {
+    PROMPT_VERSION,
+    SYSTEM_PROMPT,
+    buildUserPrompt,
+    OUTPUT_JSON_SCHEMA,
+    LIMITS,
+} from "../llm/prompts/tag_expand_v1";
 
-const PROMPT_VERSION = "v1";
+/** Hard cap on total tags added — from prompt module; env cannot override this. */
+const MAX_GENERATED_TAGS = LIMITS.max_tags;
 
-const SYSTEM_PROMPT =
-    "You expand recommendation tags. Return JSON only with keys " +
-    "\"hard_expansions\" and \"soft_expansions\". Each item must be " +
-    "{\"tag\": string, \"confidence\": number}. No extra text.";
-
-const OUTPUT_SCHEMA = {
-    type: "object",
-    properties: {
-        hard_expansions: {
-            type: "array",
-            items: {
-                type: "object",
-                properties: {
-                    tag: { type: "string" },
-                    confidence: { type: "number", minimum: 0, maximum: 1 },
-                },
-                required: ["tag", "confidence"],
-            },
-        },
-        soft_expansions: {
-            type: "array",
-            items: {
-                type: "object",
-                properties: {
-                    tag: { type: "string" },
-                    confidence: { type: "number", minimum: 0, maximum: 1 },
-                },
-                required: ["tag", "confidence"],
-            },
-        },
-    },
-    required: ["hard_expansions", "soft_expansions"],
-};
+/**
+ * Token budget guard: if usage.total_tokens exceeds this threshold the skill
+ * falls back deterministically with reason "token_budget_exceeded".
+ * Configurable via TAG_EXPAND_MAX_TOTAL_TOKENS env var (default from LIMITS).
+ */
+const TAG_EXPAND_MAX_TOTAL_TOKENS = parseInt(
+    process.env.TAG_EXPAND_MAX_TOTAL_TOKENS ?? String(LIMITS.max_total_tokens),
+    10
+);
 
 function normalizeTag(tag: string): string {
     return tag.trim().replace(/\s+/g, " ");
@@ -89,26 +73,6 @@ function normalizeSeedTags(seedTags: string[]): string[] {
         normalized.push(tag);
     }
     return normalized;
-}
-
-function buildUserPrompt(input: TagExpandInput): string {
-    const seedTags = input.intent.tags ?? [];
-    const intentType = input.intent.type ?? "unknown";
-    const budget = input.tag_budget;
-
-    return [
-        `User text: "${input.user_text}"`,
-        `Intent type: ${intentType}`,
-        `Seed tags: ${JSON.stringify(seedTags)}`,
-        `Expansion budget: ${budget.budget}`,
-        `hard_expand_limit: ${budget.hard_expand_limit}`,
-        `soft_expand_limit: ${budget.soft_expand_limit}`,
-        `min_confidence_hard: ${budget.thresholds.min_confidence_hard}`,
-        `min_confidence_soft: ${budget.thresholds.min_confidence_soft}`,
-        "Generate short tags only (1-3 words, no sentences).",
-        "Return JSON only with this shape:",
-        "{\"hard_expansions\":[{\"tag\":\"...\",\"confidence\":0.9}],\"soft_expansions\":[{\"tag\":\"...\",\"confidence\":0.7}]}",
-    ].join("\n");
 }
 
 export function createTagExpandSkill(
@@ -207,8 +171,8 @@ export function createTagExpandSkill(
                 const result = await adapter.generateStructuredJSON<TagExpandLLMOutput>({
                     systemPrompt: SYSTEM_PROMPT,
                     userPrompt: buildUserPrompt(input),
-                    schema: OUTPUT_SCHEMA,
-                    temperature: 0,
+                    schema: OUTPUT_JSON_SCHEMA,
+                    temperature: LIMITS.temperature,
                     promptVersion: PROMPT_VERSION,
                     traceContext: {
                         seed_tags: seedTags,
@@ -224,13 +188,19 @@ export function createTagExpandSkill(
                     adapterFallbackReason =
                         callTrace.fallback_reason ?? adapter.fallbackReason ?? "adapter_error";
                 }
+
+                // Token budget guard: abort if the call consumed too many tokens.
+                if (!hardFallbackUsed && callTrace.usage.total_tokens > TAG_EXPAND_MAX_TOTAL_TOKENS) {
+                    hardFallbackUsed = true;
+                    fallbackReason = "token_budget_exceeded";
+                }
             } catch (err: unknown) {
                 hardFallbackUsed = true;
                 fallbackReason = "adapter_error";
                 adapterError = err instanceof Error ? err.message : String(err);
                 callTrace = {
                     model: adapter.modelInfo,
-                    temperature: 0,
+                    temperature: LIMITS.temperature,
                     prompt_version: PROMPT_VERSION,
                     latency_ms: 0,
                     usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
@@ -366,7 +336,8 @@ export function createTagExpandSkill(
             }
             const softTags = keepUniqueWithLimit(softPrepared, limits.soft_expand_limit, seenSoft, "soft");
 
-            const tagsAdded = [...hardTags, ...softTags];
+            // Hard cap: deterministic slice — hard tags take priority over soft.
+            const tagsAdded = [...hardTags, ...softTags].slice(0, MAX_GENERATED_TAGS);
             if (tagsAdded.length === 0) {
                 return buildFallbackResult("all_filtered", dropStats);
             }

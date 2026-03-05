@@ -32,7 +32,7 @@ import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Literal
 
 from .backends import get_backend
 
@@ -93,10 +93,21 @@ class VisionMeta(BaseModel):
     latency_ms: float
 
 
+class VisionModelInfo(BaseModel):
+    """Stable model identity fields for deterministic trace evidence."""
+    name: Optional[str] = None
+    pretrained: Optional[str] = None
+
+
 class VisionResponse(BaseModel):
     ok: bool
     backend: str
-    model_id: Optional[str]
+    # V1 structured schema: type + sorted/capped cues for downstream TES
+    type: Literal["food", "scenery", "unknown"] = "unknown"
+    cues: List[str] = []
+    model: Optional[VisionModelInfo] = None
+    # Legacy fields retained for backward compatibility
+    model_id: Optional[str] = None
     device: str
     tags: List[str]
     raw: RawOutput
@@ -176,14 +187,26 @@ async def describe_endpoint(req: DescribeRequest) -> VisionResponse:
     raw_tags: List[str] = [str(t) for t in result.get("tags", []) if t]
     scores: List[Dict[str, Any]] = _guard_finite(result.get("scores", []))
 
+    # V1 structured fields: cues (sorted, capped), type, model
+    raw_cues = result.get("cues")
+    cues: List[str] = raw_cues[:20] if isinstance(raw_cues, list) else sorted(set(raw_tags))[:20]
+    vision_type: str = result.get("type", "unknown")
+    if vision_type not in ("food", "scenery", "unknown"):
+        vision_type = "unknown"
+    raw_model = result.get("model")
+    model_info = VisionModelInfo(**raw_model) if isinstance(raw_model, dict) else None
+
     logger.info(
-        "[vision] describe OK: backend=%s tags=%d latency=%.1fms",
-        b.name, len(raw_tags), latency_ms,
+        "[vision] describe OK: backend=%s type=%s cues=%d tags=%d latency=%.1fms",
+        b.name, vision_type, len(cues), len(raw_tags), latency_ms,
     )
 
     return VisionResponse(
         ok=True,
         backend=b.name,
+        type=vision_type,
+        cues=cues,
+        model=model_info,
         model_id=b.model_id,
         device=b.device,
         tags=raw_tags,
