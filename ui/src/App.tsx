@@ -1,0 +1,34 @@
+import { useState } from "react";
+import ImportPage from "./pages/ImportPage";
+import ExplorePage from "./pages/ExplorePage";
+import LibraryPage from "./pages/LibraryPage";
+
+type Tab = "import" | "explore" | "library";
+
+export default function App() {
+  const [tab, setTab] = useState<Tab>("import");
+
+  return (
+    <div className="app">
+      <nav className="nav">
+        <div className="nav-brand">Taste Aligner</div>
+        <div className="nav-tabs">
+          {(["import", "explore", "library"] as Tab[]).map((t) => (
+            <button
+              key={t}
+              className={`nav-tab ${tab === t ? "active" : ""}`}
+              onClick={() => setTab(t)}
+            >
+              {t === "import" ? "Import" : t === "explore" ? "Explore" : "Library"}
+            </button>
+          ))}
+        </div>
+      </nav>
+      <main className="main">
+        {tab === "import" && <ImportPage />}
+        {tab === "explore" && <ExplorePage />}
+        {tab === "library" && <LibraryPage />}
+      </main>
+    </div>
+  );
+}
