@@ -2,164 +2,201 @@
 Vision backends for the Taste Aligner Vision Service.
 
 Supported backends:
-  rule_v0   - keyword extraction from URL/filename (offline, no model needed)
-  clip_v1   - CLIP-based image understanding (open_clip_torch, local model, CPU default)
-  cloud_v1  - Reserved for future cloud API provider (NOT implemented yet)
+  clip_v1   - CLIP-based image understanding (open_clip_torch, local model)
+  cloud_v1  - OpenAI Responses API image understanding
+  hybrid    - CLIP first, with cloud fallback for weak or ambiguous results
 
-Extension point: to add cloud_v1, implement a CloudV1Backend class and register
-it in get_backend() under the "cloud_v1" key. The backend must expose:
-  .name: str
-  .model_id: str | None
-  .device: str
-  .warm: bool
-  .describe(image_url, image_base64, top_k) -> {"tags": [...], "scores": [...]}
+Rule-based vision backends are intentionally removed. Vision inference comes
+from CLIP locally or the OpenAI Responses API.
 """
 
-import os
+from __future__ import annotations
+
+import base64
+import io
+import json
 import math
+import os
+import re
+import urllib.error
+import urllib.request
+from typing import Any, Dict, List, Optional, Sequence, Tuple
+
+from PIL import Image
+
 import logging
-from typing import Dict, Any, List, Optional
 
 logger = logging.getLogger(__name__)
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Vocabulary for tag classification
-# ─────────────────────────────────────────────────────────────────────────────
+
+# Vocabulary includes required semantic probes for food/scenery typing.
 VISION_VOCABULARY: List[str] = [
-    # food & drink
-    "ramen", "sushi", "izakaya", "cafe", "coffee", "dessert", "pastry",
-    "street_food", "food", "restaurant", "noodles", "rice",
-    "seafood", "grilled", "spicy", "hotpot",
-    # culture & sights
-    "temple", "shrine", "museum", "art", "culture", "traditional",
-    "architecture", "landmark", "garden",
-    # urban & lifestyle
-    "nightlife", "bar", "shopping", "city_walk", "market", "night_market",
-    "urban", "modern", "vintage", "fashion",
-    # nature & outdoors
-    "park", "nature", "mountain", "lake", "seaside", "beach",
-    "hiking", "outdoor", "forest",
-    # ambience
-    "cozy", "relaxation", "photography", "street", "alley",
-    "vibrant", "calm", "lively",
+    "food",
+    "dish",
+    "restaurant",
+    "seafood",
+    "beach",
+    "seaside",
+    "coast",
+    "landscape",
+    "architecture",
+    "cityscape",
+    "mountain",
+    "nature",
+    # Additional taste-friendly labels
+    "ramen",
+    "sushi",
+    "izakaya",
+    "cafe",
+    "coffee",
+    "dessert",
+    "pastry",
+    "street_food",
+    "noodles",
+    "rice",
+    "temple",
+    "shrine",
+    "museum",
+    "art",
+    "culture",
+    "garden",
+    "park",
+    "lake",
+    "forest",
+    "outdoor",
+    "urban",
+    "modern",
+    "night_market",
+    "market",
 ]
 
-# Tag type classification sets (used by both backends)
-_FOOD_TAGS: frozenset = frozenset([
-    "ramen", "sushi", "izakaya", "cafe", "coffee", "dessert", "pastry",
-    "street_food", "food", "restaurant", "noodles", "rice",
-    "seafood", "grilled", "spicy", "hotpot",
-])
-_SCENERY_TAGS: frozenset = frozenset([
-    "temple", "shrine", "museum", "art", "culture", "traditional",
-    "architecture", "landmark", "garden", "park", "nature", "mountain",
-    "lake", "seaside", "beach", "hiking", "outdoor", "forest",
-])
+FOOD_LABELS: frozenset[str] = frozenset({
+    "food",
+    "dish",
+    "restaurant",
+    "seafood",
+    "ramen",
+    "sushi",
+    "izakaya",
+    "cafe",
+    "coffee",
+    "dessert",
+    "pastry",
+    "street_food",
+    "noodles",
+    "rice",
+})
+
+SCENERY_LABELS: frozenset[str] = frozenset({
+    "beach",
+    "seaside",
+    "coast",
+    "landscape",
+    "architecture",
+    "cityscape",
+    "mountain",
+    "nature",
+    "temple",
+    "shrine",
+    "museum",
+    "art",
+    "culture",
+    "garden",
+    "park",
+    "lake",
+    "forest",
+    "outdoor",
+    "urban",
+})
+
+CAPTION_STOPWORDS: frozenset[str] = frozenset({
+    "a", "an", "the", "and", "or", "of", "to", "in", "on", "for", "with",
+    "my", "your", "our", "their", "this", "that", "these", "those", "is",
+    "are", "was", "were", "be", "been", "being", "it", "its", "at", "from",
+    "as", "by", "about", "into", "over", "after", "before", "through",
+    "during", "without", "under", "again", "further", "then", "once",
+    "so", "very", "really", "just", "such", "want", "love", "like",
+})
+
+CAPTION_PHRASES: Sequence[Tuple[str, str]] = (
+    ("spanish food", "spanish food"),
+    ("sea side", "seaside"),
+    ("city skyline", "cityscape"),
+    ("night market", "night market"),
+)
 
 
-def _classify_type(tags: List[str]) -> str:
-    """Classify image type based on top tag distribution: food, scenery, or unknown."""
-    food_count = sum(1 for t in tags if t in _FOOD_TAGS)
-    scenery_count = sum(1 for t in tags if t in _SCENERY_TAGS)
-    if food_count > scenery_count:
+def _safe_score(score: float) -> float:
+    if not isinstance(score, (int, float)) or not math.isfinite(float(score)):
+        return 0.0
+    return float(score)
+
+
+def _score01(score: float) -> float:
+    return max(0.0, min(1.0, (_safe_score(score) + 1.0) / 2.0))
+
+
+def _dedup_keep_order(values: Sequence[str]) -> List[str]:
+    out: List[str] = []
+    seen: set[str] = set()
+    for raw in values:
+        if not isinstance(raw, str):
+            continue
+        cleaned = raw.strip().lower()
+        if not cleaned or cleaned in seen:
+            continue
+        seen.add(cleaned)
+        out.append(cleaned)
+    return out
+
+
+def _extract_caption_terms(caption_text: Optional[str]) -> List[str]:
+    if not isinstance(caption_text, str) or not caption_text.strip():
+        return []
+    caption = caption_text.strip().lower()
+    phrases: List[str] = []
+    for needle, tag in CAPTION_PHRASES:
+        if needle in caption:
+            phrases.append(tag)
+
+    tokens = re.findall(r"[a-z][a-z0-9_-]{2,}", caption)
+    nouns: List[str] = []
+    for tok in tokens:
+        if tok in CAPTION_STOPWORDS:
+            continue
+        nouns.append(tok.replace("_", " "))
+    return _dedup_keep_order([*phrases, *nouns])[:8]
+
+
+def _classify_vision_type(scores: Sequence[Dict[str, Any]]) -> str:
+    # Use the strongest score per pool, then compare with a fixed margin.
+    food_best = max((_safe_score(s.get("score", 0.0)) for s in scores if s.get("tag") in FOOD_LABELS), default=-1.0)
+    scenery_best = max((_safe_score(s.get("score", 0.0)) for s in scores if s.get("tag") in SCENERY_LABELS), default=-1.0)
+    best = max(food_best, scenery_best)
+    if best < 0.05:
+        return "other"
+    if food_best >= scenery_best + 0.03:
         return "food"
-    if scenery_count > food_count:
+    if scenery_best >= food_best + 0.03:
         return "scenery"
-    return "unknown"
+    return "other"
 
 
-# Keyword rules for rule_v0 backend
-_KEYWORD_MAP: Dict[str, str] = {
-    "ramen": "ramen", "noodle": "ramen", "sushi": "sushi",
-    "izakaya": "izakaya", "cafe": "cafe", "coffee": "cafe",
-    "dessert": "dessert", "sweet": "dessert",
-    "street food": "street_food", "street_food": "street_food",
-    "food": "food", "temple": "temple", "shrine": "shrine",
-    "museum": "museum", "culture": "culture",
-    "nightlife": "nightlife", "night": "nightlife",
-    "bar": "bar", "shopping": "shopping",
-    "city": "city_walk", "walk": "city_walk", "walking": "city_walk",
-    "park": "park", "garden": "park",
-    "hiking": "hiking", "mountain": "mountain",
-    "beach": "seaside", "sea": "seaside",
-    "photo": "photography", "relax": "relaxation",
-    "market": "market", "street": "street",
-}
+def _decode_image_bytes(image_base64: str) -> bytes:
+    raw = image_base64.strip()
+    # Accept both raw base64 and data URL payloads.
+    if raw.startswith("data:"):
+        if "," not in raw:
+            raise ValueError("invalid_data_url")
+        _head, raw = raw.split(",", 1)
+    try:
+        return base64.b64decode(raw, validate=True)
+    except Exception as exc:
+        raise ValueError(f"Failed to decode image_base64: {exc}") from exc
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# rule_v0 backend
-# ─────────────────────────────────────────────────────────────────────────────
-class RuleV0Backend:
-    """
-    Pure keyword extraction from image URL / base64 string tokens.
-    No model required. Always warm. Deterministic, fully offline.
-    """
-
-    name: str = "rule_v0"
-    model_id: Optional[str] = None
-    device: str = "cpu"
-    warm: bool = True
-
-    def describe(
-        self,
-        image_url: Optional[str],
-        image_base64: Optional[str],
-        top_k: int,
-    ) -> Dict[str, Any]:
-        import re
-
-        text = ""
-        if image_url:
-            text += " " + str(image_url)
-        if image_base64:
-            # Treat base64 string as plain text — keyword matching only
-            text += " " + str(image_base64)
-
-        cleaned = re.sub(r"[^\w\s]", " ", text.lower())
-        cleaned = re.sub(r"\s+", " ", cleaned).strip()
-
-        found: List[str] = []
-        seen: set = set()
-        # Longer keywords first to avoid partial matches overwriting longer ones
-        for keyword, tag in sorted(_KEYWORD_MAP.items(), key=lambda x: -len(x[0])):
-            if keyword in cleaned and tag not in seen:
-                found.append(tag)
-                seen.add(tag)
-
-        if not found:
-            # Deterministic default when no keywords are detected
-            found = ["ramen", "nightlife", "street_food"]
-
-        found = found[:top_k]
-        scores = [
-            {"tag": t, "score": round(0.90 + (hash(t) % 10) * 0.005, 4)}
-            for t in found
-        ]
-        sorted_tags = sorted(set(found))
-        return {
-            "tags": sorted_tags,
-            "scores": scores,
-            "cues": sorted_tags[:20],
-            "type": _classify_type(found),
-            "model": None,
-        }
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# clip_v1 backend
-# ─────────────────────────────────────────────────────────────────────────────
 class ClipV1Backend:
-    """
-    CLIP-based zero-shot image tagging.
-
-    Uses open_clip_torch to classify images against VISION_VOCABULARY.
-    Model is loaded lazily on first describe() call (or explicitly via warm_up()).
-    Requires: open_clip_torch, Pillow, torch.
-
-    VISION_MODEL_ID env format: "ViT-B-32" or "ViT-B-32/openai".
-    Default pretrained is "openai" when no "/" is present.
-    """
+    """CLIP-based zero-shot image tagging backend."""
 
     name: str = "clip_v1"
 
@@ -191,36 +228,25 @@ class ClipV1Backend:
             return
         import open_clip
         import torch
-        import numpy as np
 
-        logger.info(
-            "[clip_v1] Loading CLIP model: %s on %s", self._model_id, self._device
-        )
+        logger.info("[clip_v1] Loading CLIP model: %s on %s", self._model_id, self._device)
         parts = self._model_id.split("/", 1)
         arch = parts[0]
         pretrained = parts[1] if len(parts) > 1 else "openai"
-
         try:
             model, _, preprocess = open_clip.create_model_and_transforms(
-                arch, pretrained=pretrained, device=self._device
+                arch,
+                pretrained=pretrained,
+                device=self._device,
             )
         except Exception as exc:
-            raise RuntimeError(
-                f"Failed to load CLIP model '{self._model_id}': {exc}"
-            ) from exc
+            raise RuntimeError(f"Failed to load CLIP model '{self._model_id}': {exc}") from exc
 
         tokenizer = open_clip.get_tokenizer(arch)
         model.eval()
 
-        logger.info(
-            "[clip_v1] Precomputing text embeddings for %d vocabulary tags",
-            len(VISION_VOCABULARY),
-        )
-        prompts = [
-            f"a photo of {tag.replace('_', ' ')}" for tag in VISION_VOCABULARY
-        ]
+        prompts = [f"a photo of {tag.replace('_', ' ')}" for tag in VISION_VOCABULARY]
         texts = tokenizer(prompts).to(self._device)
-
         with torch.no_grad():
             text_features = model.encode_text(texts)
             norm = text_features.norm(dim=-1, keepdim=True)
@@ -234,7 +260,6 @@ class ClipV1Backend:
         logger.info("[clip_v1] Model loaded and warm")
 
     def warm_up(self) -> None:
-        """Explicitly preload the model (called at startup for fail-fast behaviour)."""
         self._ensure_loaded()
 
     def describe(
@@ -242,105 +267,267 @@ class ClipV1Backend:
         image_url: Optional[str],
         image_base64: Optional[str],
         top_k: int,
+        caption_text: Optional[str] = None,
     ) -> Dict[str, Any]:
         self._ensure_loaded()
 
-        import torch
         import numpy as np
-        from PIL import Image
-        import io
+        import torch
+        import urllib.request
 
-        # ── Load image ────────────────────────────────────────────────────────
         if image_base64:
-            import base64 as _b64
+            image_bytes = _decode_image_bytes(image_base64)
             try:
-                img_bytes = _b64.b64decode(image_base64)
-                image = Image.open(io.BytesIO(img_bytes)).convert("RGB")
+                image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
             except Exception as exc:
-                raise ValueError(f"Failed to decode image_base64: {exc}") from exc
+                raise ValueError(f"Failed to parse decoded image bytes: {exc}") from exc
         elif image_url:
             try:
-                import urllib.request
                 with urllib.request.urlopen(image_url, timeout=10) as resp:  # noqa: S310
-                    img_bytes = resp.read()
-                image = Image.open(io.BytesIO(img_bytes)).convert("RGB")
+                    image = Image.open(io.BytesIO(resp.read())).convert("RGB")
             except Exception as exc:
                 raise ValueError(f"Failed to fetch image_url: {exc}") from exc
         else:
             raise ValueError("Either image_url or image_base64 must be provided")
 
-        # ── Encode image ──────────────────────────────────────────────────────
         img_tensor = self._preprocess(image).unsqueeze(0).to(self._device)
         with torch.no_grad():
             img_features = self._model.encode_image(img_tensor)
             img_norm = img_features.norm(dim=-1, keepdim=True)
             img_norm = torch.where(img_norm < 1e-10, torch.ones_like(img_norm), img_norm)
             img_features = img_features / img_norm
-
-        # ── Cosine similarities ───────────────────────────────────────────────
-        with torch.no_grad():
             similarity = (img_features @ self._text_features.T).squeeze(0)
 
-        sim_np = similarity.cpu().numpy()
-
-        # Guard against non-finite values
+        sim_np = similarity.detach().cpu().numpy()
         finite_mask = np.isfinite(sim_np)
         if not np.all(finite_mask):
             logger.warning("[clip_v1] Non-finite similarities detected; clamping to 0")
             sim_np = np.where(finite_mask, sim_np, 0.0)
 
-        # Top-k by similarity
-        k = min(top_k, len(VISION_VOCABULARY))
+        k = max(1, min(int(top_k), len(VISION_VOCABULARY)))
         indices = np.argsort(sim_np)[::-1][:k]
         scores: List[Dict[str, Any]] = []
         for idx in indices:
-            score = float(sim_np[idx])
-            if not math.isfinite(score):
-                score = 0.0
-            scores.append({"tag": VISION_VOCABULARY[int(idx)], "score": round(score, 4)})
+            tag = VISION_VOCABULARY[int(idx)]
+            score = round(_safe_score(float(sim_np[idx])), 4)
+            scores.append({"tag": tag, "score": score})
 
-        tags = [s["tag"] for s in scores]
-        sorted_tags = sorted(set(tags))
+        clip_cues = [entry["tag"] for entry in scores[:8]]
+        caption_terms = _extract_caption_terms(caption_text)
+        merged_tags = _dedup_keep_order([*clip_cues, *caption_terms, *(entry["tag"] for entry in scores)])
+        if not merged_tags:
+            merged_tags = [scores[0]["tag"]] if scores else ["image"]
+        tags = merged_tags[:5]
+        cues = _dedup_keep_order([*clip_cues, *caption_terms])[:20]
+        vision_type = _classify_vision_type(scores)
+
+        top1 = _score01(scores[0]["score"]) if scores else 0.0
+        top2 = _score01(scores[1]["score"]) if len(scores) > 1 else 0.0
+        confidence = round(max(0.0, min(1.0, (0.8 * top1) + (0.2 * abs(top1 - top2)))), 4)
+
         return {
-            "tags": sorted_tags,
+            "tags": tags,
             "scores": scores,
-            "cues": sorted_tags[:20],
-            "type": _classify_type(tags),
+            "cues": cues,
+            "type": vision_type,
+            "vision_type": vision_type,
+            "confidence": confidence,
             "model": {"name": self._arch, "pretrained": self._pretrained},
         }
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# cloud_v1 stub — extension point for future cloud providers
-# ─────────────────────────────────────────────────────────────────────────────
-# To implement cloud_v1:
-#   1. Create a CloudV1Backend class with the same interface as above.
-#   2. Register it under the "cloud_v1" key in get_backend() below.
-#   3. Add required env vars (API_KEY, etc.) and document them.
-# Example:
-#
-#   class CloudV1Backend:
-#       name = "cloud_v1"
-#       model_id = "gemini-pro-vision"
-#       device = "remote"
-#       warm = True
-#       def describe(self, image_url, image_base64, top_k): ...
+class HybridV1Backend(ClipV1Backend):
+    """CLIP-first backend; cloud escalation is handled by the service route."""
+
+    name: str = "hybrid"
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Singleton factory
-# ─────────────────────────────────────────────────────────────────────────────
-_instance: Optional[object] = None
+class CloudV1Backend:
+    """OpenAI Responses API image understanding backend."""
+
+    name: str = "cloud_v1"
+
+    def __init__(self) -> None:
+        self._model_id = os.getenv("OPENAI_VISION_MODEL", "gpt-4o")
+
+    @property
+    def model_id(self) -> str:
+        return self._model_id
+
+    @property
+    def device(self) -> str:
+        return "remote"
+
+    @property
+    def warm(self) -> bool:
+        return True
+
+    def describe(
+        self,
+        image_url: Optional[str],
+        image_base64: Optional[str],
+        top_k: int,
+        caption_text: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise RuntimeError("OPENAI_API_KEY is required for cloud_v1")
+
+        if image_base64:
+            cloud_image_url = image_base64.strip()
+            if not cloud_image_url.startswith("data:"):
+                cloud_image_url = f"data:image/jpeg;base64,{cloud_image_url}"
+        elif image_url:
+            cloud_image_url = image_url.strip()
+        else:
+            raise ValueError("Either image_url or image_base64 must be provided")
+
+        caption = caption_text.strip() if isinstance(caption_text, str) else ""
+        prompt = (
+            "Analyze this travel photo for a personalized recommendation memory. "
+            "Return concise lowercase tags and visual cues. Prefer specific concepts "
+            "such as cuisine, landmark type, architecture style, landscape, activity, "
+            "and atmosphere over generic labels. Use vision_type food, scenery, other, "
+            "or unknown. Scores and confidence must be numbers from 0 to 1. "
+            "Also score the user's caption sentiment from 0.0 to 1.0, where 0.0 is very "
+            "negative, 0.5 is neutral, and 1.0 is very positive. Use approximately 0.55 "
+            "for 'just so so...but it is interesting', 0.85 for 'nice!!', 0.80 for "
+            "'beautiful place', and 0.10 for 'terrible'."
+        )
+        if caption:
+            prompt += f"\nUser caption: {caption}"
+        else:
+            prompt += "\nNo user caption was provided. Return sentiment 0.5 exactly."
+
+        schema = {
+            "type": "object",
+            "properties": {
+                "tags": {"type": "array", "items": {"type": "string"}},
+                "cues": {"type": "array", "items": {"type": "string"}},
+                "vision_type": {
+                    "type": "string",
+                    "enum": ["food", "scenery", "other", "unknown"],
+                },
+                "confidence": {"type": "number"},
+                "sentiment": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+                "scores": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "tag": {"type": "string"},
+                            "score": {"type": "number"},
+                        },
+                        "required": ["tag", "score"],
+                        "additionalProperties": False,
+                    },
+                },
+            },
+            "required": ["tags", "cues", "vision_type", "confidence", "sentiment", "scores"],
+            "additionalProperties": False,
+        }
+        payload = {
+            "model": self._model_id,
+            "input": [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "input_text", "text": prompt},
+                        {"type": "input_image", "image_url": cloud_image_url},
+                    ],
+                }
+            ],
+            "text": {
+                "format": {
+                    "type": "json_schema",
+                    "name": "taste_aligner_vision",
+                    "strict": True,
+                    "schema": schema,
+                }
+            },
+        }
+        request = urllib.request.Request(
+            "https://api.openai.com/v1/responses",
+            data=json.dumps(payload).encode("utf-8"),
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=30) as response:  # noqa: S310
+                response_payload = json.loads(response.read().decode("utf-8"))
+        except urllib.error.HTTPError as exc:
+            detail = exc.read().decode("utf-8", errors="replace")
+            raise RuntimeError(f"OpenAI Responses API error {exc.code}: {detail[:500]}") from exc
+        except Exception as exc:
+            raise RuntimeError(f"OpenAI Responses API request failed: {exc}") from exc
+
+        output_text = self._extract_output_text(response_payload)
+        try:
+            result = json.loads(output_text)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError(f"OpenAI Responses API returned invalid JSON: {exc}") from exc
+
+        tags = _dedup_keep_order(result.get("tags", []))[:5]
+        cues = _dedup_keep_order(result.get("cues", []))[:10]
+        vision_type = result.get("vision_type", "unknown")
+        if vision_type not in ("food", "scenery", "other", "unknown"):
+            vision_type = "unknown"
+        confidence = round(max(0.0, min(1.0, _safe_score(result.get("confidence", 0.0)))), 4)
+        sentiment = (
+            0.5
+            if not caption
+            else round(max(0.0, min(1.0, _safe_score(result.get("sentiment", 0.5)))), 4)
+        )
+
+        scores: List[Dict[str, Any]] = []
+        for entry in result.get("scores", []):
+            if not isinstance(entry, dict) or not isinstance(entry.get("tag"), str):
+                continue
+            scores.append({
+                "tag": entry["tag"].strip().lower(),
+                "score": round(max(0.0, min(1.0, _safe_score(entry.get("score", 0.0)))), 4),
+            })
+        if not scores:
+            scores = [{"tag": tag, "score": confidence} for tag in tags]
+
+        return {
+            "tags": tags,
+            "scores": scores[:max(1, min(int(top_k), 50))],
+            "cues": cues,
+            "type": vision_type,
+            "vision_type": vision_type,
+            "confidence": confidence,
+            "sentiment": sentiment,
+            "model": {"name": self._model_id, "pretrained": None},
+        }
+
+    @staticmethod
+    def _extract_output_text(response_payload: Dict[str, Any]) -> str:
+        for item in response_payload.get("output", []):
+            if not isinstance(item, dict):
+                continue
+            for content in item.get("content", []):
+                if not isinstance(content, dict):
+                    continue
+                if content.get("type") == "refusal":
+                    raise RuntimeError(f"OpenAI Responses API refused image analysis: {content.get('refusal', '')}")
+                if content.get("type") == "output_text" and isinstance(content.get("text"), str):
+                    return content["text"]
+        raise RuntimeError("OpenAI Responses API response did not contain output_text")
+
+
+_instance: Optional[Any] = None
 
 
 def get_backend() -> Any:
     """
     Return the module-level backend singleton, creating it on first call.
 
-    Reads VISION_BACKEND, VISION_MODEL_ID, DEVICE from environment at call time
-    (not at import time) so tests can patch os.environ before calling.
-
-    Raises RuntimeError / NotImplementedError / ValueError on misconfiguration.
+    Reads VISION_BACKEND, VISION_MODEL_ID, DEVICE, and OPENAI_VISION_MODEL from
+    environment at call time so tests can patch os.environ before calling.
     """
     global _instance
     if _instance is not None:
@@ -350,33 +537,24 @@ def get_backend() -> Any:
     model_id = os.getenv("VISION_MODEL_ID", "ViT-B-32/openai")
     device = os.getenv("DEVICE", "cpu")
 
-    if backend_name == "rule_v0":
-        _instance = RuleV0Backend()
-        logger.info("[vision] Backend selected: rule_v0 (no model)")
-
-    elif backend_name == "clip_v1":
-        # Fail-fast if open_clip_torch is not installed
+    if backend_name in ("clip_v1", "hybrid"):
         try:
             import open_clip  # noqa: F401
         except ImportError as exc:
             raise RuntimeError(
-                "VISION_BACKEND=clip_v1 requires open_clip_torch. "
-                "Install it with: pip install open_clip_torch\n"
-                "Or switch to the keyword backend: VISION_BACKEND=rule_v0"
+                f"VISION_BACKEND={backend_name} requires open_clip_torch. "
+                "Install it with: pip install open_clip_torch"
             ) from exc
-        _instance = ClipV1Backend(model_id=model_id, device=device)
-        logger.info("[vision] Backend selected: clip_v1  model=%s  device=%s", model_id, device)
+        backend_class = HybridV1Backend if backend_name == "hybrid" else ClipV1Backend
+        _instance = backend_class(model_id=model_id, device=device)
+        logger.info("[vision] Backend selected: %s  model=%s  device=%s", backend_name, model_id, device)
+        return _instance
 
-    elif backend_name == "cloud_v1":
-        # Extension point reserved for future implementation
-        raise NotImplementedError(
-            "VISION_BACKEND=cloud_v1 is reserved for a future cloud provider. "
-            "Use rule_v0 (offline keywords) or clip_v1 (local CLIP model)."
-        )
-    else:
-        raise ValueError(
-            f"Unknown VISION_BACKEND='{backend_name}'. "
-            "Supported values: rule_v0, clip_v1"
-        )
+    if backend_name == "cloud_v1":
+        _instance = CloudV1Backend()
+        logger.info("[vision] Backend selected: cloud_v1  model=%s", _instance.model_id)
+        return _instance
 
-    return _instance
+    raise ValueError(
+        f"Unknown VISION_BACKEND='{backend_name}'. Supported values: clip_v1, cloud_v1, hybrid"
+    )

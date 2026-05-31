@@ -47,6 +47,7 @@ function makeInput(overrides = {}) {
         tags: ["Sushi", "ramen", "sushi"],
         intent_tags: ["food"],
         intent: { city: "tokyo", type: "food" },
+        memory_pool: "food",
         ...overrides,
     };
 }
@@ -60,6 +61,7 @@ async function runAll() {
             assert.strictEqual(action.input.data.city, "tokyo");
             assert.strictEqual(action.input.data.user_id, "u123");
             assert.deepStrictEqual(action.input.data.tags, ["ramen", "sushi"]);
+            assert.strictEqual(action.input.data.memory_pool, "food");
             return {
                 ok: true,
                 tool: "recommendation.score",
@@ -95,7 +97,34 @@ async function runAll() {
         assert.strictEqual(result.trace.request_summary.city, "tokyo");
         assert.strictEqual(result.trace.request_summary.tags_count, 2);
         assert.strictEqual(result.trace.request_summary.intent_present, true);
+        assert.strictEqual(result.trace.request_summary.memory_pool, "food");
         assert.strictEqual(result.trace.latency_ms, 11);
+    });
+
+    await test("memory_pool normalizes culture -> scenery", async () => {
+        const client = new StubToolClient(async (action) => {
+            assert.strictEqual(action.tool, "recommendation.score");
+            assert.strictEqual(action.input.data.memory_pool, "scenery");
+            return {
+                ok: true,
+                tool: "recommendation.score",
+                trace_id: "t_pool",
+                latency_ms: 6,
+                output: {
+                    cz_ranked: [{ id: "cz1", score_CZ: 0.9 }],
+                    ez_ranked: [{ id: "ez1", score_EZ: 0.7 }],
+                    mix_policy: { ratio: "3:1", rule: "comfort_high" },
+                    decision_trace: {},
+                },
+            };
+        });
+
+        const skill = createFetchRecommendationSkill(client);
+        const result = await skill.execute(
+            makeInput({ memory_pool: "culture" }),
+            createExecutionContext({ text: "test" }),
+        );
+        assert.strictEqual(result.trace.request_summary.memory_pool, "scenery");
     });
 
     await test("tool_error fallback: toolClient throws", async () => {

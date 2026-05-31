@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { searchMemory, readMemory } from "../api";
+import { searchMemory, readMemory, deleteMemory } from "../api";
 import type { SearchResult, MemoryDetail } from "../types";
 import MemoryModal from "../components/MemoryModal";
 
@@ -46,6 +46,17 @@ export default function LibraryPage() {
     setLoadingDetail(false);
   }
 
+  async function removeMemory(memId: string) {
+    setError(null);
+    try {
+      await deleteMemory(memId);
+      await load();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(diagnose(msg));
+    }
+  }
+
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
@@ -77,6 +88,7 @@ export default function LibraryPage() {
             key={r.memory_id}
             result={r}
             onClick={() => openDetail(r.memory_id)}
+            onDelete={() => removeMemory(r.memory_id)}
           />
         ))}
       </div>
@@ -93,7 +105,7 @@ export default function LibraryPage() {
   );
 }
 
-function MemoryTile({ result, onClick }: { result: SearchResult; onClick: () => void }) {
+function MemoryTile({ result, onClick, onDelete }: { result: SearchResult; onClick: () => void; onDelete: () => void }) {
   const [imageReady, setImageReady] = useState(true);
   const ts = result.timestamp ? new Date(result.timestamp).toLocaleDateString() : "—";
   const tags = result.normalized_tags ?? [];
@@ -103,6 +115,18 @@ function MemoryTile({ result, onClick }: { result: SearchResult; onClick: () => 
 
   return (
     <div className="mem-card" onClick={onClick}>
+      <button
+        className="mem-delete"
+        type="button"
+        title="Delete memory"
+        aria-label="Delete memory"
+        onClick={(event) => {
+          event.stopPropagation();
+          onDelete();
+        }}
+      >
+        {"\uD83D\uDDD1\uFE0F"}
+      </button>
       <div className="mem-thumb">
         {imageReady ? (
           <img

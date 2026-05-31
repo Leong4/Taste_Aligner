@@ -148,6 +148,7 @@ export const RECOMMENDATION_GRAPH: GraphDefinition = {
             inputFrom: {
                 text: "input.text",
                 user_id: "input.user_id",
+                city: "input.city",
             },
         },
 
@@ -213,6 +214,7 @@ export const RECOMMENDATION_GRAPH: GraphDefinition = {
                 city: "extract_intent.city",
                 tags: "tag_normalize.normalized_tags",
                 intent_tags: "tag_expand.tags_final",
+                query_type: "extract_intent.type",
                 now_ts: "input.request_ts",
             },
         },
@@ -249,6 +251,7 @@ export const RECOMMENDATION_GRAPH: GraphDefinition = {
             inputFrom: {
                 image_url: "input.image_url",
                 image_base64: "input.image_base64",
+                caption_text: "input.caption",
             },
         },
 
@@ -265,6 +268,10 @@ export const RECOMMENDATION_GRAPH: GraphDefinition = {
                 anchor_tags: "memory_weight_adjust.anchor_tags",
                 normalized_tags: "tag_normalize.normalized_tags",
                 vision_features: "vision_describe.vision_features",
+                vision_tags: "vision_describe.tags",
+                vision_type: "vision_describe.vision_type",
+                sentiment: "vision_describe.sentiment",
+                caption_text: "input.caption",
                 request_ts: "input.request_ts",
                 user_city: "extract_intent.city",
                 decision_trace: "memory_weight_adjust.decision_trace",
@@ -285,6 +292,8 @@ export const RECOMMENDATION_GRAPH: GraphDefinition = {
                 tags: "tag_normalize.normalized_tags",
                 intent_tags: "tag_expand.tags_final",
                 memory_confidence: "memory_weight_adjust.memory_confidence",
+                memory_pool: "extract_intent.type",
+                anchor_tags: "memory_weight_adjust.anchor_tags",
             },
         },
 

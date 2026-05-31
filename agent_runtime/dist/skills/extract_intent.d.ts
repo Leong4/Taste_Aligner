@@ -13,5 +13,8 @@ import { Skill, ExtractIntentOutput } from "../core/types";
 export declare const extractIntentSkill: Skill<{
     text: string;
     user_id?: string;
+    city?: string;
+    image_url?: string;
+    image_base64?: string;
 }, ExtractIntentOutput>;
 //# sourceMappingURL=extract_intent.d.ts.map

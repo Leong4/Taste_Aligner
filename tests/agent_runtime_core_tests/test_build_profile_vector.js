@@ -14,6 +14,9 @@
  *   6. Embedding present: profile_vector is weighted average, not zero
  *   7. Anchors sorted by final_weight desc, memory_id asc (tie-break)
  *   8. Orchestrator integration: decision_trace.profile_vector_node present
+ *   9. Anchor semantic gate: low cosine memories are filtered
+ *  10. Anchor semantic gate: relative ratio filter works
+ *  11. Anchor semantic gate: normal high-cosine set keeps 3 anchors
  */
 
 "use strict";
@@ -101,6 +104,9 @@ async function runAll() {
         assert.strictEqual(result.output.decision_trace.profile_vector_node.fallback_used, true);
         assert.strictEqual(result.output.decision_trace.profile_vector_node.fallback_reason, "empty_input");
         assert.strictEqual(result.output.decision_trace.profile_vector_node.rule_id, "profile_vector_v1");
+        assert.strictEqual(result.output.decision_trace.profile_vector_node.anchor_gate_enabled, true);
+        assert.strictEqual(result.output.decision_trace.profile_vector_node.anchor_candidates_before, 0);
+        assert.strictEqual(result.output.decision_trace.profile_vector_node.anchor_candidates_after, 0);
     });
 
     // ── 3. Time decay ────────────────────────────────────────────────────────
@@ -162,6 +168,12 @@ async function runAll() {
         assert.strictEqual(trace.profile_vector_dim, 512);
         assert.strictEqual(typeof trace.fallback_used, "boolean");
         assert.strictEqual(result.output.profile_vector.length, 512, "output vector is 512-dim");
+        assert.strictEqual(trace.anchor_gate_enabled, true);
+        assert.strictEqual(trace.anchor_gate_cosine_threshold, 0.08);
+        assert.strictEqual(trace.anchor_gate_relative_ratio, 0.25);
+        assert.strictEqual(typeof trace.anchor_candidates_before, "number");
+        assert.strictEqual(typeof trace.anchor_candidates_after, "number");
+        assert.strictEqual(typeof trace.anchor_dropped_count, "number");
 
         // No latency/timestamp/random fields
         const forbidden = ["latency_ms", "timestamp", "request_id", "created_at", "random"];
@@ -227,6 +239,48 @@ async function runAll() {
         if (mAIdx !== -1 && mBIdx !== -1) {
             assert.ok(mAIdx < mBIdx, "m_a must appear before m_b (lex tie-break)");
         }
+    });
+
+    // ── 9. Anchor semantic gate: low cosine filtered ─────────────────────────
+    await test("anchor gate: cosine below threshold is removed from anchors", function () {
+        const emb = new Array(512).fill(0); emb[0] = 1;
+        const low = Object.assign(
+            makeMemory("m_low", { cosine: 0.02, timestamp: tsAgo(1), sentiment: 0.0, w_context: 1.0 }),
+            { embedding: emb }
+        );
+        const result = buildProfileVector([low], NOW_MS);
+
+        assert.deepStrictEqual(result.anchors, []);
+        assert.ok(result.profile_vector.every((v) => v === 0), "profile_vector must be neutral when no anchors pass gate");
+        assert.strictEqual(result.anchor_gate.candidates_before, 1);
+        assert.strictEqual(result.anchor_gate.candidates_after, 0);
+        assert.strictEqual(result.anchor_gate.dropped_count, 1);
+    });
+
+    // ── 10. Anchor semantic gate: relative ratio ─────────────────────────────
+    await test("anchor gate: relative ratio keeps only dominant cosine memory", function () {
+        const top = makeMemory("m_top", { cosine: 0.7, timestamp: tsAgo(1), sentiment: 0.0, w_context: 1.0 });
+        const low1 = makeMemory("m_low1", { cosine: 0.1, timestamp: tsAgo(1), sentiment: 0.0, w_context: 1.0 });
+        const low2 = makeMemory("m_low2", { cosine: 0.09, timestamp: tsAgo(1), sentiment: 0.0, w_context: 1.0 });
+
+        const result = buildProfileVector([top, low1, low2], NOW_MS);
+        assert.deepStrictEqual(result.anchors.map((a) => a.memory_id), ["m_top"]);
+        assert.strictEqual(result.anchor_gate.candidates_before, 3);
+        assert.strictEqual(result.anchor_gate.candidates_after, 1);
+        assert.strictEqual(result.anchor_gate.dropped_count, 2);
+    });
+
+    // ── 11. Anchor semantic gate: normal multi-anchor pass ───────────────────
+    await test("anchor gate: keeps 3 anchors when cosine cluster is consistently high", function () {
+        const m1 = makeMemory("m1", { cosine: 0.62, timestamp: tsAgo(1), sentiment: 0.0, w_context: 1.0 });
+        const m2 = makeMemory("m2", { cosine: 0.54, timestamp: tsAgo(1), sentiment: 0.0, w_context: 1.0 });
+        const m3 = makeMemory("m3", { cosine: 0.51, timestamp: tsAgo(1), sentiment: 0.0, w_context: 1.0 });
+
+        const result = buildProfileVector([m1, m2, m3], NOW_MS);
+        assert.strictEqual(result.anchors.length, 3);
+        assert.strictEqual(result.anchor_gate.candidates_before, 3);
+        assert.strictEqual(result.anchor_gate.candidates_after, 3);
+        assert.strictEqual(result.anchor_gate.dropped_count, 0);
     });
 
     // ── 8. Orchestrator integration ──────────────────────────────────────────

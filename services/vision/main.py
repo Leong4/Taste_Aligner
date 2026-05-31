@@ -1,22 +1,26 @@
 """
-Vision Service v2 — backend-agnostic image description API.
+Vision Service v2 — CLIP and cloud-backed image description API.
 
 Backends (set via VISION_BACKEND env var):
-  rule_v0  — offline keyword extraction, no model required (fast)
   clip_v1  — local CLIP model via open_clip_torch (default)
-  cloud_v1 — reserved extension point (not implemented)
+  cloud_v1 — OpenAI Responses API image understanding
+  hybrid   — CLIP first, with cloud replacement for weak or ambiguous results
 
 Environment:
-  VISION_BACKEND   rule_v0 | clip_v1          (default: clip_v1)
+  VISION_BACKEND   clip_v1 | cloud_v1 | hybrid (default: clip_v1)
   VISION_MODEL_ID  open_clip model identifier (default: ViT-B-32/openai)
+  OPENAI_VISION_MODEL OpenAI vision model     (default: gpt-4o)
+  OPENAI_API_KEY    OpenAI API key             (required for cloud_v1 / hybrid fallback)
   DEVICE           cpu | cuda                 (default: cpu)
 
 Output contract (/describe):
   {
     "ok": true,
     "backend": "clip_v1",
+    "vision_type": "food",
     "model_id": "ViT-B-32/openai",
     "device": "cpu",
+    "confidence": 0.84,
     "tags": ["ramen", "night_market", ...],
     "raw": { "scores": [{"tag": "...", "score": 0.12}, ...] },
     "meta": { "inputs": {"has_url": true, "has_base64": false, "top_k": 10},
@@ -34,7 +38,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any, Literal
 
-from .backends import get_backend
+from .backends import CloudV1Backend, get_backend
 
 logging.basicConfig(
     level=logging.INFO,
@@ -72,6 +76,7 @@ app = FastAPI(title="Taste Aligner Vision Service v2", lifespan=lifespan)
 class ImageData(BaseModel):
     image_url: Optional[str] = None
     image_base64: Optional[str] = None
+    caption_text: Optional[str] = None
     top_k: Optional[int] = 10
 
 
@@ -103,8 +108,11 @@ class VisionResponse(BaseModel):
     ok: bool
     backend: str
     # V1 structured schema: type + sorted/capped cues for downstream TES
-    type: Literal["food", "scenery", "unknown"] = "unknown"
+    type: Literal["food", "scenery", "other", "unknown"] = "unknown"
+    vision_type: Literal["food", "scenery", "other", "unknown"] = "unknown"
     cues: List[str] = []
+    confidence: float = 0.0
+    sentiment: float = 0.5
     model: Optional[VisionModelInfo] = None
     # Legacy fields retained for backward compatibility
     model_id: Optional[str] = None
@@ -167,6 +175,9 @@ async def describe_endpoint(req: DescribeRequest) -> VisionResponse:
 
     top_k = max(1, min(int(data.top_k or 10), 50))  # clamp [1, 50]
     b = get_backend()
+    response_backend = b.name
+    response_model_id = b.model_id
+    response_device = b.device
     started = time.monotonic()
 
     try:
@@ -174,7 +185,22 @@ async def describe_endpoint(req: DescribeRequest) -> VisionResponse:
             image_url=data.image_url,
             image_base64=data.image_base64,
             top_k=top_k,
+            caption_text=data.caption_text,
         )
+        if b.name == "hybrid":
+            try:
+                cloud = CloudV1Backend()
+                cloud_result = cloud.describe(
+                    image_url=data.image_url,
+                    image_base64=data.image_base64,
+                    top_k=top_k,
+                    caption_text=data.caption_text,
+                )
+                result = cloud_result
+                response_model_id = cloud.model_id
+                response_device = cloud.device
+            except Exception as exc:
+                logger.warning("[vision] cloud_v1 fallback failed; using clip_v1 result: %s", exc)
     except ValueError as exc:
         logger.warning("[vision] describe ValueError: %s", exc)
         raise HTTPException(status_code=422, detail=str(exc))
@@ -190,25 +216,41 @@ async def describe_endpoint(req: DescribeRequest) -> VisionResponse:
     # V1 structured fields: cues (sorted, capped), type, model
     raw_cues = result.get("cues")
     cues: List[str] = raw_cues[:20] if isinstance(raw_cues, list) else sorted(set(raw_tags))[:20]
-    vision_type: str = result.get("type", "unknown")
-    if vision_type not in ("food", "scenery", "unknown"):
-        vision_type = "unknown"
+    raw_vision_type = result.get("vision_type", result.get("type", "unknown"))
+    vision_type: str = (
+        raw_vision_type if raw_vision_type in ("food", "scenery", "other", "unknown") else "unknown"
+    )
+    confidence_raw = result.get("confidence", 0.0)
+    confidence = (
+        float(confidence_raw)
+        if isinstance(confidence_raw, (int, float)) and math.isfinite(float(confidence_raw))
+        else 0.0
+    )
+    sentiment_raw = result.get("sentiment", 0.5)
+    sentiment = (
+        float(sentiment_raw)
+        if isinstance(sentiment_raw, (int, float)) and math.isfinite(float(sentiment_raw))
+        else 0.5
+    )
     raw_model = result.get("model")
     model_info = VisionModelInfo(**raw_model) if isinstance(raw_model, dict) else None
 
     logger.info(
         "[vision] describe OK: backend=%s type=%s cues=%d tags=%d latency=%.1fms",
-        b.name, vision_type, len(cues), len(raw_tags), latency_ms,
+        response_backend, vision_type, len(cues), len(raw_tags), latency_ms,
     )
 
     return VisionResponse(
         ok=True,
-        backend=b.name,
+        backend=response_backend,
         type=vision_type,
+        vision_type=vision_type,
         cues=cues,
+        confidence=round(max(0.0, min(1.0, confidence)), 4),
+        sentiment=round(max(0.0, min(1.0, sentiment)), 4),
         model=model_info,
-        model_id=b.model_id,
-        device=b.device,
+        model_id=response_model_id,
+        device=response_device,
         tags=raw_tags,
         raw=RawOutput(scores=[ScoreEntry(**s) for s in scores]),
         meta=VisionMeta(

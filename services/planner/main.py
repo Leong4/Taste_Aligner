@@ -5,6 +5,7 @@ Planner Service v1 - Trip Card Composer
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 from typing import Any, Dict, List, Optional
+import math
 import os
 import uuid
 import time
@@ -17,6 +18,7 @@ PLANNER_VERSION = "v1"
 PLANNER_PORT = int(os.getenv("PLANNER_PORT", "5006"))
 RECO_URL = os.getenv("RECO_URL", "http://localhost:5005")
 MEMORY_URL = os.getenv("MEMORY_URL", "http://localhost:5001")
+EMBEDDING_URL = os.getenv("EMBEDDING_TES_V2_URL", "http://localhost:5004/tes/build")
 REQUEST_TIMEOUT_MS = int(os.getenv("REQUEST_TIMEOUT_MS", "2000"))
 
 
@@ -29,6 +31,10 @@ class ComposeRequestData(BaseModel):
     tags: Optional[List[str]] = None
     constraints: Optional[Dict[str, Any]] = None
     controls: Optional[Dict[str, Any]] = None
+    cz_ranked: Optional[List[Dict[str, Any]]] = None
+    ez_ranked: Optional[List[Dict[str, Any]]] = None
+    mix_policy: Optional[Dict[str, Any]] = None
+    decision_trace: Optional[Dict[str, Any]] = None
 
 
 class ComposeRequest(BaseModel):
@@ -69,6 +75,48 @@ def _merge_trace_dict(base: Dict[str, Any], extra: Dict[str, Any]) -> Dict[str, 
     return merged
 
 
+def _is_ranked_list(value: Any) -> bool:
+    if not isinstance(value, list):
+        return False
+    return all(isinstance(item, dict) for item in value)
+
+
+def _coerce_trace(value: Any) -> Dict[str, Any]:
+    if isinstance(value, dict):
+        return value
+    return {}
+
+
+def _fetch_recommendation_payload(
+    user_id: str,
+    city: str,
+    tags: List[str],
+    headers: Dict[str, str],
+) -> tuple[Optional[Dict[str, Any]], int, Optional[str]]:
+    reco_start = time.time()
+    try:
+        reco_resp = requests.post(
+            f"{RECO_URL}/score",
+            json={
+                "data": {
+                    "user_id": user_id,
+                    "city": city,
+                    "tags": tags
+                }
+            },
+            timeout=_timeout_sec(),
+            headers=headers
+        )
+    except Exception as e:
+        return None, int((time.time() - reco_start) * 1000), f"recommendation_service_error: {e}"
+
+    reco_latency = int((time.time() - reco_start) * 1000)
+    if reco_resp.status_code != 200:
+        return None, reco_latency, f"recommendation_service_status_{reco_resp.status_code}"
+
+    return reco_resp.json(), reco_latency, None
+
+
 @app.get("/health")
 async def health():
     return {"ok": True, "service": "planner", "version": PLANNER_VERSION}
@@ -86,45 +134,77 @@ async def compose(payload: ComposeRequest):
     controls = normalized["controls"]
 
     headers = {"X-Trace-Id": trace_id}
+    payload_data = payload.data
 
-    # Call Recommendation Service
-    reco_start = time.time()
-    try:
-        reco_resp = requests.post(
-            f"{RECO_URL}/score",
-            json={
-                "data": {
-                    "user_id": user_id,
-                    "city": city,
-                    "tags": tags
-                }
-            },
-            timeout=_timeout_sec(),
+    upstream_cz = payload_data.cz_ranked
+    upstream_ez = payload_data.ez_ranked
+    upstream_mix_policy = payload_data.mix_policy
+    upstream_trace = _coerce_trace(payload_data.decision_trace)
+
+    planner_mode = "trust_upstream"
+    used_upstream_rankings = True
+    rescored = False
+    fallback_reason: Optional[str] = None
+    reco_latency: Optional[int] = None
+    reco_payload: Optional[Dict[str, Any]] = None
+
+    upstream_fields_present = (
+        upstream_cz is not None and
+        upstream_ez is not None and
+        upstream_mix_policy is not None
+    )
+
+    if not upstream_fields_present:
+        planner_mode = "fallback_rescore"
+        used_upstream_rankings = False
+        rescored = True
+        fallback_reason = "missing_upstream_rankings"
+    elif not _is_ranked_list(upstream_cz) or not _is_ranked_list(upstream_ez) or not isinstance(upstream_mix_policy, dict):
+        planner_mode = "fallback_rescore"
+        used_upstream_rankings = False
+        rescored = True
+        fallback_reason = "invalid_upstream_structure"
+
+    if planner_mode == "trust_upstream":
+        reco_payload = {
+            "cz_ranked": upstream_cz or [],
+            "ez_ranked": upstream_ez or [],
+            "mix_policy": upstream_mix_policy or {},
+            "decision_trace": upstream_trace,
+            "version": "upstream_passthrough"
+        }
+
+        selected_cz, selected_ez, selection_debug = select_items_for_cards(
+            reco_payload, city, controls
+        )
+
+        if len(selected_cz) + len(selected_ez) == 0:
+            planner_mode = "fallback_rescore"
+            used_upstream_rankings = False
+            rescored = True
+            fallback_reason = "upstream_empty_after_selection"
+    else:
+        selected_cz, selected_ez, selection_debug = [], [], {}
+
+    if planner_mode == "fallback_rescore":
+        reco_payload, reco_latency, reco_error = _fetch_recommendation_payload(
+            user_id=user_id,
+            city=city,
+            tags=tags,
             headers=headers
         )
-    except Exception as e:
-        return {
-            "ok": False,
-            "service": "planner",
-            "version": PLANNER_VERSION,
-            "trace_id": trace_id,
-            "detail": f"Recommendation service error: {e}"
-        }
-    reco_latency = int((time.time() - reco_start) * 1000)
-    if reco_resp.status_code != 200:
-        return {
-            "ok": False,
-            "service": "planner",
-            "version": PLANNER_VERSION,
-            "trace_id": trace_id,
-            "detail": f"Recommendation service returned {reco_resp.status_code}"
-        }
+        if reco_payload is None:
+            return {
+                "ok": False,
+                "service": "planner",
+                "version": PLANNER_VERSION,
+                "trace_id": trace_id,
+                "detail": reco_error
+            }
 
-    reco_payload = reco_resp.json()
-
-    selected_cz, selected_ez, selection_debug = select_items_for_cards(
-        reco_payload, city, controls
-    )
+        selected_cz, selected_ez, selection_debug = select_items_for_cards(
+            reco_payload, city, controls
+        )
 
     # Memory anchors
     anchors_by_item: Dict[str, List[Dict[str, Any]]] = {}
@@ -155,11 +235,29 @@ async def compose(payload: ComposeRequest):
                 anchors_by_item[item_id] = []
                 continue
             try:
+                embedding_resp = requests.post(
+                    EMBEDDING_URL,
+                    json={
+                        "tags": query_tags,
+                        "normalize": True
+                    },
+                    timeout=_timeout_sec(),
+                    headers=headers
+                )
+                query_embedding = embedding_resp.json().get("vector") if embedding_resp.status_code == 200 else None
+                if (
+                    not isinstance(query_embedding, list) or
+                    len(query_embedding) != 512 or
+                    not all(isinstance(value, (int, float)) and math.isfinite(value) for value in query_embedding)
+                ):
+                    anchors_by_item[item_id] = []
+                    continue
                 mem_resp = requests.post(
                     f"{MEMORY_URL}/search",
                     json={
                         "data": {
                             "user_id": user_id,
+                            "query_embedding": query_embedding,
                             "query_tags": query_tags,
                             "city": city,
                             "top_k": 1
@@ -197,6 +295,12 @@ async def compose(payload: ComposeRequest):
     planner_trace = _merge_trace_dict(
         planner_trace,
         {
+            "planner_mode": planner_mode,
+            "used_upstream_rankings": used_upstream_rankings,
+            "rescored": rescored,
+            "upstream_cz_count": len(upstream_cz) if isinstance(upstream_cz, list) else 0,
+            "upstream_ez_count": len(upstream_ez) if isinstance(upstream_ez, list) else 0,
+            "cards_generated": len(cards),
             "compose": {
                 "rule_id": "planner_compose_v1",
                 "cards_count": len(cards),
@@ -205,7 +309,10 @@ async def compose(payload: ComposeRequest):
             }
         }
     )
-    reco_trace = reco_payload.get("decision_trace", {})
+    if fallback_reason:
+        planner_trace["fallback_reason"] = fallback_reason
+
+    reco_trace = _coerce_trace(reco_payload.get("decision_trace", {}) if reco_payload else {})
     decision_trace = _merge_trace_dict(reco_trace, {"planner": planner_trace})
 
     response = {
@@ -222,7 +329,7 @@ async def compose(payload: ComposeRequest):
                 "recommendation": {
                     "url": RECO_URL,
                     "latency_ms": reco_latency,
-                    "version": reco_payload.get("version", "unknown")
+                    "version": reco_payload.get("version", "unknown") if reco_payload else "unknown"
                 },
                 "memory": {
                     "url": MEMORY_URL,
@@ -230,7 +337,10 @@ async def compose(payload: ComposeRequest):
                     "version": memory_version
                 }
             },
-            "selection": selection_debug
+            "selection": selection_debug,
+            "planner_mode": planner_mode,
+            "used_upstream_rankings": used_upstream_rankings,
+            "rescored": rescored
         }
     }
 

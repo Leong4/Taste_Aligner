@@ -39,7 +39,12 @@ from .config import (
     EZ_DIVERSITY_ENABLED, EZ_DIVERSITY_METHOD, EZ_LAMBDA_DIVERSITY,
     MEM_INFLUENCE_MODE, MEM_BETA
 )
-from .embedding_client import generate_embedding_with_error
+from .embedding_client import (
+    TES_NONE_SPACE,
+    TES_V1_FALLBACK_SPACE,
+    TES_V2_SPACE,
+    generate_embedding_with_error,
+)
 from .db import get_item_embedding, upsert_item_embedding
 from .number_safety import ensure_finite_float
 
@@ -143,6 +148,8 @@ def compute_memory_influence_local_fallback(
         "score": round(influence_score, 4),
         "method": "local_tag_fallback",
         "memory_similarity": round(tag_sim, 4),
+        "embedding_space": TES_NONE_SPACE,
+        "fallback_reason": "embedding_unavailable",
         "anchor_memory_ids": [],
         "top_similarities": []
     }
@@ -151,29 +158,35 @@ def compute_memory_influence_local_fallback(
 def _get_or_create_item_embedding(
     item_id: str,
     title: str,
-    tags: List[str]
-) -> Tuple[Optional[List[float]], Optional[str]]:
-    cached = get_item_embedding(item_id)
+    tags: List[str],
+    city: str
+) -> Tuple[Optional[List[float]], Optional[str], str, Optional[str]]:
+    cached = get_item_embedding(item_id, embedding_space=TES_V2_SPACE)
     if cached:
-        return cached, None
+        return cached, None, TES_V2_SPACE, None
 
     vision_tags = _title_to_tokens(title)
     normalized_tags = _normalize_tokens(tags)
-    vector, error = generate_embedding_with_error(
+    vector, error, embedding_space, fallback_reason = generate_embedding_with_error(
         vision_tags=vision_tags,
-        normalized_tags=normalized_tags
+        normalized_tags=normalized_tags,
+        location=city
     )
     if vector:
-        upsert_item_embedding(item_id, vector)
-    return vector, error
+        upsert_item_embedding(item_id, vector, embedding_space=embedding_space)
+    return vector, error, embedding_space, fallback_reason
 
 
-def _get_user_embedding(user_tags: List[str], user_city: str) -> Tuple[Optional[List[float]], Optional[str]]:
+def _get_user_embedding(
+    user_tags: List[str],
+    user_city: str
+) -> Tuple[Optional[List[float]], Optional[str], str, Optional[str]]:
     vision_tags = [user_city] if user_city else []
     normalized_tags = _normalize_tokens(user_tags)
     return generate_embedding_with_error(
         vision_tags=vision_tags,
-        normalized_tags=normalized_tags
+        normalized_tags=normalized_tags,
+        location=user_city
     )
 
 
@@ -181,9 +194,11 @@ def compute_memory_influence(
     item_id: str,
     item_title: str,
     item_tags: List[str],
+    item_city: str,
     user_id: str,
     user_city: str,
-    user_tags: List[str]
+    user_tags: List[str],
+    anchor_tags: Optional[List[str]] = None
 ) -> Dict[str, Any]:
     """
     Compute memory influence score for CZ (v1.3: embedding-based, item-discriminative).
@@ -195,13 +210,27 @@ def compute_memory_influence(
         return compute_memory_influence_local_fallback(item_tags, user_tags)
 
     try:
-        item_vec, item_err = _get_or_create_item_embedding(item_id, item_title, item_tags)
-        user_vec, user_err = _get_user_embedding(user_tags, user_city)
+        item_vec, item_err, item_space, item_fallback_reason = _get_or_create_item_embedding(
+            item_id,
+            item_title,
+            item_tags,
+            item_city
+        )
+        embedding_tags = anchor_tags if anchor_tags else user_tags
+        user_vec, user_err, user_space, user_fallback_reason = _get_user_embedding(embedding_tags, user_city)
         embed_error = item_err or user_err
+        embedding_space = (
+            TES_V2_SPACE
+            if item_space == TES_V2_SPACE and user_space == TES_V2_SPACE
+            else TES_V1_FALLBACK_SPACE
+        )
+        fallback_reason = item_fallback_reason or user_fallback_reason
 
         if not item_vec or not user_vec or len(item_vec) != len(user_vec):
             fallback = compute_memory_influence_local_fallback(item_tags, user_tags)
             fallback["embedding_error"] = embed_error or "embedding_unavailable"
+            fallback["embedding_space"] = TES_NONE_SPACE
+            fallback["fallback_reason"] = fallback_reason or fallback.get("fallback_reason")
             return fallback
 
         cosine = cosine_similarity(item_vec, user_vec)
@@ -212,6 +241,8 @@ def compute_memory_influence(
             "score": round(influence_score, 4),
             "method": "embedding_cosine",
             "memory_similarity": round(sim01, 4),
+            "embedding_space": embedding_space,
+            "fallback_reason": fallback_reason,
             "anchor_memory_ids": [],
             "top_similarities": [],
             "embedding_error": None
@@ -220,6 +251,8 @@ def compute_memory_influence(
         logger.warning(f"Embedding memory influence failed: {e}, using local tag fallback")
         fallback = compute_memory_influence_local_fallback(item_tags, user_tags)
         fallback["embedding_error"] = str(e)
+        fallback["embedding_space"] = TES_NONE_SPACE
+        fallback["fallback_reason"] = "embedding_exception"
         return fallback
 
 
@@ -249,6 +282,7 @@ def score_alignment_components(user_ctx: Dict[str, Any], item: Dict[str, Any]) -
     """
     user_city = user_ctx.get("user_city", "")
     user_tags = user_ctx.get("user_tags", [])
+    anchor_tags = user_ctx.get("anchor_tags", [])
     user_id = user_ctx.get("user_id", "")
     item_id = item.get("id")
     item_tags = item.get("tags", [])
@@ -257,7 +291,7 @@ def score_alignment_components(user_ctx: Dict[str, Any], item: Dict[str, Any]) -
 
     tag_sim = compute_tag_similarity(item_tags, user_tags)
     memory_inf_data = compute_memory_influence(
-        item_id, item_title, item_tags, user_id, user_city, user_tags
+        item_id, item_title, item_tags, item_city, user_id, user_city, user_tags, anchor_tags
     )
     memory_inf = memory_inf_data["score"]
     memory_sim = memory_inf_data.get("memory_similarity", 0.0)
@@ -300,6 +334,7 @@ def score_cz_item(
     user_city: str,
     user_tags: List[str],
     user_id: str,
+    anchor_tags: Optional[List[str]] = None,
     finite_guard: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
     """
@@ -335,7 +370,7 @@ def score_cz_item(
     item_city = item.get("city", "")
 
     components = score_alignment_components(
-        {"user_city": user_city, "user_tags": user_tags, "user_id": user_id},
+        {"user_city": user_city, "user_tags": user_tags, "user_id": user_id, "anchor_tags": anchor_tags or []},
         item
     )
     finite_guard = finite_guard or {}
@@ -706,7 +741,8 @@ def rerank_candidates(
     recall_results: Dict[str, Any],
     user_id: str,
     user_city: str,
-    user_tags: List[str]
+    user_tags: List[str],
+    anchor_tags: Optional[List[str]] = None
 ) -> Dict[str, Any]:
     """
     Stage 2: Rerank recall candidates into CZ and EZ ranked lists.
@@ -751,6 +787,12 @@ def rerank_candidates(
     embedding_ok_count = 0
     embedding_fail_count = 0
     embedding_last_error = None
+    embedding_space_counts: Dict[str, int] = {
+        TES_V2_SPACE: 0,
+        TES_V1_FALLBACK_SPACE: 0,
+        TES_NONE_SPACE: 0
+    }
+    fallback_reasons_seen: List[str] = []
 
     # FIX: Defensive filter - ensure CZ candidates are strictly city-only
     user_city_lower = user_city.lower().strip() if user_city else ""
@@ -786,8 +828,19 @@ def rerank_candidates(
 
     # Rerank CZ candidates (using filtered list)
     for item in cz_filtered:
-        cz_result = score_cz_item(item, user_city, user_tags, user_id, finite_guard=finite_guard)
+        cz_result = score_cz_item(
+            item, user_city, user_tags, user_id,
+            anchor_tags=anchor_tags,
+            finite_guard=finite_guard
+        )
         mem_detail = cz_result.get("memory_influence_detail", {})
+        embedding_space = str(mem_detail.get("embedding_space") or TES_NONE_SPACE)
+        if embedding_space not in embedding_space_counts:
+            embedding_space_counts[embedding_space] = 0
+        embedding_space_counts[embedding_space] += 1
+        fallback_reason = mem_detail.get("fallback_reason")
+        if isinstance(fallback_reason, str) and fallback_reason:
+            fallback_reasons_seen.append(fallback_reason)
         if mem_detail.get("method") == "embedding_cosine":
             embedding_ok_count += 1
         else:
@@ -882,6 +935,14 @@ def rerank_candidates(
         "rejected_cities": cross_city_rejected_cities,
         "truncated": cross_city_truncated
     }
+    fallback_reasons_unique = sorted(set(fallback_reasons_seen))
+    embedding_space = (
+        TES_V1_FALLBACK_SPACE
+        if embedding_space_counts.get(TES_V1_FALLBACK_SPACE, 0) > 0
+        else TES_V2_SPACE
+    )
+    if embedding_space_counts.get(TES_V2_SPACE, 0) == 0 and embedding_space_counts.get(TES_V1_FALLBACK_SPACE, 0) == 0:
+        embedding_space = TES_NONE_SPACE
 
     return {
         "cz_ranked": cz_ranked,
@@ -899,8 +960,10 @@ def rerank_candidates(
             "ez_filter_reasons": ez_filter_reasons,
             "embedding_ok_count": embedding_ok_count,
             "embedding_fail_count": embedding_fail_count,
-            "embedding_last_error": embedding_last_error
-            ,
+            "embedding_last_error": embedding_last_error,
+            "embedding_space": embedding_space,
+            "embedding_space_counts": embedding_space_counts,
+            "embedding_fallback_reason": fallback_reasons_unique[0] if fallback_reasons_unique else None,
             "non_finite_sanitized_count": finite_guard["non_finite_count"],
             "non_finite_sanitized_fields": finite_guard["sample_fields"]
         },
@@ -922,6 +985,11 @@ def rerank_candidates(
                 "ez_taste_distance_max": EZ_TASTE_DISTANCE_MAX,
                 "top_k_cz": TOP_K_CZ,
                 "top_k_ez": TOP_K_EZ
+            },
+            "embedding": {
+                "embedding_space": embedding_space,
+                "embedding_space_counts": embedding_space_counts,
+                "fallback_reason": fallback_reasons_unique[0] if fallback_reasons_unique else None
             },
             "non_finite_guard": {
                 "sanitized_non_finite_count": finite_guard["non_finite_count"],

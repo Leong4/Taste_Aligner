@@ -5,16 +5,27 @@ FastAPI service for storing and retrieving P5 multimodal memories.
 v1: SQLite + cosine similarity + minimal P4 weighting
 """
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field, validator
 from typing import Optional, List, Dict, Any
 import uvicorn
 import logging
 import math
 from datetime import datetime
+from pathlib import Path
+import base64
+import io
+import uuid
+import re
 
-from .db import init_database, write_memory, read_memory, load_user_memories, get_database_stats, delete_all_memories
+from .db import init_database, write_memory, read_memory, delete_memory, load_user_memories, get_database_stats, delete_all_memories
 from .search import search_memories
+
+try:
+    from PIL import Image  # type: ignore
+except Exception:
+    Image = None
 
 # Configure logging
 logging.basicConfig(
@@ -24,6 +35,181 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Taste Aligner Memory Service")
+UPLOAD_ROOT = Path(__file__).parent / "uploads"
+UPLOAD_ROOT.mkdir(parents=True, exist_ok=True)
+PREVIEW_MAX_WIDTH = 1200
+THUMB_MAX_WIDTH = 256
+VISION_INPUT_MAX_WIDTH = 1024
+
+
+def _safe_user_dir(user_id: str) -> Path:
+    cleaned = re.sub(r"[^a-zA-Z0-9._-]", "_", user_id or "unknown")
+    cleaned = cleaned[:64] if cleaned else "unknown"
+    user_dir = UPLOAD_ROOT / cleaned
+    user_dir.mkdir(parents=True, exist_ok=True)
+    return user_dir
+
+
+def _memory_asset_dir(user_id: str, memory_id: str) -> Path:
+    user_dir = _safe_user_dir(user_id)
+    mem_dir = user_dir / memory_id
+    mem_dir.mkdir(parents=True, exist_ok=True)
+    return mem_dir
+
+
+def _parse_data_url(data_url: str) -> tuple[str, bytes]:
+    if "," not in data_url:
+        raise ValueError("invalid_data_url")
+    head, payload = data_url.split(",", 1)
+    if ";base64" not in head:
+        raise ValueError("data_url_must_be_base64")
+    mime = "application/octet-stream"
+    if head.startswith("data:"):
+        mime = head[5:].split(";")[0] or mime
+    try:
+        content = base64.b64decode(payload, validate=True)
+    except Exception as e:
+        raise ValueError(f"invalid_base64: {e}") from e
+    return mime, content
+
+
+def _ext_from_mime(mime: str) -> str:
+    if mime == "image/png":
+        return ".png"
+    if mime == "image/webp":
+        return ".webp"
+    return ".jpg"
+
+
+def _ensure_rgb(img: "Image.Image") -> "Image.Image":
+    if img.mode == "RGBA":
+        return img.convert("RGB")
+    if img.mode not in ("RGB",):
+        return img.convert("RGB")
+    return img
+
+
+def _resize_max_width(img: "Image.Image", max_width: int) -> "Image.Image":
+    width = img.width or 1
+    if width <= max_width:
+        return img
+    height = max(1, int(img.height * (float(max_width) / float(width))))
+    resampling = getattr(Image, "Resampling", None)
+    lanczos = resampling.LANCZOS if resampling is not None else Image.LANCZOS
+    return img.resize((max_width, height), lanczos)
+
+
+def _save_webp_variant(
+    src_img: "Image.Image",
+    out_path: Path,
+    max_width: int,
+    quality: int,
+) -> None:
+    img = _ensure_rgb(src_img)
+    img = _resize_max_width(img, max_width)
+    img.save(out_path, format="WEBP", quality=quality, method=6)
+
+
+def _save_image_assets(memory_data: Dict[str, Any]) -> None:
+    image_base64 = memory_data.get("image_base64")
+    if not isinstance(image_base64, str) or not image_base64.strip():
+        return
+
+    if not memory_data.get("memory_id"):
+        memory_data["memory_id"] = str(uuid.uuid4())
+
+    mime, content = _parse_data_url(image_base64.strip())
+    ext = _ext_from_mime(mime)
+    user_id = str(memory_data.get("user_id", "unknown"))
+    memory_id = str(memory_data["memory_id"])
+    asset_dir = _memory_asset_dir(user_id, memory_id)
+    original_abs = asset_dir / f"original{ext}"
+    preview_abs = asset_dir / "preview.webp"
+    thumb_abs = asset_dir / "thumb.webp"
+    vision_input_abs = asset_dir / "vision_input.webp"
+    original_abs.write_bytes(content)
+
+    preview_path = original_abs
+    thumb_path = original_abs
+    vision_input_path = original_abs
+    if Image is not None:
+        try:
+            with Image.open(original_abs) as img:
+                _save_webp_variant(img.copy(), preview_abs, PREVIEW_MAX_WIDTH, quality=85)
+                preview_path = preview_abs
+                _save_webp_variant(img.copy(), thumb_abs, THUMB_MAX_WIDTH, quality=80)
+                thumb_path = thumb_abs
+                _save_webp_variant(img.copy(), vision_input_abs, VISION_INPUT_MAX_WIDTH, quality=82)
+                vision_input_path = vision_input_abs
+        except Exception as e:
+            logger.warning(f"Failed to generate image variants from original for {memory_id}: {e}")
+
+        vision_input_override = memory_data.get("image_vision_input_base64")
+        if isinstance(vision_input_override, str) and vision_input_override.strip():
+            try:
+                _mime_override, vision_bytes = _parse_data_url(vision_input_override.strip())
+                with Image.open(io.BytesIO(vision_bytes)) as img:
+                    _save_webp_variant(img.copy(), vision_input_abs, VISION_INPUT_MAX_WIDTH, quality=82)
+                    vision_input_path = vision_input_abs
+            except Exception as e:
+                logger.warning(f"Failed to apply explicit vision_input for {memory_id}: {e}")
+    else:
+        logger.warning("Pillow unavailable: derived variants fallback to original")
+
+    original_rel = str(original_abs.relative_to(Path(__file__).parent))
+    preview_rel = str(preview_path.relative_to(Path(__file__).parent))
+    thumb_rel = str(thumb_path.relative_to(Path(__file__).parent))
+    vision_rel = str(vision_input_path.relative_to(Path(__file__).parent))
+
+    # Canonical split fields
+    memory_data["image_original_path"] = original_rel
+    memory_data["image_preview_path"] = preview_rel
+    memory_data["image_thumbnail_path"] = thumb_rel
+    memory_data["image_vision_input_path"] = vision_rel
+
+    # Legacy compatibility fields
+    memory_data["image_path"] = original_rel
+    memory_data["thumbnail_path"] = thumb_rel
+    memory_data.pop("image_base64", None)
+    memory_data.pop("image_vision_input_base64", None)
+
+
+def _resolve_upload_path(stored_path: str) -> Optional[Path]:
+    if not stored_path:
+        return None
+    base = Path(__file__).parent.resolve()
+    candidate = (base / stored_path).resolve()
+    upload_root = UPLOAD_ROOT.resolve()
+    if not str(candidate).startswith(str(upload_root)):
+        return None
+    return candidate
+
+
+def _delete_image_assets(memory: Dict[str, Any]) -> None:
+    asset_keys = (
+        "image_path",
+        "thumbnail_path",
+        "image_original_path",
+        "image_preview_path",
+        "image_thumbnail_path",
+        "image_vision_input_path",
+    )
+    asset_dirs = set()
+    for key in asset_keys:
+        stored_path = memory.get(key)
+        if not isinstance(stored_path, str) or not stored_path.strip():
+            continue
+        file_path = _resolve_upload_path(stored_path)
+        if file_path is None:
+            continue
+        asset_dirs.add(file_path.parent)
+        if file_path.exists():
+            file_path.unlink()
+
+    upload_root = UPLOAD_ROOT.resolve()
+    for asset_dir in sorted(asset_dirs, key=lambda path: len(path.parts), reverse=True):
+        if asset_dir != upload_root and asset_dir.exists():
+            asset_dir.rmdir()
 
 
 # Pydantic Models
@@ -40,6 +226,18 @@ class WriteData(BaseModel):
     embedding: List[float]
     source: Optional[str] = "unknown"
     memory_id: Optional[str] = None
+    image_path: Optional[str] = None
+    thumbnail_path: Optional[str] = None
+    image_original_path: Optional[str] = None
+    image_preview_path: Optional[str] = None
+    image_thumbnail_path: Optional[str] = None
+    image_vision_input_path: Optional[str] = None
+    caption_text: Optional[str] = None
+    vision_type: Optional[str] = None
+    # Upload-only transient field: used to persist image to local storage.
+    image_base64: Optional[str] = None
+    image_vision_input_base64: Optional[str] = None
+    image_url: Optional[str] = None
 
     @validator('embedding')
     def validate_embedding(cls, v):
@@ -67,6 +265,7 @@ class SearchData(BaseModel):
     top_k: Optional[int] = 10
     city: Optional[str] = None
     now_ts: Optional[str] = None
+    memory_pool: Optional[str] = None
 
 
 class SearchPayload(BaseModel):
@@ -127,6 +326,8 @@ async def write_endpoint(payload: WritePayload):
     try:
         # Convert Pydantic model to dict
         memory_data = payload.data.dict()
+        _save_image_assets(memory_data)
+        memory_data.pop("image_url", None)
 
         # Write to database
         result = write_memory(memory_data)
@@ -161,6 +362,67 @@ async def read_endpoint(memory_id: str):
         raise HTTPException(status_code=404, detail=f"Memory {memory_id} not found")
 
     return memory
+
+
+@app.delete("/memories/{memory_id}")
+async def delete_endpoint(memory_id: str):
+    """Delete a single memory and its associated image files."""
+    logger.info(f"DELETE /memories/{memory_id}")
+    memory = read_memory(memory_id)
+    if not memory:
+        raise HTTPException(status_code=404, detail=f"Memory {memory_id} not found")
+
+    try:
+        _delete_image_assets(memory)
+        delete_memory(memory_id)
+        return {"ok": True, "memory_id": memory_id}
+    except Exception as e:
+        logger.error(f"Error deleting memory {memory_id}: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+def _variant_candidates(memory: Dict[str, Any], variant: str) -> List[str]:
+    if variant == "original":
+        return ["image_original_path", "image_path"]
+    if variant == "preview":
+        return ["image_preview_path", "image_thumbnail_path", "thumbnail_path", "image_original_path", "image_path"]
+    if variant == "vision_input":
+        return ["image_vision_input_path", "image_preview_path", "image_thumbnail_path", "thumbnail_path", "image_original_path", "image_path"]
+    # default thumb
+    return ["image_thumbnail_path", "thumbnail_path", "image_preview_path", "image_original_path", "image_path"]
+
+
+@app.get("/files/{memory_id}")
+async def read_memory_file(
+    memory_id: str,
+    variant: str = Query("thumb", regex="^(thumb|preview|original|vision_input)$"),
+):
+    """
+    Return memory thumbnail (preferred) or original upload file.
+    """
+    logger.info(f"GET /files/{memory_id}?variant={variant}")
+    memory = read_memory(memory_id)
+    if not memory:
+        raise HTTPException(status_code=404, detail=f"Memory {memory_id} not found")
+
+    for key in _variant_candidates(memory, variant):
+        stored = memory.get(key)
+        if not isinstance(stored, str) or not stored.strip():
+            continue
+        file_path = _resolve_upload_path(stored)
+        if file_path is None or not file_path.exists():
+            continue
+        media_type = "application/octet-stream"
+        suffix = file_path.suffix.lower()
+        if suffix in (".jpg", ".jpeg"):
+            media_type = "image/jpeg"
+        elif suffix == ".png":
+            media_type = "image/png"
+        elif suffix == ".webp":
+            media_type = "image/webp"
+        return FileResponse(str(file_path), media_type=media_type)
+
+    raise HTTPException(status_code=404, detail=f"No file assets for memory {memory_id}")
 
 
 @app.post("/search")
@@ -204,7 +466,8 @@ async def search_endpoint(payload: SearchPayload):
     logger.info(
         f"POST /search - user_id: {payload.data.user_id}, "
         f"top_k: {payload.data.top_k}, "
-        f"has_embedding: {payload.data.query_embedding is not None}"
+        f"has_embedding: {payload.data.query_embedding is not None}, "
+        f"memory_pool: {payload.data.memory_pool or 'all'}"
     )
 
     # Validate inputs
@@ -237,6 +500,7 @@ async def search_endpoint(payload: SearchPayload):
             query_tags=payload.data.query_tags,
             query_city=payload.data.city,
             now_ts=now_ts,
+            memory_pool=payload.data.memory_pool,
             top_k=payload.data.top_k
         )
 

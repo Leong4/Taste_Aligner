@@ -81,7 +81,15 @@ const server = http.createServer(async (req, res) => {
             return;
         }
 
-        const orchInput: { text: string; user_id?: string; image_url?: string; image_base64?: string } = { text };
+        const orchInput: {
+            text: string;
+            user_id?: string;
+            image_url?: string;
+            image_base64?: string;
+            image_original_base64?: string;
+            caption?: string;
+            city?: string;
+        } = { text };
         if (typeof body.user_id === "string") {
             orchInput.user_id = body.user_id;
         }
@@ -90,6 +98,19 @@ const server = http.createServer(async (req, res) => {
         }
         if (typeof body.image_base64 === "string" && body.image_base64.trim()) {
             orchInput.image_base64 = body.image_base64;
+        }
+        if (typeof body.image_original_base64 === "string" && body.image_original_base64.trim()) {
+            orchInput.image_original_base64 = body.image_original_base64;
+        }
+        if (!orchInput.image_base64 && orchInput.image_original_base64) {
+            // Backward-compat: if caller only provides original image, keep previous behavior.
+            orchInput.image_base64 = orchInput.image_original_base64;
+        }
+        if (typeof body.caption === "string") {
+            orchInput.caption = body.caption;
+        }
+        if (typeof body.city === "string") {
+            orchInput.city = body.city;
         }
         const result = await orchestrator.runWithTrace(orchInput);
 

@@ -357,15 +357,19 @@ if [ "$START_VISION" = "true" ]; then
     log "-- Starting vision --"
     [ -f "$REPO_ROOT/services/vision/main.py" ] \
         || die "services/vision/main.py not found. Use ./scripts/dev_up.sh --core if you only want core services."
-    VISION_BACKEND="${VISION_BACKEND:-rule_v0}"  # override: VISION_BACKEND=clip_v1 ./scripts/dev_up.sh --with-vision
-    if [ "$VISION_BACKEND" = "clip_v1" ] && ! "$PYTHON_BIN" -c "import open_clip" >/dev/null 2>&1; then
-        die "VISION_BACKEND=clip_v1 requires open_clip_torch. Install with 'pip install open_clip_torch' or switch to 'VISION_BACKEND=rule_v0'."
+    VISION_BACKEND="${VISION_BACKEND:-clip_v1}"
+    if [ "$VISION_BACKEND" != "clip_v1" ] && [ "$VISION_BACKEND" != "hybrid" ]; then
+        die "Unsupported VISION_BACKEND=$VISION_BACKEND. Supported values: clip_v1, hybrid."
+    fi
+    if ! "$PYTHON_BIN" -c "import open_clip" >/dev/null 2>&1; then
+        die "VISION_BACKEND=clip_v1 requires open_clip_torch. Install with 'pip install open_clip_torch'."
     fi
     if ! "$PYTHON_BIN" -c "import services.vision.main" >/dev/null 2>&1; then
         die "Vision import failed. Install dependencies with 'pip install -r services/vision/requirements.txt' or run './scripts/dev_up.sh --core'."
     fi
     start_bg VISION "vision" 5002 "$LOGS_DIR/vision.log" \
         env VISION_BACKEND="$VISION_BACKEND" DEVICE="${DEVICE:-cpu}" \
+        OPENAI_API_KEY="${OPENAI_API_KEY:-}" \
         "$PYTHON_BIN" -m uvicorn services.vision.main:app --host 0.0.0.0 --port 5002
 fi
 
@@ -404,6 +408,16 @@ if [ "$EMBED_BACKEND" != "st_v1" ]; then
     die "Embedding backend='$EMBED_BACKEND', expected 'st_v1'. See $LOGS_DIR/embedding.log"
 fi
 log "  OK: embedding backend=$EMBED_BACKEND  warm=$EMBED_WARM"
+
+# Warm up embedding /tes/build so the first /run does not pay model cold-start.
+# Keep this best-effort and non-blocking for developer ergonomics.
+sleep 2
+log "[warmup] embedding tes_build..."
+curl -s --max-time 10 \
+    -X POST http://localhost:5004/tes/build \
+    -H "Content-Type: application/json" \
+    -d '{"tags":["warmup"],"normalize":true}' > /dev/null || true
+log "[warmup] done"
 
 # Gateway: Maven + JVM startup ~20-40 s; allow 2 min
 wait_http "gateway" "http://localhost:8080/health" 40 3 "$LOGS_DIR/gateway.log"

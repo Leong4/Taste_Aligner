@@ -45,7 +45,6 @@ const MOCK_RESPONSES = {
             "Cross-city guard filtered irrelevant results",
             "Exploration candidates scored for novelty potential",
             "Mix policy balanced comfort vs. exploration ratio",
-            "Final cards composed by the planner service",
         ],
     },
 };
@@ -55,7 +54,6 @@ class MockLLMAdapter {
         this.mode = mode ?? process.env.LLM_MOCK_MODE ?? "short";
     }
     async generateStructuredJSON(input) {
-        const start = Date.now();
         if (this.mode === "error") {
             throw new Error("[MockLLMAdapter] Simulated adapter error (LLM_MOCK_MODE=error)");
         }
@@ -64,7 +62,7 @@ class MockLLMAdapter {
             model: this.modelInfo,
             temperature: input.temperature,
             prompt_version: input.promptVersion,
-            latency_ms: Date.now() - start,
+            latency_ms: 0,
             usage: ZERO_USAGE,
             fallback_used: false,
         };

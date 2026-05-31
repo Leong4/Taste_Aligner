@@ -53,6 +53,7 @@ function makeInput(overrides = {}) {
         city: "Tokyo",
         tags: ["Sushi", "food", "sushi"],
         intent_tags: ["fallback_tag"],
+        query_type: "food",
         top_k: 10,
         now_ts: 1704067200000,
         ...overrides,
@@ -61,6 +62,31 @@ function makeInput(overrides = {}) {
 
 function makeContext() {
     return createExecutionContext({ text: "test", request_ts: 1704067200000 });
+}
+
+function makeTesVector(dim = 512) {
+    const vector = Array(dim).fill(0);
+    vector[0] = 1;
+    return vector;
+}
+
+function makeTesBuildObservation(overrides = {}) {
+    return {
+        ok: true,
+        tool: "embedding.tes_build",
+        trace_id: "t_tes",
+        latency_ms: 5,
+        output: {
+            vector: makeTesVector(512),
+            dim: 512,
+            normalized: true,
+            meta: {
+                backend: "st_v1",
+                tes_version: "v2",
+            },
+        },
+        ...overrides,
+    };
 }
 
 // ---------------------------------------------------------------------------
@@ -75,27 +101,37 @@ async function runAll() {
     // =====================================================================
     await test("happy path: 3 results with equal scores -> tie-break by memory_id asc", async () => {
         const client = new StubToolClient(async (action) => {
-            // Verify tool payload matches gateway contract
-            assert.strictEqual(action.tool, "memory.search");
-            assert.strictEqual(action.input.data.user_id, "u123");
-            assert.deepStrictEqual(action.input.data.query_tags, ["food", "sushi"]);
-            assert.strictEqual(action.input.data.city, "tokyo");
-            assert.strictEqual(action.input.data.top_k, 10);
-            assert.strictEqual(action.input.data.now_ts, "2024-01-01T00:00:00.000Z");
+            if (action.tool === "embedding.tes_build") {
+                assert.deepStrictEqual(action.input.tags, ["food", "sushi"]);
+                assert.strictEqual(action.input.normalize, true);
+                return makeTesBuildObservation();
+            }
+            if (action.tool === "memory.search") {
+                // Verify tool payload matches gateway contract
+                assert.strictEqual(action.input.data.user_id, "u123");
+                assert.deepStrictEqual(action.input.data.query_tags, ["food", "sushi"]);
+                assert.ok(Array.isArray(action.input.data.query_embedding));
+                assert.strictEqual(action.input.data.query_embedding.length, 512);
+                assert.strictEqual(action.input.data.city, "tokyo");
+                assert.strictEqual(action.input.data.top_k, 10);
+                assert.strictEqual(action.input.data.memory_pool, "food");
+                assert.strictEqual(action.input.data.now_ts, "2024-01-01T00:00:00.000Z");
 
-            return {
-                ok: true,
-                tool: "memory.search",
-                trace_id: "t_happy",
-                latency_ms: 15,
-                output: {
-                    results: [
-                        { memory_id: "m_c", score: 0.8, normalized_tags: ["sushi", "ramen"] },
-                        { memory_id: "m_a", score: 0.8, normalized_tags: ["izakaya"] },
-                        { memory_id: "m_b", score: 0.9, normalized_tags: ["sushi", "quiet"] },
-                    ],
-                },
-            };
+                return {
+                    ok: true,
+                    tool: "memory.search",
+                    trace_id: "t_happy",
+                    latency_ms: 15,
+                    output: {
+                        results: [
+                            { memory_id: "m_c", score: 0.8, normalized_tags: ["sushi", "ramen"] },
+                            { memory_id: "m_a", score: 0.8, normalized_tags: ["izakaya"] },
+                            { memory_id: "m_b", score: 0.9, normalized_tags: ["sushi", "quiet"] },
+                        ],
+                    },
+                };
+            }
+            throw new Error(`unexpected tool call: ${action.tool}`);
         });
 
         const skill = createMemoryWeightAdjustSkill(client);
@@ -132,6 +168,12 @@ async function runAll() {
         assert.strictEqual(trace.input_summary.now_ts_present, true);
         assert.strictEqual(trace.aggregation.anchor_top_n, 3);
         assert.strictEqual(trace.aggregation.confidence_formula, "clamp01(0.7*top_score_avg + 0.3*coverage)");
+        assert.strictEqual(trace.query_embedding_used, true);
+        assert.strictEqual(trace.query_embedding_dim, 512);
+        assert.strictEqual(trace.query_tags_count, 2);
+        assert.strictEqual(trace.memory_search_mode, "embedding_plus_tags");
+        assert.strictEqual(trace.memory_pool, "food");
+        assert.strictEqual(trace.pool_filter_applied, true);
         assert.strictEqual(trace.fallback_used, false);
         assert.strictEqual(trace.latency_ms, 15);
     });
@@ -153,7 +195,15 @@ async function runAll() {
             },
         };
 
-        const client = new StubToolClient(async () => fixedObs);
+        const client = new StubToolClient(async (action) => {
+            if (action.tool === "embedding.tes_build") {
+                return makeTesBuildObservation({ trace_id: "t_tes_det" });
+            }
+            if (action.tool === "memory.search") {
+                return fixedObs;
+            }
+            throw new Error(`unexpected tool call: ${action.tool}`);
+        });
         const skill = createMemoryWeightAdjustSkill(client);
         const input = makeInput({ city: "Kyoto", tags: ["ramen", "sushi"], now_ts: 1704067200000 });
 
@@ -188,15 +238,125 @@ async function runAll() {
         const trace = result.output.decision_trace.memory_weight_adjust;
         assert.strictEqual(trace.fallback_used, true);
         assert.strictEqual(trace.fallback_reason, "no_tags");
+        assert.strictEqual(trace.query_embedding_used, false);
+        assert.strictEqual(trace.query_tags_count, 0);
+        assert.strictEqual(trace.memory_search_mode, "tags_only_fallback");
+        assert.strictEqual(trace.memory_pool, "food");
+        assert.strictEqual(trace.pool_filter_applied, true);
         assert.strictEqual(trace.rule_id, "memory_weight_adjust_v1");
     });
 
     // =====================================================================
-    // 4. tool_error fallback (mock throws)
+    // 4. query embedding failure -> tags-only fallback path
+    // =====================================================================
+    await test("query embedding failure falls back to tags-only memory.search", async () => {
+        const client = new StubToolClient(async (action) => {
+            if (action.tool === "embedding.tes_build") {
+                return {
+                    ok: false,
+                    tool: "embedding.tes_build",
+                    trace_id: "t_tes_fail",
+                    latency_ms: 8,
+                    error: { code: "gateway_error", message: "503" },
+                };
+            }
+            if (action.tool === "memory.search") {
+                assert.strictEqual(action.input.data.query_embedding, undefined);
+                assert.deepStrictEqual(action.input.data.query_tags, ["food", "sushi"]);
+                assert.strictEqual(action.input.data.memory_pool, "food");
+                return {
+                    ok: true,
+                    tool: "memory.search",
+                    trace_id: "t_mem_ok",
+                    latency_ms: 7,
+                    output: {
+                        results: [
+                            { memory_id: "m1", score: 0.6, normalized_tags: ["food"] },
+                            { memory_id: "m2", score: 0.5, normalized_tags: ["sushi"] },
+                        ],
+                    },
+                };
+            }
+            throw new Error(`unexpected tool call: ${action.tool}`);
+        });
+        const skill = createMemoryWeightAdjustSkill(client);
+        const result = await skill.execute(makeInput(), makeContext());
+        const trace = result.output.decision_trace.memory_weight_adjust;
+
+        assert.strictEqual(trace.fallback_used, false);
+        assert.strictEqual(trace.query_embedding_used, false);
+        assert.strictEqual(trace.query_embedding_dim, undefined);
+        assert.strictEqual(trace.query_tags_count, 2);
+        assert.strictEqual(trace.memory_search_mode, "tags_only_fallback");
+        assert.strictEqual(trace.memory_pool, "food");
+        assert.strictEqual(trace.pool_filter_applied, true);
+        assert.strictEqual(trace.fallback_reason, "query_embedding_tool_error");
+    });
+
+    await test("query_type=culture maps to scenery pool", async () => {
+        const client = new StubToolClient(async (action) => {
+            if (action.tool === "embedding.tes_build") {
+                return makeTesBuildObservation();
+            }
+            if (action.tool === "memory.search") {
+                assert.strictEqual(action.input.data.memory_pool, "scenery");
+                return {
+                    ok: true,
+                    tool: "memory.search",
+                    trace_id: "t_pool_scenery",
+                    latency_ms: 4,
+                    output: {
+                        results: [{ memory_id: "m_scenery", score: 0.5, normalized_tags: ["park"] }],
+                    },
+                };
+            }
+            throw new Error(`unexpected tool call: ${action.tool}`);
+        });
+        const skill = createMemoryWeightAdjustSkill(client);
+        const result = await skill.execute(makeInput({ query_type: "culture", tags: ["park"] }), makeContext());
+        const trace = result.output.decision_trace.memory_weight_adjust;
+        assert.strictEqual(trace.memory_pool, "scenery");
+        assert.strictEqual(trace.pool_filter_applied, true);
+    });
+
+    await test("query_type=mixed maps to all pool", async () => {
+        const client = new StubToolClient(async (action) => {
+            if (action.tool === "embedding.tes_build") {
+                return makeTesBuildObservation();
+            }
+            if (action.tool === "memory.search") {
+                assert.strictEqual(action.input.data.memory_pool, "all");
+                return {
+                    ok: true,
+                    tool: "memory.search",
+                    trace_id: "t_pool_all",
+                    latency_ms: 4,
+                    output: {
+                        results: [{ memory_id: "m_any", score: 0.5, normalized_tags: ["walk"] }],
+                    },
+                };
+            }
+            throw new Error(`unexpected tool call: ${action.tool}`);
+        });
+        const skill = createMemoryWeightAdjustSkill(client);
+        const result = await skill.execute(makeInput({ query_type: "mixed", tags: ["walk"] }), makeContext());
+        const trace = result.output.decision_trace.memory_weight_adjust;
+        assert.strictEqual(trace.memory_pool, "all");
+        assert.strictEqual(trace.pool_filter_applied, false);
+    });
+
+    // =====================================================================
+    // 5. tool_error fallback (mock throws)
     // =====================================================================
     await test("tool_error fallback: trace contains reason + error_message", async () => {
-        const client = new StubToolClient(async () => {
-            throw new Error("memory service timeout");
+        const client = new StubToolClient(async (action) => {
+            if (action.tool === "embedding.tes_build") {
+                return makeTesBuildObservation();
+            }
+            if (action.tool === "memory.search") {
+                throw new Error("memory service timeout");
+            }
+            throw new Error(`unexpected tool call: ${action.tool}`);
         });
         const skill = createMemoryWeightAdjustSkill(client);
         const result = await skill.execute(makeInput(), makeContext());
@@ -212,16 +372,24 @@ async function runAll() {
     });
 
     // =====================================================================
-    // 5. invalid_output fallback (results missing or not array)
+    // 6. invalid_output fallback (results missing or not array)
     // =====================================================================
     await test("invalid_output fallback: results missing", async () => {
-        const client = new StubToolClient(async () => ({
-            ok: true,
-            tool: "memory.search",
-            trace_id: "t_bad",
-            latency_ms: 4,
-            output: {},
-        }));
+        const client = new StubToolClient(async (action) => {
+            if (action.tool === "embedding.tes_build") {
+                return makeTesBuildObservation();
+            }
+            if (action.tool === "memory.search") {
+                return {
+                    ok: true,
+                    tool: "memory.search",
+                    trace_id: "t_bad",
+                    latency_ms: 4,
+                    output: {},
+                };
+            }
+            throw new Error(`unexpected tool call: ${action.tool}`);
+        });
         const skill = createMemoryWeightAdjustSkill(client);
         const result = await skill.execute(makeInput(), makeContext());
 
@@ -232,13 +400,21 @@ async function runAll() {
     });
 
     await test("invalid_output fallback: results is a string", async () => {
-        const client = new StubToolClient(async () => ({
-            ok: true,
-            tool: "memory.search",
-            trace_id: "t_bad2",
-            latency_ms: 3,
-            output: { results: "not_an_array" },
-        }));
+        const client = new StubToolClient(async (action) => {
+            if (action.tool === "embedding.tes_build") {
+                return makeTesBuildObservation();
+            }
+            if (action.tool === "memory.search") {
+                return {
+                    ok: true,
+                    tool: "memory.search",
+                    trace_id: "t_bad2",
+                    latency_ms: 3,
+                    output: { results: "not_an_array" },
+                };
+            }
+            throw new Error(`unexpected tool call: ${action.tool}`);
+        });
         const skill = createMemoryWeightAdjustSkill(client);
         const result = await skill.execute(makeInput(), makeContext());
 
@@ -248,16 +424,24 @@ async function runAll() {
     });
 
     // =====================================================================
-    // 6. empty_results fallback
+    // 7. empty_results fallback
     // =====================================================================
     await test("empty_results fallback: results array is empty", async () => {
-        const client = new StubToolClient(async () => ({
-            ok: true,
-            tool: "memory.search",
-            trace_id: "t_empty",
-            latency_ms: 6,
-            output: { results: [] },
-        }));
+        const client = new StubToolClient(async (action) => {
+            if (action.tool === "embedding.tes_build") {
+                return makeTesBuildObservation();
+            }
+            if (action.tool === "memory.search") {
+                return {
+                    ok: true,
+                    tool: "memory.search",
+                    trace_id: "t_empty",
+                    latency_ms: 6,
+                    output: { results: [] },
+                };
+            }
+            throw new Error(`unexpected tool call: ${action.tool}`);
+        });
         const skill = createMemoryWeightAdjustSkill(client);
         const result = await skill.execute(makeInput(), makeContext());
 

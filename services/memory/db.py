@@ -37,9 +37,34 @@ def init_database():
             sentiment REAL,
             embedding TEXT NOT NULL,
             source TEXT,
+            image_path TEXT,
+            thumbnail_path TEXT,
+            caption_text TEXT,
+            vision_type TEXT,
+            image_original_path TEXT,
+            image_preview_path TEXT,
+            image_thumbnail_path TEXT,
+            image_vision_input_path TEXT,
             created_at TEXT DEFAULT CURRENT_TIMESTAMP
         )
     """)
+
+    # Lightweight migration for existing DBs that predate image/caption fields.
+    cursor.execute("PRAGMA table_info(p5_memories)")
+    existing_cols = {row[1] for row in cursor.fetchall()}
+    alter_columns = [
+        ("image_path", "TEXT"),
+        ("thumbnail_path", "TEXT"),
+        ("caption_text", "TEXT"),
+        ("vision_type", "TEXT"),
+        ("image_original_path", "TEXT"),
+        ("image_preview_path", "TEXT"),
+        ("image_thumbnail_path", "TEXT"),
+        ("image_vision_input_path", "TEXT"),
+    ]
+    for col_name, col_type in alter_columns:
+        if col_name not in existing_cols:
+            cursor.execute(f"ALTER TABLE p5_memories ADD COLUMN {col_name} {col_type}")
 
     # Create index for user_id for faster queries
     cursor.execute("""
@@ -80,8 +105,10 @@ def write_memory(memory: Dict[str, Any]) -> Dict[str, Any]:
             INSERT INTO p5_memories (
                 memory_id, user_id, timestamp, city,
                 raw_tags, normalized_tags, taxonomy,
-                sentiment, embedding, source
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                sentiment, embedding, source,
+                image_path, thumbnail_path, caption_text, vision_type,
+                image_original_path, image_preview_path, image_thumbnail_path, image_vision_input_path
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             memory["memory_id"],
             memory.get("user_id", ""),
@@ -92,7 +119,15 @@ def write_memory(memory: Dict[str, Any]) -> Dict[str, Any]:
             taxonomy_json,
             memory.get("sentiment", 0.0),
             embedding_json,
-            memory.get("source", "unknown")
+            memory.get("source", "unknown"),
+            memory.get("image_path", ""),
+            memory.get("thumbnail_path", ""),
+            memory.get("caption_text", ""),
+            memory.get("vision_type", ""),
+            memory.get("image_original_path", memory.get("image_path", "")),
+            memory.get("image_preview_path", memory.get("thumbnail_path", "")),
+            memory.get("image_thumbnail_path", memory.get("thumbnail_path", "")),
+            memory.get("image_vision_input_path", ""),
         ))
 
         conn.commit()
@@ -147,6 +182,19 @@ def read_memory(memory_id: str) -> Optional[Dict[str, Any]]:
 
         return memory
 
+    finally:
+        conn.close()
+
+
+def delete_memory(memory_id: str) -> bool:
+    """Delete a single memory by ID."""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("DELETE FROM p5_memories WHERE memory_id = ?", (memory_id,))
+        conn.commit()
+        return cursor.rowcount > 0
     finally:
         conn.close()
 

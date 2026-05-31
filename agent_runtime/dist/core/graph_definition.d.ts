@@ -68,6 +68,14 @@ import { GraphDefinition } from "./types";
 /**
  * The default recommendation pipeline graph (v8.0).
  *
+ * v13.0 changes from v12.0:
+ *   - Added build_profile_vector node (Node 6) between memory_weight_adjust
+ *     and vision_describe.  Single authoritative source for P4 dynamic
+ *     weighting: computes final_weight = cosine * w_time * w_sent * w_context
+ *     per memory and writes decision_trace.profile_vector_node.
+ *   - explain_from_trace now reads profile_vector_node from the trace.
+ *   - Graph version bumped to 13.0.0.
+ *
  * v12.0 changes from v11.0:
  *   - Removed legacy memory_signal node from default /run main path.
  *   - mix_policy.memory_confidence now reads from memory_weight_adjust.

@@ -147,6 +147,12 @@ ONTOLOGY_SERVICE_URL = os.getenv("ONTOLOGY_SERVICE_URL", "http://localhost:5003"
 # Embedding service endpoint (for semantic similarity)
 EMBEDDING_SERVICE_URL = os.getenv("EMBEDDING_SERVICE_URL", "http://localhost:5002")
 
-# v1.3: Embedding generation endpoint (item/user embeddings)
-EMBEDDING_URL = os.getenv("EMBEDDING_URL", "http://localhost:5004/generate")
+# v1.4: Recommendation embedding space defaults to TES v2.
+# Legacy TES v1 (/generate) is retained as deterministic fallback only.
+EMBEDDING_TES_V2_URL = os.getenv("EMBEDDING_TES_V2_URL", "http://localhost:5004/tes/build")
+EMBEDDING_TES_V1_URL = os.getenv("EMBEDDING_TES_V1_URL", "http://localhost:5004/generate")
 EMBEDDING_TIMEOUT_MS = int(os.getenv("EMBEDDING_TIMEOUT_MS", "1500"))
+EMBEDDING_EXPECTED_DIM = int(os.getenv("EMBEDDING_EXPECTED_DIM", "512"))
+
+# Backward-compatible debug field name used by /score response.
+EMBEDDING_URL = os.getenv("EMBEDDING_URL", EMBEDDING_TES_V2_URL)

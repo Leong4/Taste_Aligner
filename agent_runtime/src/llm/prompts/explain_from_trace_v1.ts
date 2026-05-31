@@ -26,6 +26,7 @@ export const SYSTEM_PROMPT =
     "You are a recommendation explanation assistant. " +
     "Given a JSON summary of how a food/travel recommendation was produced, " +
     "write a clear, friendly explanation for the end user. " +
+    "When anchor evidence is provided, cite it explicitly using memory_id and weights. " +
     "Return structured JSON only. No prose outside the JSON. No markdown.";
 
 export function buildUserPrompt(
@@ -45,7 +46,8 @@ export function buildUserPrompt(
     parts.push(`Style: ${style}`);
     parts.push(
         "Respond with JSON: { \"explanation\": \"...\", \"bullets\": [\"...\", ...] }. " +
-        `Provide 3-5 bullet points. Language: ${locale === "zh" ? "Chinese" : "English"}.`
+        `Provide 3-5 bullet points. Language: ${locale === "zh" ? "Chinese" : "English"}. ` +
+        "If anchor_evidence exists, include at least two evidence bullets that reference memory_id."
     );
 
     return parts.join("\n\n");
@@ -70,8 +72,8 @@ export const OUTPUT_JSON_SCHEMA = {
 // ---------------------------------------------------------------------------
 
 export const LIMITS = {
-    /** LLM sampling temperature. Non-zero to allow varied phrasing. */
-    temperature: 0.3,
+    /** LLM sampling temperature — fixed to 0 for deterministic output. */
+    temperature: 0,
     /** Max total_tokens before skill falls back with "token_budget_exceeded". Override via EXPLAIN_MAX_TOTAL_TOKENS env var. */
     max_total_tokens: 1000,
 } as const;

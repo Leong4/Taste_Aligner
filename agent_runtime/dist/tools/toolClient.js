@@ -5,6 +5,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ToolClient = void 0;
 const axios_1 = __importDefault(require("axios"));
+const TOOL_TIMEOUT_OVERRIDES_MS = {
+    "embedding.tes_build": 7000,
+    "vision.describe": 15000,
+};
 class ToolClient {
     constructor(opts) {
         this.baseUrl = opts.gatewayBaseUrl.replace(/\/$/, "");
@@ -29,11 +33,12 @@ class ToolClient {
             return this.fail("bad_action", "action.input must be object", traceId, 0, { action });
         }
         const path = `/tool/${action.tool}`;
+        const timeoutMs = TOOL_TIMEOUT_OVERRIDES_MS[action.tool] ?? this.timeoutMs;
         try {
             if (this.logPayload) {
-                console.log(`[toolClient] -> ${path}`, { traceId, input });
+                console.log(`[toolClient] -> ${path}`, { traceId, timeoutMs, input });
             }
-            const resp = await this.http.post(path, input);
+            const resp = await this.http.post(path, input, { timeout: timeoutMs });
             const latencyMs = Date.now() - started;
             if (resp.status >= 200 && resp.status < 300) {
                 return {

@@ -29,6 +29,8 @@ export interface LLMCallTrace {
     latency_ms: number;
     usage: LLMUsage;
     fallback_used: boolean;
+    /** Set when the adapter itself fell back (e.g. missing key, unknown provider). */
+    fallback_reason?: string;
 }
 /** Input to an LLM generation call. */
 export interface LLMGenerateInput {
@@ -70,6 +72,12 @@ export interface LLMGenerateOutput<T> {
 export interface LLMAdapter {
     /** Model info for this adapter instance. */
     readonly modelInfo: LLMModelInfo;
+    /**
+     * When set, this adapter is a fallback standing in for the intended
+     * provider (e.g. missing API key). The value is the reason string
+     * that gets propagated into decision_trace.llm_call.fallback_reason.
+     */
+    readonly fallbackReason?: string;
     /**
      * Generate a structured JSON response.
      *

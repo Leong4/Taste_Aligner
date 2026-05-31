@@ -11,7 +11,7 @@
  *
  * Prerequisites:
  *   - Gateway running on localhost:8080
- *   - Vision service running (rule_v0 or clip_v1)
+ *   - Vision service running (clip_v1)
  *   - Agent runtime running on localhost:8787
  *
  * Run:

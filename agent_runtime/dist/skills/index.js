@@ -6,7 +6,7 @@
  * them with the SkillRegistry.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createExplainFromTraceSkill = exports.createBuildCardsSkill = exports.mixPolicySkill = exports.rerankSkill = exports.createRerankSkill = exports.createFetchRecommendationSkill = exports.createTesBuilderSkill = exports.createVisionDescribeSkill = exports.createMemoryWeightAdjustSkill = exports.createMemorySignalSkill = exports.createTagNormalizeSkill = exports.createTagExpandSkill = exports.decideTagBudgetSkill = exports.extractIntentSkill = void 0;
+exports.createExplainFromTraceSkill = exports.createBuildCardsSkill = exports.mixPolicySkill = exports.rerankSkill = exports.createRerankSkill = exports.createFetchRecommendationSkill = exports.createTesBuilderSkill = exports.createVisionDescribeSkill = exports.buildProfileVector = exports.createBuildProfileVectorSkill = exports.createMemoryWeightAdjustSkill = exports.createMemorySignalSkill = exports.createTagNormalizeSkill = exports.createTagExpandSkill = exports.decideTagBudgetSkill = exports.extractIntentSkill = void 0;
 var extract_intent_1 = require("./extract_intent");
 Object.defineProperty(exports, "extractIntentSkill", { enumerable: true, get: function () { return extract_intent_1.extractIntentSkill; } });
 var decide_tag_budget_1 = require("./decide_tag_budget");
@@ -19,6 +19,9 @@ var memory_signal_1 = require("./memory_signal");
 Object.defineProperty(exports, "createMemorySignalSkill", { enumerable: true, get: function () { return memory_signal_1.createMemorySignalSkill; } });
 var memory_weight_adjust_1 = require("./memory_weight_adjust");
 Object.defineProperty(exports, "createMemoryWeightAdjustSkill", { enumerable: true, get: function () { return memory_weight_adjust_1.createMemoryWeightAdjustSkill; } });
+var build_profile_vector_1 = require("./build_profile_vector");
+Object.defineProperty(exports, "createBuildProfileVectorSkill", { enumerable: true, get: function () { return build_profile_vector_1.createBuildProfileVectorSkill; } });
+Object.defineProperty(exports, "buildProfileVector", { enumerable: true, get: function () { return build_profile_vector_1.buildProfileVector; } });
 var vision_describe_1 = require("./vision_describe");
 Object.defineProperty(exports, "createVisionDescribeSkill", { enumerable: true, get: function () { return vision_describe_1.createVisionDescribeSkill; } });
 var tes_builder_1 = require("./tes_builder");

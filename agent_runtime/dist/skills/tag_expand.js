@@ -5,38 +5,15 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createTagExpandSkill = createTagExpandSkill;
-const PROMPT_VERSION = "v1";
-const SYSTEM_PROMPT = "You expand recommendation tags. Return JSON only with keys " +
-    "\"hard_expansions\" and \"soft_expansions\". Each item must be " +
-    "{\"tag\": string, \"confidence\": number}. No extra text.";
-const OUTPUT_SCHEMA = {
-    type: "object",
-    properties: {
-        hard_expansions: {
-            type: "array",
-            items: {
-                type: "object",
-                properties: {
-                    tag: { type: "string" },
-                    confidence: { type: "number", minimum: 0, maximum: 1 },
-                },
-                required: ["tag", "confidence"],
-            },
-        },
-        soft_expansions: {
-            type: "array",
-            items: {
-                type: "object",
-                properties: {
-                    tag: { type: "string" },
-                    confidence: { type: "number", minimum: 0, maximum: 1 },
-                },
-                required: ["tag", "confidence"],
-            },
-        },
-    },
-    required: ["hard_expansions", "soft_expansions"],
-};
+const tag_expand_v1_1 = require("../llm/prompts/tag_expand_v1");
+/** Hard cap on total tags added — from prompt module; env cannot override this. */
+const MAX_GENERATED_TAGS = tag_expand_v1_1.LIMITS.max_tags;
+/**
+ * Token budget guard: if usage.total_tokens exceeds this threshold the skill
+ * falls back deterministically with reason "token_budget_exceeded".
+ * Configurable via TAG_EXPAND_MAX_TOTAL_TOKENS env var (default from LIMITS).
+ */
+const TAG_EXPAND_MAX_TOTAL_TOKENS = parseInt(process.env.TAG_EXPAND_MAX_TOTAL_TOKENS ?? String(tag_expand_v1_1.LIMITS.max_total_tokens), 10);
 function normalizeTag(tag) {
     return tag.trim().replace(/\s+/g, " ");
 }
@@ -80,24 +57,6 @@ function normalizeSeedTags(seedTags) {
     }
     return normalized;
 }
-function buildUserPrompt(input) {
-    const seedTags = input.intent.tags ?? [];
-    const intentType = input.intent.type ?? "unknown";
-    const budget = input.tag_budget;
-    return [
-        `User text: "${input.user_text}"`,
-        `Intent type: ${intentType}`,
-        `Seed tags: ${JSON.stringify(seedTags)}`,
-        `Expansion budget: ${budget.budget}`,
-        `hard_expand_limit: ${budget.hard_expand_limit}`,
-        `soft_expand_limit: ${budget.soft_expand_limit}`,
-        `min_confidence_hard: ${budget.thresholds.min_confidence_hard}`,
-        `min_confidence_soft: ${budget.thresholds.min_confidence_soft}`,
-        "Generate short tags only (1-3 words, no sentences).",
-        "Return JSON only with this shape:",
-        "{\"hard_expansions\":[{\"tag\":\"...\",\"confidence\":0.9}],\"soft_expansions\":[{\"tag\":\"...\",\"confidence\":0.7}]}",
-    ].join("\n");
-}
 function createTagExpandSkill(adapter) {
     return {
         name: "tag_expand",
@@ -123,8 +82,10 @@ function createTagExpandSkill(adapter) {
             let llmData = { hard_expansions: [], soft_expansions: [] };
             let callTrace = null;
             let adapterError = null;
-            let fallbackUsed = false;
+            let hardFallbackUsed = false;
             let fallbackReason = "";
+            let adapterFallbackUsed = false;
+            let adapterFallbackReason = "";
             const buildFallbackResult = (reason, dropStats) => {
                 const output = {
                     tags_seed: seedTags,
@@ -137,7 +98,7 @@ function createTagExpandSkill(adapter) {
                     schema_version: "1.0",
                     provider: adapter.modelInfo.provider,
                     model_name: adapter.modelInfo.model_name,
-                    prompt_version: PROMPT_VERSION,
+                    prompt_version: tag_expand_v1_1.PROMPT_VERSION,
                     limits,
                     thresholds,
                     raw_counts: {
@@ -154,17 +115,30 @@ function createTagExpandSkill(adapter) {
                     error_message: reason === "adapter_error" ? (adapterError ?? "") : "",
                 };
                 if (callTrace) {
-                    trace.latency_ms = callTrace.latency_ms;
+                    const llmCallEntry = {
+                        provider: callTrace.model.provider,
+                        model_name: callTrace.model.model_name,
+                        model_version: callTrace.model.version,
+                        temperature: callTrace.temperature,
+                        prompt_version: callTrace.prompt_version,
+                        usage: callTrace.usage,
+                        fallback_used: callTrace.fallback_used,
+                    };
+                    const llmFallbackReason = callTrace.fallback_reason ?? (reason || "adapter_error");
+                    if (llmFallbackReason !== undefined && llmFallbackReason !== "") {
+                        llmCallEntry.fallback_reason = llmFallbackReason;
+                    }
+                    trace.llm_call = llmCallEntry;
                 }
                 return { output, trace };
             };
             try {
                 const result = await adapter.generateStructuredJSON({
-                    systemPrompt: SYSTEM_PROMPT,
-                    userPrompt: buildUserPrompt(input),
-                    schema: OUTPUT_SCHEMA,
-                    temperature: 0,
-                    promptVersion: PROMPT_VERSION,
+                    systemPrompt: tag_expand_v1_1.SYSTEM_PROMPT,
+                    userPrompt: (0, tag_expand_v1_1.buildUserPrompt)(input),
+                    schema: tag_expand_v1_1.OUTPUT_JSON_SCHEMA,
+                    temperature: tag_expand_v1_1.LIMITS.temperature,
+                    promptVersion: tag_expand_v1_1.PROMPT_VERSION,
                     traceContext: {
                         seed_tags: seedTags,
                         intent_type: input.intent.type ?? "unknown",
@@ -174,21 +148,32 @@ function createTagExpandSkill(adapter) {
                 });
                 llmData = result.data ?? llmData;
                 callTrace = result.callTrace;
+                if (callTrace.fallback_used || adapter.fallbackReason) {
+                    adapterFallbackUsed = true;
+                    adapterFallbackReason =
+                        callTrace.fallback_reason ?? adapter.fallbackReason ?? "adapter_error";
+                }
+                // Token budget guard: abort if the call consumed too many tokens.
+                if (!hardFallbackUsed && callTrace.usage.total_tokens > TAG_EXPAND_MAX_TOTAL_TOKENS) {
+                    hardFallbackUsed = true;
+                    fallbackReason = "token_budget_exceeded";
+                }
             }
             catch (err) {
-                fallbackUsed = true;
+                hardFallbackUsed = true;
                 fallbackReason = "adapter_error";
                 adapterError = err instanceof Error ? err.message : String(err);
                 callTrace = {
                     model: adapter.modelInfo,
-                    temperature: 0,
-                    prompt_version: PROMPT_VERSION,
+                    temperature: tag_expand_v1_1.LIMITS.temperature,
+                    prompt_version: tag_expand_v1_1.PROMPT_VERSION,
                     latency_ms: 0,
                     usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
                     fallback_used: true,
+                    fallback_reason: "adapter_error",
                 };
             }
-            if (!fallbackUsed) {
+            if (!hardFallbackUsed) {
                 const isObject = llmData !== null && typeof llmData === "object";
                 const hasExpectedShape = isObject &&
                     Object.prototype.hasOwnProperty.call(llmData, "hard_expansions") &&
@@ -196,11 +181,11 @@ function createTagExpandSkill(adapter) {
                     Array.isArray(llmData.hard_expansions) &&
                     Array.isArray(llmData.soft_expansions);
                 if (!hasExpectedShape) {
-                    fallbackUsed = true;
+                    hardFallbackUsed = true;
                     fallbackReason = "invalid_output";
                 }
             }
-            if (fallbackUsed) {
+            if (hardFallbackUsed) {
                 return buildFallbackResult(fallbackReason || "invalid_output", { by_confidence: 0, by_budget: 0, by_duplicate: 0, by_invalid: 0 });
             }
             const rawHard = llmData.hard_expansions;
@@ -285,7 +270,8 @@ function createTagExpandSkill(adapter) {
                 seenSoft.add(canonicalTag(hard));
             }
             const softTags = keepUniqueWithLimit(softPrepared, limits.soft_expand_limit, seenSoft, "soft");
-            const tagsAdded = [...hardTags, ...softTags];
+            // Hard cap: deterministic slice — hard tags take priority over soft.
+            const tagsAdded = [...hardTags, ...softTags].slice(0, MAX_GENERATED_TAGS);
             if (tagsAdded.length === 0) {
                 return buildFallbackResult("all_filtered", dropStats);
             }
@@ -301,7 +287,7 @@ function createTagExpandSkill(adapter) {
                 schema_version: "1.0",
                 provider: adapter.modelInfo.provider,
                 model_name: adapter.modelInfo.model_name,
-                prompt_version: PROMPT_VERSION,
+                prompt_version: tag_expand_v1_1.PROMPT_VERSION,
                 limits,
                 thresholds,
                 raw_counts: {
@@ -313,12 +299,25 @@ function createTagExpandSkill(adapter) {
                     soft_kept: softTags.length,
                 },
                 drop_stats: dropStats,
-                fallback_used: false,
-                fallback_reason: "",
+                fallback_used: adapterFallbackUsed,
+                fallback_reason: adapterFallbackReason,
                 error_message: "",
             };
             if (callTrace) {
-                trace.latency_ms = callTrace.latency_ms;
+                const llmCallEntry = {
+                    provider: callTrace.model.provider,
+                    model_name: callTrace.model.model_name,
+                    model_version: callTrace.model.version,
+                    temperature: callTrace.temperature,
+                    prompt_version: callTrace.prompt_version,
+                    usage: callTrace.usage,
+                    fallback_used: callTrace.fallback_used,
+                };
+                const llmFallbackReason = callTrace.fallback_reason ?? (adapterFallbackUsed ? (adapterFallbackReason || "adapter_error") : undefined);
+                if (llmFallbackReason !== undefined && llmFallbackReason !== "") {
+                    llmCallEntry.fallback_reason = llmFallbackReason;
+                }
+                trace.llm_call = llmCallEntry;
             }
             return { output, trace };
         },

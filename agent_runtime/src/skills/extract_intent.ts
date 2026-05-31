@@ -18,13 +18,33 @@ import { Skill, SkillResult, ExecutionContext, ExtractIntentOutput } from "../co
 
 const CITY_RULES: Array<{ name: string; patterns: RegExp[] }> = [
     { name: "london", patterns: [/\blondon\b/i] },
+    { name: "tokyo", patterns: [/\btokyo\b/i] },
     { name: "kyoto", patterns: [/\bkyoto\b/i] },
     { name: "osaka", patterns: [/\bosaka\b/i] },
-    { name: "tokyo", patterns: [/\btokyo\b/i] },
     { name: "madrid", patterns: [/\bmadrid\b/i] },
     { name: "barcelona", patterns: [/\bbarcelona\b/i] },
     { name: "munich", patterns: [/\bmunich\b/i] },
     { name: "berlin", patterns: [/\bberlin\b/i] },
+    { name: "guangzhou", patterns: [/\bguangzhou\b/i] },
+    { name: "shanghai", patterns: [/\bshanghai\b/i] },
+    { name: "beijing", patterns: [/\bbeijing\b/i] },
+    { name: "chengdu", patterns: [/\bchengdu\b/i] },
+    { name: "shenzhen", patterns: [/\bshenzhen\b/i] },
+    { name: "hangzhou", patterns: [/\bhangzhou\b/i] },
+    { name: "paris", patterns: [/\bparis\b/i] },
+    { name: "rome", patterns: [/\brome\b/i] },
+    { name: "milan", patterns: [/\bmilan\b/i] },
+    { name: "naples", patterns: [/\bnaples\b/i] },
+    { name: "vienna", patterns: [/\bvienna\b/i] },
+    { name: "prague", patterns: [/\bprague\b/i] },
+    { name: "budapest", patterns: [/\bbudapest\b/i] },
+    { name: "amsterdam", patterns: [/\bamsterdam\b/i] },
+    { name: "new york", patterns: [/\bnew york\b/i] },
+    { name: "los angeles", patterns: [/\blos angeles\b/i] },
+    { name: "san francisco", patterns: [/\bsan francisco\b/i] },
+    { name: "singapore", patterns: [/\bsingapore\b/i] },
+    { name: "bangkok", patterns: [/\bbangkok\b/i] },
+    { name: "seoul", patterns: [/\bseoul\b/i] },
 ];
 
 const FOOD_KEYWORDS = [
@@ -33,6 +53,16 @@ const FOOD_KEYWORDS = [
 
 const CULTURE_KEYWORDS = [
     "museum", "temple", "shrine", "culture", "history", "art", "park",
+];
+
+const TRAVEL_INTENT_PATTERNS = [
+    /\btrip\b/,
+    /\btravel\b/,
+    /\bvisit\b/,
+    /\bplanning\b/,
+    /\brecommendations?\b/,
+    /\bgoing to\b/,
+    /\bwant to go\b/,
 ];
 
 // ---------------------------------------------------------------------------
@@ -52,7 +82,7 @@ function containsAny(text: string, keywords: string[]): boolean {
     return keywords.some((kw) => text.includes(kw));
 }
 
-type IntentType = "food" | "culture" | "mixed" | "unknown";
+type IntentType = "food" | "culture" | "mixed" | "unknown" | "general";
 
 function detectType(text: string): IntentType {
     const hasFood = containsAny(text, FOOD_KEYWORDS);
@@ -72,6 +102,10 @@ function extractMatchedTags(text: string): string[] {
         if (text.includes(kw)) tags.push(kw);
     }
     return Array.from(new Set(tags));
+}
+
+function hasTravelIntent(text: string): boolean {
+    return TRAVEL_INTENT_PATTERNS.some((pattern) => pattern.test(text));
 }
 
 function buildZoneSeed(type: IntentType): { cz_seed: string[]; ez_seed: string[] } {
@@ -108,6 +142,7 @@ function hasUploadImageSignal(
 export const extractIntentSkill: Skill<{
     text: string;
     user_id?: string;
+    city?: string;
     image_url?: string;
     image_base64?: string;
 }, ExtractIntentOutput> = {
@@ -116,7 +151,7 @@ export const extractIntentSkill: Skill<{
     inputSchema: {
         description: "Raw user text and optional user ID",
         required: ["text"],
-        optional: ["user_id", "image_url", "image_base64"],
+        optional: ["user_id", "city", "image_url", "image_base64"],
     },
 
     outputSchema: {
@@ -125,19 +160,24 @@ export const extractIntentSkill: Skill<{
     },
 
     async execute(
-        input: { text: string; user_id?: string; image_url?: string; image_base64?: string },
+        input: { text: string; user_id?: string; city?: string; image_url?: string; image_base64?: string },
         context: ExecutionContext
     ): Promise<SkillResult<ExtractIntentOutput>> {
         const text = (input.text ?? "").toLowerCase();
-        const city = detectCity(text);
-        const type = detectType(text);
-        const tags = extractMatchedTags(text);
+        let city = detectCity(text);
+        if (!city && typeof input.city === "string" && input.city.trim()) {
+            city = input.city.toLowerCase().trim();
+        }
+        const matchedTags = extractMatchedTags(text);
+        const generalTravelQuery = matchedTags.length === 0 && hasTravelIntent(text);
+        const type: IntentType = generalTravelQuery ? "general" : detectType(text);
+        const tags = generalTravelQuery ? ["general"] : matchedTags;
         const seed = buildZoneSeed(type);
         const isUploadFlow = hasUploadImageSignal(input, context);
 
         const output: ExtractIntentOutput = {
             city,
-            type,
+            type: type as ExtractIntentOutput["type"],
             tags,
             cz_seed: seed.cz_seed,
             ez_seed: seed.ez_seed,

@@ -10,6 +10,7 @@ export { createTagExpandSkill } from "./tag_expand";
 export { createTagNormalizeSkill } from "./tag_normalize";
 export { createMemorySignalSkill } from "./memory_signal";
 export { createMemoryWeightAdjustSkill } from "./memory_weight_adjust";
+export { createBuildProfileVectorSkill, buildProfileVector } from "./build_profile_vector";
 export { createVisionDescribeSkill } from "./vision_describe";
 export { createTesBuilderSkill } from "./tes_builder";
 export { createFetchRecommendationSkill } from "./fetch_recommendation";

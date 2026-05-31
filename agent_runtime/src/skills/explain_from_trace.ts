@@ -68,6 +68,16 @@ interface ExplainLLMOutput {
     disclaimer?: string;
 }
 
+interface AnchorEvidence {
+    memory_id: string;
+    tags: string[];
+    w_time?: number;
+    w_sent?: number;
+    final_weight?: number;
+    sentiment?: number;
+    timestamp?: string;
+}
+
 function isValidOutput(data: unknown): data is ExplainLLMOutput {
     if (!data || typeof data !== "object") return false;
     const d = data as Record<string, unknown>;
@@ -119,8 +129,143 @@ function capItemFields(item: Record<string, unknown>): Record<string, unknown> {
     return out;
 }
 
+function asObject(value: unknown): Record<string, unknown> | null {
+    if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+    return value as Record<string, unknown>;
+}
+
+function toNumber4(value: unknown): number | undefined {
+    const n = typeof value === "number" ? value : Number(value);
+    if (!Number.isFinite(n)) return undefined;
+    return Number(n.toFixed(4));
+}
+
+function extractWeightedResultIndex(trace: Record<string, unknown>): Map<string, Record<string, unknown>> {
+    const index = new Map<string, Record<string, unknown>>();
+    const mwa = asObject(trace.memory_weight_adjust);
+    const weighted = mwa?.weighted_results;
+    if (!Array.isArray(weighted)) return index;
+    for (const row of weighted) {
+        const obj = asObject(row);
+        if (!obj) continue;
+        const memoryId = typeof obj.memory_id === "string" ? obj.memory_id : "";
+        if (!memoryId) continue;
+        index.set(memoryId, obj);
+    }
+    return index;
+}
+
+function extractAnchorEvidence(trace: Record<string, unknown>): AnchorEvidence[] {
+    const pvn = asObject(trace.profile_vector_node);
+    if (!pvn || !Array.isArray(pvn.anchors)) return [];
+    const weightedIndex = extractWeightedResultIndex(trace);
+    const evidence: AnchorEvidence[] = [];
+
+    for (const anchorRaw of pvn.anchors) {
+        const anchor = asObject(anchorRaw);
+        if (!anchor) continue;
+        const memoryId = typeof anchor.memory_id === "string" ? anchor.memory_id : "";
+        if (!memoryId) continue;
+        const weighted = weightedIndex.get(memoryId);
+        const rawTags = Array.isArray(weighted?.normalized_tags) ? weighted?.normalized_tags : [];
+        const tags = rawTags
+            .filter((t): t is string => typeof t === "string" && t.trim().length > 0)
+            .map((t) => t.trim().toLowerCase())
+            .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }))
+            .slice(0, 3);
+
+        const row: AnchorEvidence = {
+            memory_id: memoryId,
+            tags,
+        };
+        const wTime = toNumber4(anchor.w_time ?? weighted?.w_time);
+        if (wTime !== undefined) row.w_time = wTime;
+        const wSent = toNumber4(anchor.w_sent ?? weighted?.w_sent);
+        if (wSent !== undefined) row.w_sent = wSent;
+        const finalWeight = toNumber4(anchor.final_weight);
+        if (finalWeight !== undefined) row.final_weight = finalWeight;
+        const sentiment = toNumber4(weighted?.sentiment);
+        if (sentiment !== undefined) row.sentiment = sentiment;
+        if (typeof weighted?.timestamp === "string" && weighted.timestamp.trim()) {
+            row.timestamp = weighted.timestamp.trim();
+        }
+        evidence.push(row);
+    }
+
+    evidence.sort((a, b) => {
+        const aw = a.final_weight ?? -1;
+        const bw = b.final_weight ?? -1;
+        if (bw !== aw) return bw - aw;
+        return a.memory_id.localeCompare(b.memory_id);
+    });
+    return evidence.slice(0, 3);
+}
+
+function hasProfileVectorNode(trace: Record<string, unknown>): boolean {
+    return asObject(trace.profile_vector_node) !== null;
+}
+
+function formatEvidenceLine(e: AnchorEvidence): string {
+    const tags = e.tags.length > 0 ? e.tags.join("|") : "none";
+    const wTime = e.w_time !== undefined ? String(e.w_time) : "n/a";
+    const wSent = e.w_sent !== undefined ? String(e.w_sent) : "n/a";
+    const finalWeight = e.final_weight !== undefined ? String(e.final_weight) : "n/a";
+    return `memory_id=${e.memory_id}, tags=${tags}, w_time=${wTime}, w_sent=${wSent}, final_weight=${finalWeight}`;
+}
+
+function buildEvidenceBullets(evidence: AnchorEvidence[]): string[] {
+    return evidence.slice(0, 2).map((e, i) => `Evidence ${i + 1}: ${formatEvidenceLine(e)}`);
+}
+
+function mergeBulletsWithEvidence(baseBullets: string[], evidenceBullets: string[]): string[] {
+    const out: string[] = [];
+    const seen = new Set<string>();
+    for (const b of [...evidenceBullets, ...baseBullets]) {
+        const trimmed = b.trim();
+        if (!trimmed || seen.has(trimmed)) continue;
+        seen.add(trimmed);
+        out.push(trimmed);
+        if (out.length >= 5) break;
+    }
+    while (out.length < 3) {
+        out.push("Evidence-based ranking with deterministic weighting.");
+    }
+    return out.slice(0, 5);
+}
+
+function appendEvidenceToExplanation(explanation: string, evidenceBullets: string[]): string {
+    const trimmed = explanation.trim();
+    const evidenceBlock = evidenceBullets.map((b, i) => `${i + 1}) ${b}`).join("\n");
+    return `${trimmed}\n\nAnchor evidence:\n${evidenceBlock}`;
+}
+
+function buildAnchoredFallback(evidence: AnchorEvidence[]): { explanation: string; bullets: string[] } {
+    const evidenceBullets = buildEvidenceBullets(evidence);
+    return {
+        explanation:
+            "Recommendations are grounded in your recent uploaded memories. " +
+            "The following anchor evidence was used deterministically.",
+        bullets: mergeBulletsWithEvidence(
+            ["Profile vector and recall weights were applied consistently."],
+            evidenceBullets
+        ),
+    };
+}
+
+function buildInsufficientEvidenceFallback(anchorCount: number): { explanation: string; bullets: string[] } {
+    return {
+        explanation: `Cold start: evidence is insufficient for a grounded explanation (anchors=${anchorCount}).`,
+        bullets: [
+            `Only ${anchorCount} anchor(s) are currently available from memory recall.`,
+            "Upload more photos or provide richer captions to strengthen memory evidence.",
+            "Current ranking falls back to intent, location, and baseline scoring signals.",
+        ],
+    };
+}
+
 function compactTrace(trace: Record<string, unknown>): Record<string, unknown> {
     const compact: Record<string, unknown> = {};
+    const anchorEvidence = extractAnchorEvidence(trace);
 
     // extract_intent summary
     const intent = trace.extract_intent;
@@ -190,6 +335,7 @@ function compactTrace(trace: Record<string, unknown>): Record<string, unknown> {
         const p = pvn as Record<string, unknown>;
         compact.profile = {
             anchors_count: Array.isArray(p.anchors) ? (p.anchors as unknown[]).length : 0,
+            anchor_evidence: anchorEvidence,
             weights_summary: p.weights_summary,
             total_memories_considered: p.total_memories_considered,
         };
@@ -305,6 +451,8 @@ export function createExplainFromTraceSkill(
                     ? input.decision_trace
                     : _context.decision_trace;
 
+            const profileNodePresent = hasProfileVectorNode(traceSource);
+            const anchorEvidence = extractAnchorEvidence(traceSource);
             const compact = compactTrace(traceSource);
             const userPrompt = buildExplainUserPrompt(compact, locale, style, input.user_text);
 
@@ -346,13 +494,36 @@ export function createExplainFromTraceSkill(
                         fallbackUsed = true;
                         fallbackReason = callTrace.fallback_reason ?? adapter.fallbackReason ?? "adapter_error";
                     }
+                    if (profileNodePresent) {
+                        if (anchorEvidence.length < 2) {
+                            const local = buildInsufficientEvidenceFallback(anchorEvidence.length);
+                            explanation = local.explanation;
+                            bullets = local.bullets;
+                        } else {
+                            const evidenceBullets = buildEvidenceBullets(anchorEvidence);
+                            explanation = appendEvidenceToExplanation(explanation, evidenceBullets);
+                            bullets = mergeBulletsWithEvidence(bullets, evidenceBullets);
+                        }
+                    }
                 }
             } catch (err: unknown) {
                 // Graceful fallback — never throw from this skill
                 fallbackUsed = true;
                 fallbackReason = "adapter_error";
-                explanation = "Explanation unavailable.";
-                bullets = [];
+                if (profileNodePresent) {
+                    if (anchorEvidence.length >= 2) {
+                        const local = buildAnchoredFallback(anchorEvidence);
+                        explanation = local.explanation;
+                        bullets = local.bullets;
+                    } else {
+                        const local = buildInsufficientEvidenceFallback(anchorEvidence.length);
+                        explanation = local.explanation;
+                        bullets = local.bullets;
+                    }
+                } else {
+                    explanation = "Explanation unavailable.";
+                    bullets = [];
+                }
                 const adapterError = err instanceof Error ? err.message : String(err);
 
                 callTrace = {
@@ -385,6 +556,13 @@ export function createExplainFromTraceSkill(
             };
             if (fallbackUsed) {
                 trace.fallback_reason = fallbackReason || "adapter_error";
+            }
+            if (profileNodePresent) {
+                trace.anchor_evidence_count = anchorEvidence.length;
+                trace.evidence_status = anchorEvidence.length >= 2 ? "anchored" : "insufficient";
+                if (anchorEvidence.length > 0) {
+                    trace.anchor_evidence = anchorEvidence.slice(0, 2);
+                }
             }
 
             if (callTrace) {

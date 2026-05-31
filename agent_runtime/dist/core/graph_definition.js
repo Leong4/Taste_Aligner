@@ -71,6 +71,14 @@ exports.validateGraph = validateGraph;
 /**
  * The default recommendation pipeline graph (v8.0).
  *
+ * v13.0 changes from v12.0:
+ *   - Added build_profile_vector node (Node 6) between memory_weight_adjust
+ *     and vision_describe.  Single authoritative source for P4 dynamic
+ *     weighting: computes final_weight = cosine * w_time * w_sent * w_context
+ *     per memory and writes decision_trace.profile_vector_node.
+ *   - explain_from_trace now reads profile_vector_node from the trace.
+ *   - Graph version bumped to 13.0.0.
+ *
  * v12.0 changes from v11.0:
  *   - Removed legacy memory_signal node from default /run main path.
  *   - mix_policy.memory_confidence now reads from memory_weight_adjust.
@@ -128,7 +136,7 @@ exports.validateGraph = validateGraph;
  */
 exports.RECOMMENDATION_GRAPH = {
     name: "recommendation_pipeline",
-    version: "12.0.0",
+    version: "13.0.0",
     nodes: [
         // ─────────────────────────────────────────────────────────
         // Node 1: Extract intent from raw user text
@@ -141,6 +149,7 @@ exports.RECOMMENDATION_GRAPH = {
             inputFrom: {
                 text: "input.text",
                 user_id: "input.user_id",
+                city: "input.city",
             },
         },
         // ─────────────────────────────────────────────────────────
@@ -202,11 +211,31 @@ exports.RECOMMENDATION_GRAPH = {
                 city: "extract_intent.city",
                 tags: "tag_normalize.normalized_tags",
                 intent_tags: "tag_expand.tags_final",
+                query_type: "extract_intent.type",
                 now_ts: "input.request_ts",
             },
         },
         // ─────────────────────────────────────────────────────────
-        // Node 6: Vision describe — optional multimodal signal
+        // Node 6: Build profile vector — P4 dynamic weighting unification
+        // Single authoritative source for time/sentiment weighting in the
+        // pipeline.  Reads weighted_results from memory_weight_adjust and
+        // computes final_weight = cosine * w_time * w_sent * w_context for
+        // each memory.  Profile vector is a weighted average of embeddings
+        // (512-dim zero vector when no raw embeddings are available).
+        // Writes decision_trace.profile_vector_node for explain_from_trace.
+        // Output: profile_vector, anchors, total_memories_considered, weights,
+        //         decision_trace
+        // ─────────────────────────────────────────────────────────
+        {
+            id: "build_profile_vector",
+            skill: "build_profile_vector",
+            inputFrom: {
+                weighted_results: "memory_weight_adjust.weighted_results",
+                now_ts: "input.request_ts",
+            },
+        },
+        // ─────────────────────────────────────────────────────────
+        // Node 7: Vision describe — optional multimodal signal
         // Reads image_url / image_base64 from root input (optional).
         // Returns vision_features[] for TES enrichment.
         // Falls back gracefully to [] when no image is provided.
@@ -217,10 +246,11 @@ exports.RECOMMENDATION_GRAPH = {
             inputFrom: {
                 image_url: "input.image_url",
                 image_base64: "input.image_base64",
+                caption_text: "input.caption",
             },
         },
         // ─────────────────────────────────────────────────────────
-        // Node 7: Build TES vector from anchor_tags + vision_features
+        // Node 8: Build TES vector from anchor_tags + vision_features
         // Now reads from memory_weight_adjust instead of memory_signal.
         // vision_features wired from vision_describe for multimodal enrichment.
         // Output: tes_vector, normalized, backend, tes_version
@@ -232,6 +262,10 @@ exports.RECOMMENDATION_GRAPH = {
                 anchor_tags: "memory_weight_adjust.anchor_tags",
                 normalized_tags: "tag_normalize.normalized_tags",
                 vision_features: "vision_describe.vision_features",
+                vision_tags: "vision_describe.tags",
+                vision_type: "vision_describe.vision_type",
+                sentiment: "vision_describe.sentiment",
+                caption_text: "input.caption",
                 request_ts: "input.request_ts",
                 user_city: "extract_intent.city",
                 decision_trace: "memory_weight_adjust.decision_trace",
@@ -251,6 +285,8 @@ exports.RECOMMENDATION_GRAPH = {
                 tags: "tag_normalize.normalized_tags",
                 intent_tags: "tag_expand.tags_final",
                 memory_confidence: "memory_weight_adjust.memory_confidence",
+                memory_pool: "extract_intent.type",
+                anchor_tags: "memory_weight_adjust.anchor_tags",
             },
         },
         // ─────────────────────────────────────────────────────────

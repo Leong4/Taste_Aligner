@@ -1,89 +1,13 @@
-INFO:     Started server process [74733]
+INFO:     Started server process [11091]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:5003 (Press CTRL+C to quit)
-INFO:     127.0.0.1:62937 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:62950 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63038 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63119 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63226 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63306 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63384 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63306 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63306 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63507 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63523 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63547 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63570 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63573 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63587 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63592 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63597 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63674 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63751 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63828 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63905 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:63983 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64059 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64135 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64210 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64287 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64390 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64393 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64394 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64469 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64547 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64626 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64702 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64787 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64862 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64938 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65013 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65093 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65253 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65336 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65415 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:65492 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49192 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49273 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49352 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49428 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49534 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49612 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49689 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:49765 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50078 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50335 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50418 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50499 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50576 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50654 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50742 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50820 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50898 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:50974 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51052 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51130 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51130 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51304 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51387 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51468 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51547 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51654 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51736 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51815 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51890 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:51966 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52043 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52172 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52254 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52337 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52416 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52493 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52569 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52657 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52737 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52817 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52896 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52973 - "POST /normalize HTTP/1.1" 200 OK
-INFO:     127.0.0.1:52973 - "POST /normalize HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64856 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64869 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64883 - "POST /normalize HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65046 - "POST /normalize HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65210 - "POST /normalize HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [11091]

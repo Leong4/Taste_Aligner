@@ -2,6 +2,9 @@
 /**
  * TagNormalize skill — deterministic normalization from expanded tags to the
  * ontology standard tag space.
+ *
+ * Prefers the remote ontology.normalize gateway tool when a toolClient is
+ * supplied.  Falls back to local dictionary matching on any error.
  */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -12,6 +15,7 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const RULE_ID = "tag_normalize_v1";
 const SCHEMA_VERSION = "1.0";
+const TOOL_NAME = "ontology.normalize";
 let cachedIndex = null;
 function normalizeForMatch(raw) {
     return raw
@@ -173,7 +177,91 @@ function extractInputTags(input) {
     }
     return [];
 }
-function createTagNormalizeSkill() {
+function localNormalize(inputTags, index) {
+    const mappingObject = {};
+    const droppedObject = {};
+    const normalizedTags = [];
+    const seenNormalized = new Set();
+    for (const originalRaw of inputTags) {
+        const original = typeof originalRaw === "string" ? originalRaw : "";
+        const cleaned = normalizeForMatch(original);
+        const inputTokens = tokenize(original);
+        if (!cleaned || inputTokens.length === 0) {
+            droppedObject[original] = "not_in_dictionary";
+            continue;
+        }
+        if (!index) {
+            droppedObject[original] = "not_in_dictionary";
+            continue;
+        }
+        let normalized = null;
+        if (index.standardByCanonical.has(cleaned)) {
+            normalized = index.standardByCanonical.get(cleaned) ?? null;
+        }
+        else if (index.aliasByCanonical.has(cleaned)) {
+            normalized = index.aliasByCanonical.get(cleaned) ?? null;
+        }
+        else {
+            normalized = tokenSafeSubsetMatch(cleaned, inputTokens, index);
+        }
+        if (!normalized) {
+            droppedObject[original] = "not_in_dictionary";
+            continue;
+        }
+        mappingObject[original] = normalized;
+        if (!seenNormalized.has(normalized)) {
+            seenNormalized.add(normalized);
+            normalizedTags.push(normalized);
+        }
+    }
+    return { normalizedTags, mappingObject, droppedObject };
+}
+async function tryOntologyNormalize(toolClient, tags) {
+    let observation;
+    try {
+        observation = await toolClient.call({
+            tool: TOOL_NAME,
+            input: { data: { tags, lang: "auto", strict: true } },
+        });
+    }
+    catch {
+        return { ok: false, reason: "tool_error" };
+    }
+    if (!observation || typeof observation !== "object") {
+        return { ok: false, reason: "invalid_output" };
+    }
+    const obs = observation;
+    if (obs.ok === false) {
+        return { ok: false, reason: "service_not_ok" };
+    }
+    // Gateway wraps service response in output; accept from either location.
+    const output = obs.output;
+    const rawTags = (output?.normalized_tags ?? obs.normalized_tags);
+    if (!Array.isArray(rawTags)) {
+        return { ok: false, reason: "invalid_output" };
+    }
+    for (const item of rawTags) {
+        if (typeof item !== "string") {
+            return { ok: false, reason: "invalid_output" };
+        }
+    }
+    // Deterministic post-processing: trim -> lowercase -> filter empty -> dedupe -> stable sort.
+    const seen = new Set();
+    const normalizedTags = [];
+    for (const tag of rawTags) {
+        const cleaned = tag.trim().toLowerCase();
+        if (!cleaned || seen.has(cleaned))
+            continue;
+        seen.add(cleaned);
+        normalizedTags.push(cleaned);
+    }
+    normalizedTags.sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
+    return { ok: true, normalizedTags };
+}
+// ---------------------------------------------------------------------------
+// Skill factory
+// ---------------------------------------------------------------------------
+function createTagNormalizeSkill(toolClient) {
     return {
         name: "tag_normalize",
         inputSchema: {
@@ -185,6 +273,81 @@ function createTagNormalizeSkill() {
             required: ["normalized_tags", "mapping", "dropped", "decision_trace"],
         },
         async execute(input) {
+            const inputTags = extractInputTags(input);
+            // ── no_tags: skip tool call entirely ──────────────────────────
+            if (inputTags.length === 0) {
+                const traceNode = {
+                    rule_id: RULE_ID,
+                    schema_version: SCHEMA_VERSION,
+                    provider: "local",
+                    used: false,
+                    fallback_used: true,
+                    fallback_reason: "no_tags",
+                    mapping: {},
+                    dropped: {},
+                    normalized_tags: [],
+                };
+                const output = {
+                    normalized_tags: [],
+                    mapping: {},
+                    dropped: {},
+                    decision_trace: { tag_normalize: traceNode },
+                };
+                return { output, trace: traceNode };
+            }
+            // ── try remote ontology.normalize ─────────────────────────────
+            if (toolClient) {
+                const remoteResult = await tryOntologyNormalize(toolClient, inputTags);
+                if (remoteResult.ok) {
+                    const traceNode = {
+                        rule_id: RULE_ID,
+                        schema_version: SCHEMA_VERSION,
+                        provider: "ontology",
+                        tool: { name: TOOL_NAME },
+                        used: true,
+                        fallback_used: false,
+                        mapping: {},
+                        dropped: {},
+                        normalized_tags: remoteResult.normalizedTags,
+                    };
+                    const output = {
+                        normalized_tags: remoteResult.normalizedTags,
+                        mapping: {},
+                        dropped: {},
+                        decision_trace: { tag_normalize: traceNode },
+                    };
+                    return { output, trace: traceNode };
+                }
+                // remote failed → fall through to local
+                const fallbackReason = remoteResult.reason;
+                let index = null;
+                try {
+                    index = loadDictionaryIndex();
+                }
+                catch {
+                    index = null;
+                }
+                const { normalizedTags, mappingObject, droppedObject } = localNormalize(inputTags, index);
+                const traceNode = {
+                    rule_id: RULE_ID,
+                    schema_version: SCHEMA_VERSION,
+                    provider: "local",
+                    used: false,
+                    fallback_used: true,
+                    fallback_reason: fallbackReason,
+                    mapping: mappingObject,
+                    dropped: droppedObject,
+                    normalized_tags: normalizedTags,
+                };
+                const output = {
+                    normalized_tags: normalizedTags,
+                    mapping: mappingObject,
+                    dropped: droppedObject,
+                    decision_trace: { tag_normalize: traceNode },
+                };
+                return { output, trace: traceNode };
+            }
+            // ── no toolClient: pure local path ────────────────────────────
             let index = null;
             try {
                 index = loadDictionaryIndex();
@@ -192,46 +355,13 @@ function createTagNormalizeSkill() {
             catch {
                 index = null;
             }
-            const mappingObject = {};
-            const droppedObject = {};
-            const normalizedTags = [];
-            const seenNormalized = new Set();
-            const inputTags = extractInputTags(input);
-            for (const originalRaw of inputTags) {
-                const original = typeof originalRaw === "string" ? originalRaw : "";
-                const cleaned = normalizeForMatch(original);
-                const inputTokens = tokenize(original);
-                if (!cleaned || inputTokens.length === 0) {
-                    droppedObject[original] = "not_in_dictionary";
-                    continue;
-                }
-                if (!index) {
-                    droppedObject[original] = "not_in_dictionary";
-                    continue;
-                }
-                let normalized = null;
-                if (index.standardByCanonical.has(cleaned)) {
-                    normalized = index.standardByCanonical.get(cleaned) ?? null;
-                }
-                else if (index.aliasByCanonical.has(cleaned)) {
-                    normalized = index.aliasByCanonical.get(cleaned) ?? null;
-                }
-                else {
-                    normalized = tokenSafeSubsetMatch(cleaned, inputTokens, index);
-                }
-                if (!normalized) {
-                    droppedObject[original] = "not_in_dictionary";
-                    continue;
-                }
-                mappingObject[original] = normalized;
-                if (!seenNormalized.has(normalized)) {
-                    seenNormalized.add(normalized);
-                    normalizedTags.push(normalized);
-                }
-            }
+            const { normalizedTags, mappingObject, droppedObject } = localNormalize(inputTags, index);
             const traceNode = {
                 rule_id: RULE_ID,
                 schema_version: SCHEMA_VERSION,
+                provider: "local",
+                used: false,
+                fallback_used: false,
                 mapping: mappingObject,
                 dropped: droppedObject,
                 normalized_tags: normalizedTags,
@@ -240,14 +370,9 @@ function createTagNormalizeSkill() {
                 normalized_tags: normalizedTags,
                 mapping: mappingObject,
                 dropped: droppedObject,
-                decision_trace: {
-                    tag_normalize: traceNode,
-                },
+                decision_trace: { tag_normalize: traceNode },
             };
-            return {
-                output,
-                trace: traceNode,
-            };
+            return { output, trace: traceNode };
         },
     };
 }

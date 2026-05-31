@@ -4,6 +4,7 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
@@ -401,6 +402,15 @@ public class GatewayServer {
                     if (!hasAnyPath(payload, List.of("data.city", "city"))) {
                         missing.add("data.city|city");
                     }
+                    Object recommendationDataObj = payload.get("data");
+                    if (recommendationDataObj instanceof Map<?, ?>) {
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> recommendationData = (Map<String, Object>) recommendationDataObj;
+                        List<String> allowedData = List.of(
+                                "user_id", "city", "tags", "intent", "memory_confidence", "memory_pool", "anchor_tags"
+                        );
+                        missing.addAll(findUnknownKeys(recommendationData, allowedData, "data"));
+                    }
                     break;
                 case "memory.read":
                     if (!hasAnyPath(payload, List.of("memory_id", "data.memory_id"))) {
@@ -437,7 +447,9 @@ public class GatewayServer {
                 return new HashMap<>();
             }
             try {
-                Yaml yaml = new Yaml();
+                LoaderOptions loaderOptions = new LoaderOptions();
+                loaderOptions.setCodePointLimit(10_485_760);
+                Yaml yaml = new Yaml(loaderOptions);
                 Object parsed = yaml.load(raw);
                 if (parsed instanceof Map<?, ?>) {
                     Map<String, Object> result = new HashMap<>();
@@ -568,7 +580,7 @@ public class GatewayServer {
                 missing.add("data.query_tags|data.query_embedding");
             }
             List<String> allowed = List.of(
-                    "user_id", "query_tags", "query_embedding", "city", "top_k", "now_ts"
+                    "user_id", "query_tags", "query_embedding", "city", "top_k", "now_ts", "memory_pool"
             );
             List<String> invalid = findUnknownKeys(data, allowed, "data");
             missing.addAll(invalid);
@@ -587,7 +599,7 @@ public class GatewayServer {
             if (dataObj instanceof Map<?, ?>) {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> data = (Map<String, Object>) dataObj;
-                List<String> allowedData = List.of("image_url", "image_base64", "top_k");
+                List<String> allowedData = List.of("image_url", "image_base64", "top_k", "caption_text");
                 missing.addAll(findUnknownKeys(data, allowedData, "data"));
             }
             return missing.isEmpty();

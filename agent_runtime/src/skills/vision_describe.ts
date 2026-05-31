@@ -75,8 +75,11 @@ function buildTrace(
     backend: string | undefined,
     modelId: string | null | undefined,
     device: string | undefined,
-    visionType: "food" | "scenery" | "unknown" | undefined,
+    visionType: "food" | "scenery" | "other" | "unknown" | undefined,
     tagsCount: number,
+    cuesCount: number | undefined,
+    confidence: number | undefined,
+    sentiment: number | undefined,
     latencyMs: number | undefined,
     fallbackUsed: boolean,
     fallbackReason: FallbackReason | undefined,
@@ -94,6 +97,9 @@ function buildTrace(
     if (modelId !== undefined) trace.model_id = modelId;
     if (device !== undefined) trace.device = device;
     if (visionType !== undefined) trace.vision_type = visionType;
+    if (cuesCount !== undefined) trace.cues_count = cuesCount;
+    if (confidence !== undefined) trace.confidence = confidence;
+    if (sentiment !== undefined) trace.sentiment = sentiment;
     if (latencyMs !== undefined) trace.latency_ms = latencyMs;
     if (fallbackReason !== undefined) trace.fallback_reason = fallbackReason;
     return trace;
@@ -105,11 +111,15 @@ function buildFallback(
     inputSummary: VisionDescribeDecisionTrace["input_summary"]
 ): SkillResult<VisionDescribeOutput> {
     const trace = buildTrace(
-        false, undefined, undefined, undefined, undefined, 0, latencyMs,
+        false, undefined, undefined, undefined, undefined, 0, 0, undefined, undefined, latencyMs,
         true, fallbackReason, inputSummary
     );
+    trace.cues = [];
+    trace.tags = [];
     const output: VisionDescribeOutput = {
         vision_features: [],
+        cues: [],
+        tags: [],
         used: false,
         tags_count: 0,
         fallback_used: true,
@@ -135,13 +145,13 @@ export function createVisionDescribeSkill(
         inputSchema: {
             description: "Describe an image and extract tags using vision backend",
             required: [],
-            optional: ["image_url", "image_base64", "top_k"],
+            optional: ["image_url", "image_base64", "caption_text", "top_k"],
         },
 
         outputSchema: {
             description: "Extracted vision tags for multimodal TES input",
             required: ["vision_features", "used", "fallback_used", "tags_count", "decision_trace"],
-            optional: ["backend", "model_id", "device", "latency_ms", "fallback_reason"],
+            optional: ["backend", "model_id", "device", "latency_ms", "fallback_reason", "vision_type", "cues", "tags", "confidence", "sentiment"],
         },
 
         async execute(
@@ -167,6 +177,9 @@ export function createVisionDescribeSkill(
                 const toolInput: Record<string, unknown> = { top_k: topK };
                 if (hasUrl) toolInput.image_url = input.image_url;
                 if (hasBase64) toolInput.image_base64 = input.image_base64;
+                if (typeof input.caption_text === "string" && input.caption_text.trim().length > 0) {
+                    toolInput.caption_text = input.caption_text.trim();
+                }
 
                 observation = await toolClient.call({
                     tool: TOOL_NAME,
@@ -189,13 +202,17 @@ export function createVisionDescribeSkill(
             }
 
             // ── Normalise output ─────────────────────────────────────────────
-            // Merge cues (V1 schema) + tags (legacy/backward compat), then dedup + sort.
             const rawCues = Array.isArray(payload.cues) ? payload.cues : [];
             const rawTags = Array.isArray(payload.tags) ? payload.tags : [];
-            const normalizedTags = normalizeTags([...rawCues, ...rawTags]);
+            const normalizedCues = normalizeTags(rawCues);
+            const normalizedTagsRaw = normalizeTags(rawTags);
+            const normalizedTags = normalizeTags([...normalizedCues, ...normalizedTagsRaw]);
 
             const backend =
                 typeof payload.backend === "string" ? payload.backend : undefined;
+            if (backend !== "clip_v1" && backend !== "cloud_v1" && backend !== "hybrid") {
+                return buildFallback("invalid_output", latencyMs, inputSummary);
+            }
             const modelId =
                 typeof payload.model_id === "string" || payload.model_id === null
                     ? (payload.model_id as string | null)
@@ -203,19 +220,33 @@ export function createVisionDescribeSkill(
             const device =
                 typeof payload.device === "string" ? payload.device : undefined;
             // Extract vision type classification (V1 schema, optional).
-            const rawType = payload.type;
-            const visionType: "food" | "scenery" | "unknown" | undefined =
-                rawType === "food" || rawType === "scenery" || rawType === "unknown"
+            const rawType = payload.vision_type ?? payload.type;
+            const visionType: "food" | "scenery" | "other" | "unknown" | undefined =
+                rawType === "food" || rawType === "scenery" || rawType === "other" || rawType === "unknown"
                     ? rawType
                     : undefined;
+            const rawConfidence = payload.confidence;
+            const confidence =
+                typeof rawConfidence === "number" && Number.isFinite(rawConfidence)
+                    ? Math.max(0, Math.min(1, rawConfidence))
+                    : undefined;
+            const rawSentiment = payload.sentiment;
+            const sentiment =
+                typeof rawSentiment === "number" && Number.isFinite(rawSentiment)
+                    ? Math.max(0, Math.min(1, rawSentiment))
+                    : 0.5;
 
             const trace = buildTrace(
                 true, backend, modelId, device, visionType,
-                normalizedTags.length, latencyMs, false, undefined, inputSummary
+                normalizedTags.length, normalizedCues.length, confidence, sentiment, latencyMs, false, undefined, inputSummary
             );
+            trace.cues = normalizedCues;
+            trace.tags = normalizedTagsRaw;
 
             const output: VisionDescribeOutput = {
                 vision_features: normalizedTags,
+                cues: normalizedCues,
+                tags: normalizedTagsRaw,
                 used: true,
                 tags_count: normalizedTags.length,
                 latency_ms: latencyMs,
@@ -225,6 +256,9 @@ export function createVisionDescribeSkill(
             if (backend !== undefined) output.backend = backend;
             if (modelId !== undefined) output.model_id = modelId;
             if (device !== undefined) output.device = device;
+            if (visionType !== undefined) output.vision_type = visionType;
+            if (confidence !== undefined) output.confidence = confidence;
+            output.sentiment = sentiment;
 
             return {
                 output,

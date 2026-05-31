@@ -57,6 +57,8 @@ const SCHEMA_VERSION = "1.0";
 const PROFILE_VECTOR_DIM = 512;
 const TOP_K = 3;
 const FIXED_EPOCH_MS = 0;
+const ANCHOR_GATE_COSINE_THRESHOLD = 0.08;
+const ANCHOR_GATE_RELATIVE_RATIO = 0.25;
 
 /** Per-day time-decay rate for w_time = exp(-LAMBDA_TIME * delta_days). */
 const LAMBDA_TIME = 0.1;
@@ -117,6 +119,14 @@ export interface BuildProfileVectorResult {
     total_memories_considered: number;
     weights: ProfileVectorWeights;
     has_embeddings: boolean;
+    anchor_gate: {
+        enabled: boolean;
+        cosine_threshold: number;
+        relative_ratio: number;
+        candidates_before: number;
+        candidates_after: number;
+        dropped_count: number;
+    };
 }
 
 /**
@@ -145,6 +155,14 @@ export function buildProfileVector(
                 },
             },
             has_embeddings: false,
+            anchor_gate: {
+                enabled: true,
+                cosine_threshold: ANCHOR_GATE_COSINE_THRESHOLD,
+                relative_ratio: ANCHOR_GATE_RELATIVE_RATIO,
+                candidates_before: 0,
+                candidates_after: 0,
+                dropped_count: 0,
+            },
         };
     }
 
@@ -177,7 +195,14 @@ export function buildProfileVector(
         if (b.final_weight !== a.final_weight) return b.final_weight - a.final_weight;
         return a.memory_id.localeCompare(b.memory_id);
     });
-    const anchors = sorted.slice(0, TOP_K);
+    const anchorCandidatesBefore = sorted.length;
+    const absolutePassed = sorted.filter((m) => m.cosine >= ANCHOR_GATE_COSINE_THRESHOLD);
+    const topCosine = absolutePassed.reduce((mx, m) => Math.max(mx, m.cosine), 0);
+    const relativeThreshold = topCosine * ANCHOR_GATE_RELATIVE_RATIO;
+    const gated = absolutePassed.filter((m) => m.cosine >= relativeThreshold);
+    const anchorCandidatesAfter = gated.length;
+    const anchorDroppedCount = anchorCandidatesBefore - anchorCandidatesAfter;
+    const anchors = gated.slice(0, TOP_K);
 
     // ── 3. Summary statistics over ALL memories ───────────────────────────────
 
@@ -192,7 +217,8 @@ export function buildProfileVector(
         { name: "sentiment", dev: Math.abs(sentimentBias - 1) },
         { name: "context", dev: Math.abs(contextBias - 1) },
     ].sort((a, b) => b.dev - a.dev || a.name.localeCompare(b.name));
-    const dominantReason = biasDevs[0].dev > 0.001 ? biasDevs[0].name : "balanced";
+    const topBias = biasDevs[0];
+    const dominantReason = topBias && topBias.dev > 0.001 ? topBias.name : "balanced";
 
     // ── 4. Profile vector: weighted average of embeddings ────────────────────
 
@@ -204,7 +230,9 @@ export function buildProfileVector(
     const has_embeddings = memoriesWithEmbeddings.length > 0;
 
     let profile_vector: number[];
-    if (has_embeddings) {
+    if (anchors.length === 0) {
+        profile_vector = new Array(PROFILE_VECTOR_DIM).fill(0);
+    } else if (has_embeddings) {
         const weightById = new Map(sorted.map((p) => [p.memory_id, p.final_weight]));
         const totalWeight = memoriesWithEmbeddings.reduce(
             (s, m) => s + (weightById.get(String(m.memory_id ?? "")) ?? 0),
@@ -213,9 +241,12 @@ export function buildProfileVector(
         if (totalWeight > 0) {
             const vec = new Array(PROFILE_VECTOR_DIM).fill(0);
             for (const m of memoriesWithEmbeddings) {
+                if (!Array.isArray(m.embedding) || m.embedding.length !== PROFILE_VECTOR_DIM) continue;
                 const w = weightById.get(String(m.memory_id ?? "")) ?? 0;
                 for (let i = 0; i < PROFILE_VECTOR_DIM; i++) {
-                    vec[i] += (w / totalWeight) * m.embedding![i];
+                    const current = vec[i] ?? 0;
+                    const value = m.embedding[i] ?? 0;
+                    vec[i] = current + (w / totalWeight) * value;
                 }
             }
             profile_vector = vec.map((v) => round6(v));
@@ -240,6 +271,14 @@ export function buildProfileVector(
             },
         },
         has_embeddings,
+        anchor_gate: {
+            enabled: true,
+            cosine_threshold: ANCHOR_GATE_COSINE_THRESHOLD,
+            relative_ratio: ANCHOR_GATE_RELATIVE_RATIO,
+            candidates_before: anchorCandidatesBefore,
+            candidates_after: anchorCandidatesAfter,
+            dropped_count: anchorDroppedCount,
+        },
     };
 }
 
@@ -312,6 +351,12 @@ export function createBuildProfileVectorSkill(): Skill<
                     has_embeddings: false,
                     fallback_used: true,
                     fallback_reason: "empty_input",
+                    anchor_gate_enabled: true,
+                    anchor_gate_cosine_threshold: ANCHOR_GATE_COSINE_THRESHOLD,
+                    anchor_gate_relative_ratio: ANCHOR_GATE_RELATIVE_RATIO,
+                    anchor_candidates_before: 0,
+                    anchor_candidates_after: 0,
+                    anchor_dropped_count: 0,
                 };
                 const fallbackOutput: BuildProfileVectorOutput = {
                     profile_vector: new Array(PROFILE_VECTOR_DIM).fill(0),
@@ -346,6 +391,12 @@ export function createBuildProfileVectorSkill(): Skill<
                 profile_vector_dim: PROFILE_VECTOR_DIM,
                 has_embeddings: result.has_embeddings,
                 fallback_used: false,
+                anchor_gate_enabled: result.anchor_gate.enabled,
+                anchor_gate_cosine_threshold: result.anchor_gate.cosine_threshold,
+                anchor_gate_relative_ratio: result.anchor_gate.relative_ratio,
+                anchor_candidates_before: result.anchor_gate.candidates_before,
+                anchor_candidates_after: result.anchor_gate.candidates_after,
+                anchor_dropped_count: result.anchor_gate.dropped_count,
             };
 
             const output: BuildProfileVectorOutput = {

@@ -130,7 +130,7 @@ function makeSuccessClient() {
 
 /**
  * makeContext — wraps createExecutionContext with sensible defaults.
- * Pass { image_url, image_base64 } to simulate an upload request.
+ * Pass { image_url, image_base64, image_original_base64 } to simulate an upload request.
  */
 function makeContext(overrides) {
     return createExecutionContext(
@@ -161,6 +161,7 @@ async function runAll() {
                         anchor_tags: ["ramen", "quiet"],
                         normalized_tags: ["ramen", "quiet"],
                         vision_features: ["cozy", "japanese"],
+                        vision_type: "food",
                         user_city: "tokyo",
                         request_ts: 1704067200000,
                     },
@@ -186,6 +187,7 @@ async function runAll() {
                 assert.ok(Array.isArray(body.data.embedding) && body.data.embedding.length === 512,
                     "embedding forwarded");
                 assert.strictEqual(body.data.source, "upload", "source=upload");
+                assert.strictEqual(body.data.vision_type, "food", "vision_type forwarded to memory.write");
             } finally {
                 await stub.close();
                 delete process.env.MEMORY_SERVICE_URL;
@@ -246,10 +248,53 @@ async function runAll() {
                 assert.ok(Array.isArray(body.data.raw_tags), "raw_tags present");
                 assert.ok(Array.isArray(body.data.normalized_tags), "normalized_tags present");
                 assert.strictEqual(body.data.source, "upload", "source=upload");
-                assert.strictEqual(body.data.sentiment, 0.0, "sentiment=0.0");
+                assert.strictEqual(body.data.sentiment, 0.5, "sentiment defaults to neutral 0.5");
                 // Must NOT include time-weighting fields (those belong to memory.search only)
                 assert.strictEqual(body.data.recency_days, undefined, "no recency_days in body");
                 assert.strictEqual(body.data.w_time, undefined, "no w_time in body");
+            } finally {
+                await stub.close();
+                delete process.env.MEMORY_SERVICE_URL;
+            }
+        }
+    );
+
+    await test(
+        "upload flow: prefers image_original_base64 and forwards image_vision_input_base64",
+        async function () {
+            var stub = await startStubMemoryServer(200);
+            process.env.MEMORY_SERVICE_URL = "http://127.0.0.1:" + stub.port;
+
+            try {
+                var skill = createTesBuilderSkill(makeSuccessClient());
+                var ctx = makeContext({
+                    image_base64: "data:image/webp;base64,VISION_PAYLOAD",
+                    image_original_base64: "data:image/jpeg;base64,ORIGINAL_PAYLOAD",
+                    request_ts: 1704067200000,
+                });
+
+                var result = await skill.execute(
+                    {
+                        anchor_tags: ["ramen"],
+                        normalized_tags: ["ramen"],
+                        vision_features: ["food"],
+                        user_city: "tokyo",
+                        request_ts: 1704067200000,
+                    },
+                    ctx
+                );
+
+                assert.strictEqual(result.output.fallback_used, false, "skill must succeed");
+                assert.strictEqual(result.trace.memory_persisted, true, "memory_persisted=true");
+                assert.strictEqual(result.trace.memory_write_status, "queued", "memory_write queued");
+
+                var body = await stub.bodyPromise;
+                assert.strictEqual(body.data.image_base64, "data:image/jpeg;base64,ORIGINAL_PAYLOAD");
+                assert.strictEqual(
+                    body.data.image_vision_input_base64,
+                    "data:image/webp;base64,VISION_PAYLOAD",
+                    "vision_input payload should be forwarded separately"
+                );
             } finally {
                 await stub.close();
                 delete process.env.MEMORY_SERVICE_URL;
@@ -290,8 +335,8 @@ async function runAll() {
                 var body = await stub.bodyPromise;
                 assert.strictEqual(stub.getRequestCount(), 1, "memory.write must be called exactly once");
                 assert.strictEqual(body.data.timestamp, "2024-01-01T00:00:00.000Z");
-                assert.deepStrictEqual(body.data.raw_tags, []);
-                assert.deepStrictEqual(body.data.normalized_tags, []);
+                assert.deepStrictEqual(body.data.raw_tags, ["ramen", "scenery"]);
+                assert.deepStrictEqual(body.data.normalized_tags, ["ramen", "scenery"]);
                 assert.ok(Array.isArray(body.data.embedding) && body.data.embedding.length === 512,
                     "embedding forwarded");
             } finally {

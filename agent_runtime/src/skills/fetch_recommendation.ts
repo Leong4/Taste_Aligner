@@ -21,8 +21,10 @@ import { ToolClient } from "../tools/toolClient";
 const RULE_ID = "fetch_recommendation_v1";
 const SCHEMA_VERSION = "1.0";
 const TOOL_NAME = "recommendation.score";
+const DEFAULT_MEMORY_POOL = "all";
 
 type FallbackReason = "tool_error" | "invalid_output" | "empty_result";
+type MemoryPool = "food" | "scenery" | "all";
 
 function normalizeCity(city: unknown): string {
     if (typeof city !== "string") {
@@ -59,6 +61,15 @@ function normalizeTags(primary: unknown, fallback: unknown): string[] {
     const out = Array.from(normalized);
     out.sort((a, b) => a.localeCompare(b));
     return out;
+}
+
+function normalizeMemoryPool(value: unknown): MemoryPool {
+    if (typeof value !== "string") return DEFAULT_MEMORY_POOL;
+    const cleaned = value.trim().toLowerCase();
+    if (cleaned === "food") return "food";
+    if (cleaned === "scenery" || cleaned === "culture") return "scenery";
+    if (cleaned === "all" || cleaned === "mixed" || cleaned === "unknown") return "all";
+    return DEFAULT_MEMORY_POOL;
 }
 
 function emptyOutput(): FetchRecommendationOutput {
@@ -140,7 +151,7 @@ export function createFetchRecommendationSkill(
         inputSchema: {
             description: "User context for recommendation scoring",
             required: ["city"],
-            optional: ["user_id", "tags", "intent_tags", "intent", "meta", "controls", "memory_confidence"],
+            optional: ["user_id", "tags", "intent_tags", "intent", "meta", "controls", "memory_confidence", "memory_pool", "anchor_tags"],
         },
 
         outputSchema: {
@@ -156,12 +167,15 @@ export function createFetchRecommendationSkill(
             const city = normalizeCity(input.city);
             const userIdInfo = normalizeUserId(input.user_id);
             const tags = normalizeTags(input.tags, input.intent_tags);
+            const memoryPool = normalizeMemoryPool(input.memory_pool);
+            const anchorTags = normalizeTags(input.anchor_tags, []);
             const requestSummary = {
                 city,
                 user_id: userIdInfo.value,
                 user_id_defaulted: userIdInfo.usedDefault,
                 tags_count: tags.length,
                 intent_present: input.intent !== undefined && input.intent !== null,
+                memory_pool: memoryPool,
             };
 
             if (!city) {
@@ -180,6 +194,8 @@ export function createFetchRecommendationSkill(
                             tags,
                             intent: input.intent ?? "balanced",
                             memory_confidence: input.memory_confidence ?? 0.6,
+                            memory_pool: memoryPool,
+                            anchor_tags: anchorTags,
                         },
                     },
                 });

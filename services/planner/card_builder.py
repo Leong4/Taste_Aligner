@@ -142,8 +142,8 @@ def select_items_for_cards(
     raw_cz = reco_payload.get("cz_ranked", [])
     raw_ez = reco_payload.get("ez_ranked", [])
 
-    cz_items = _stable_sort(_filter_city(raw_cz, city), "score_CZ")
-    ez_items = _stable_sort(_filter_city(raw_ez, city), "score_EZ")
+    cz_items = _filter_city(raw_cz, city)
+    ez_items = _filter_city(raw_ez, city)
 
     selected_cz = cz_items[:requested_topk_cz]
     selected_ez = ez_items[:requested_topk_ez]

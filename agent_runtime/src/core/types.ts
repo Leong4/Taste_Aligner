@@ -132,8 +132,14 @@ export interface OrchestratorInput {
     request_ts?: number;
     /** Optional image URL for multimodal input (passed to vision_describe). */
     image_url?: string;
-    /** Optional base64-encoded image for multimodal input (passed to vision_describe). */
+    /** Optional vision-input image (base64) consumed by vision_describe. */
     image_base64?: string;
+    /** Optional original upload image (full quality) for memory persistence. */
+    image_original_base64?: string;
+    /** Optional caption/journal text for upload memory enrichment. */
+    caption?: string;
+    /** Optional explicit city from UI upload form. */
+    city?: string;
 }
 
 /** Final output from the orchestrator, returned to the /run endpoint. */
@@ -177,6 +183,8 @@ export interface FetchRecommendationInput {
     meta?: Record<string, unknown>;
     controls?: Record<string, unknown>;
     memory_confidence?: number;
+    memory_pool?: "food" | "scenery" | "all";
+    anchor_tags?: string[];
 }
 
 /** Input to the memory_signal skill. */
@@ -247,6 +255,8 @@ export interface VisionDescribeInput {
     image_url?: string;
     /** Optional base64-encoded image. */
     image_base64?: string;
+    /** Optional caption text to enrich tag extraction. */
+    caption_text?: string;
     /** Max tags to return (default 10, clamped [1, 50]). */
     top_k?: number;
 }
@@ -260,8 +270,11 @@ export interface VisionDescribeDecisionTrace extends Record<string, unknown> {
     model_id?: string | null;
     device?: string;
     /** Image type classification from vision backend (clip_v1 V1 schema). */
-    vision_type?: "food" | "scenery" | "unknown";
+    vision_type?: "food" | "scenery" | "other" | "unknown";
     tags_count: number;
+    cues_count?: number;
+    confidence?: number;
+    sentiment?: number;
     latency_ms?: number;
     fallback_used: boolean;
     fallback_reason?: "no_image" | "tool_error" | "invalid_output";
@@ -275,6 +288,12 @@ export interface VisionDescribeDecisionTrace extends Record<string, unknown> {
 /** Output of the vision_describe skill. */
 export interface VisionDescribeOutput {
     vision_features: string[];
+    /** Canonical multimodal type propagated downstream (food|scenery|unknown). */
+    vision_type?: "food" | "scenery" | "other" | "unknown";
+    cues?: string[];
+    tags?: string[];
+    confidence?: number;
+    sentiment?: number;
     used: boolean;
     backend?: string;
     model_id?: string | null;
@@ -292,6 +311,14 @@ export interface TesBuilderInput {
     normalized_tags?: string[];
     /** Vision features from vision_describe for multimodal TES enrichment. */
     vision_features?: string[];
+    /** Raw semantic tags emitted by vision_describe. */
+    vision_tags?: string[];
+    /** Vision type inferred by vision_describe. */
+    vision_type?: "food" | "scenery" | "other" | "unknown" | string;
+    /** Caption sentiment scored by cloud vision, in [0, 1]. */
+    sentiment?: number;
+    /** Optional caption text from UI/upload payload. */
+    caption_text?: string;
     request_ts?: number | string;
     user_city?: string;
     decision_trace?: Record<string, unknown>;
@@ -303,6 +330,8 @@ export interface TesBuilderDecisionTrace extends Record<string, unknown> {
     schema_version: "1.0";
     request_ts: number;
     timestamp_source?: "input_timestamp" | "context_request_ts" | "fixed_epoch";
+    sentiment_source?: "vision" | "neutral_default";
+    sentiment_value?: number;
     input_summary: {
         anchor_tag_count: number;
         normalized_tag_count?: number;
@@ -601,6 +630,7 @@ export interface MemoryWeightAdjustInput {
     city?: string | null;
     tags?: string[];
     intent_tags?: string[];
+    query_type?: "food" | "culture" | "mixed" | "unknown" | "scenery" | string;
     top_k?: number;
     now_ts?: number;
 }
@@ -649,13 +679,31 @@ export interface MemoryWeightAdjustDecisionTrace extends Record<string, unknown>
         tags_count: number;
         top_k: number;
         now_ts_present: boolean;
+        memory_pool?: "food" | "scenery" | "all";
     };
     aggregation: {
         anchor_top_n: number;
         confidence_formula: string;
     };
+    memory_pool?: "food" | "scenery" | "all";
+    pool_filter_applied?: boolean;
+    query_embedding_used?: boolean;
+    query_embedding_dim?: number;
+    query_tags_count?: number;
+    memory_search_mode?: "embedding_plus_tags" | "tags_only_fallback";
+    query_embedding_fallback_reason?:
+        | "query_embedding_tool_error"
+        | "query_embedding_invalid_output"
+        | "query_embedding_invalid_vector";
     fallback_used: boolean;
-    fallback_reason?: "no_tags" | "tool_error" | "invalid_output" | "empty_results";
+    fallback_reason?:
+        | "no_tags"
+        | "tool_error"
+        | "invalid_output"
+        | "empty_results"
+        | "query_embedding_tool_error"
+        | "query_embedding_invalid_output"
+        | "query_embedding_invalid_vector";
     error_message?: string;
     latency_ms?: number;
 }

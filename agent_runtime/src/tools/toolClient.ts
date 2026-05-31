@@ -7,6 +7,11 @@ type ToolClientOpts = {
     logPayload?: boolean;       // debug 用
 };
 
+const TOOL_TIMEOUT_OVERRIDES_MS: Record<string, number> = {
+    "embedding.tes_build": 7000,
+    "vision.describe": 15000,
+};
+
 export class ToolClient {
     private http: AxiosInstance;
     private baseUrl: string;
@@ -40,12 +45,13 @@ export class ToolClient {
         }
 
         const path = `/tool/${action.tool}`;
+        const timeoutMs = TOOL_TIMEOUT_OVERRIDES_MS[action.tool] ?? this.timeoutMs;
         try {
             if (this.logPayload) {
-                console.log(`[toolClient] -> ${path}`, { traceId, input });
+                console.log(`[toolClient] -> ${path}`, { traceId, timeoutMs, input });
             }
 
-            const resp = await this.http.post(path, input);
+            const resp = await this.http.post(path, input, { timeout: timeoutMs });
             const latencyMs = Date.now() - started;
 
             if (resp.status >= 200 && resp.status < 300) {

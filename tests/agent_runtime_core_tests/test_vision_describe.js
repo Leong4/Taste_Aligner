@@ -119,6 +119,19 @@ async function runAll() {
         assert.deepStrictEqual(result.output.vision_features, []);
     });
 
+    await test("invalid_output fallback: non-clip backend payload is rejected", async () => {
+        const client = new StubToolClient(async () => ({
+            ok: true,
+            latency_ms: 9,
+            output: { tags: ["ramen"], backend: "rule_v0", device: "cpu" },
+        }));
+        const skill = createVisionDescribeSkill(client);
+        const result = await skill.execute({ image_url: "http://example.com/img.jpg" }, makeContext());
+
+        assert.strictEqual(result.output.fallback_reason, "invalid_output");
+        assert.strictEqual(result.output.used, false);
+    });
+
     // ── success path ──────────────────────────────────────────────────────────
     await test("success: tags sorted, deduped, lowercased", async () => {
         const client = new StubToolClient(async (action) => {
@@ -171,7 +184,7 @@ async function runAll() {
                 latency_ms: 15,
                 output: {
                     tags: ["garden", "outdoor"],
-                    backend: "rule_v0",
+                    backend: "clip_v1",
                     model_id: null,
                     device: "cpu",
                 },
@@ -185,6 +198,8 @@ async function runAll() {
 
         assert.strictEqual(result.output.used, true);
         assert.deepStrictEqual(result.output.vision_features, ["garden", "outdoor"]);
+        assert.deepStrictEqual(result.output.tags, ["garden", "outdoor"]);
+        assert.deepStrictEqual(result.output.cues, []);
         assert.strictEqual(result.output.model_id, null);
         assert.strictEqual(result.trace.input_summary.has_url, false);
         assert.strictEqual(result.trace.input_summary.has_base64, true);
@@ -218,6 +233,7 @@ async function runAll() {
             output: {
                 backend: "clip_v1",
                 type: "food",
+                confidence: 0.91,
                 cues: ["ramen", "noodles", "izakaya"],
                 tags: ["RAMEN", "cafe"],   // "ramen" deduped across cues+tags
                 model_id: "ViT-B-32/openai",
@@ -234,10 +250,16 @@ async function runAll() {
         assert.strictEqual(result.output.fallback_used, false);
         // cafe < izakaya < noodles < ramen — merged, deduped, lowercased, sorted
         assert.deepStrictEqual(result.output.vision_features, ["cafe", "izakaya", "noodles", "ramen"]);
+        assert.deepStrictEqual(result.output.cues, ["izakaya", "noodles", "ramen"]);
+        assert.deepStrictEqual(result.output.tags, ["cafe", "ramen"]);
         assert.strictEqual(result.output.tags_count, 4);
+        assert.strictEqual(result.output.vision_type, "food", "vision_type must be exposed on skill output");
+        assert.strictEqual(result.output.confidence, 0.91, "confidence must be exposed on skill output");
 
         const trace = result.output.decision_trace.vision_describe;
         assert.strictEqual(trace.vision_type, "food", "vision_type must be propagated from V1 schema");
+        assert.strictEqual(trace.cues_count, 3, "trace must include cues_count");
+        assert.strictEqual(trace.confidence, 0.91, "trace must include confidence");
         assert.strictEqual(trace.used, true);
         assert.strictEqual(trace.backend, "clip_v1");
     });
@@ -265,6 +287,7 @@ async function runAll() {
         assert.strictEqual(result.output.fallback_used, false);
         // garden < outdoor < temple
         assert.deepStrictEqual(result.output.vision_features, ["garden", "outdoor", "temple"]);
+        assert.strictEqual(result.output.vision_type, "scenery");
         assert.strictEqual(result.trace.vision_type, "scenery");
     });
 

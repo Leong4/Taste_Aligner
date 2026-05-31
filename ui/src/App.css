@@ -246,10 +246,26 @@ textarea { min-height: 80px; resize: vertical; }
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   padding: 1rem;
+  position: relative;
   cursor: pointer;
   transition: box-shadow 0.15s, transform 0.1s;
 }
 .mem-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateY(-1px); }
+.mem-delete {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mem-delete:hover { background: #fee2e2; }
 .mem-thumb {
   width: 100%;
   height: 100px;

@@ -14,6 +14,7 @@ exports.createFetchRecommendationSkill = createFetchRecommendationSkill;
 const RULE_ID = "fetch_recommendation_v1";
 const SCHEMA_VERSION = "1.0";
 const TOOL_NAME = "recommendation.score";
+const DEFAULT_MEMORY_POOL = "all";
 function normalizeCity(city) {
     if (typeof city !== "string") {
         return "";
@@ -45,6 +46,18 @@ function normalizeTags(primary, fallback) {
     const out = Array.from(normalized);
     out.sort((a, b) => a.localeCompare(b));
     return out;
+}
+function normalizeMemoryPool(value) {
+    if (typeof value !== "string")
+        return DEFAULT_MEMORY_POOL;
+    const cleaned = value.trim().toLowerCase();
+    if (cleaned === "food")
+        return "food";
+    if (cleaned === "scenery" || cleaned === "culture")
+        return "scenery";
+    if (cleaned === "all" || cleaned === "mixed" || cleaned === "unknown")
+        return "all";
+    return DEFAULT_MEMORY_POOL;
 }
 function emptyOutput() {
     return {
@@ -94,7 +107,7 @@ function createFetchRecommendationSkill(toolClient) {
         inputSchema: {
             description: "User context for recommendation scoring",
             required: ["city"],
-            optional: ["user_id", "tags", "intent_tags", "intent", "meta", "controls", "memory_confidence"],
+            optional: ["user_id", "tags", "intent_tags", "intent", "meta", "controls", "memory_confidence", "memory_pool", "anchor_tags"],
         },
         outputSchema: {
             description: "Ranked CZ/EZ items + recommendation service decision trace",
@@ -105,12 +118,15 @@ function createFetchRecommendationSkill(toolClient) {
             const city = normalizeCity(input.city);
             const userIdInfo = normalizeUserId(input.user_id);
             const tags = normalizeTags(input.tags, input.intent_tags);
+            const memoryPool = normalizeMemoryPool(input.memory_pool);
+            const anchorTags = normalizeTags(input.anchor_tags, []);
             const requestSummary = {
                 city,
                 user_id: userIdInfo.value,
                 user_id_defaulted: userIdInfo.usedDefault,
                 tags_count: tags.length,
                 intent_present: input.intent !== undefined && input.intent !== null,
+                memory_pool: memoryPool,
             };
             if (!city) {
                 return buildFallback("invalid_output", requestSummary, 0, "missing_city", userIdInfo.usedDefault);
@@ -127,6 +143,8 @@ function createFetchRecommendationSkill(toolClient) {
                             tags,
                             intent: input.intent ?? "balanced",
                             memory_confidence: input.memory_confidence ?? 0.6,
+                            memory_pool: memoryPool,
+                            anchor_tags: anchorTags,
                         },
                     },
                 });

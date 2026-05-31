@@ -425,6 +425,30 @@ async function runAll() {
         assert.ok(profileIdx !== -1 && explainIdx !== -1 && profileIdx < explainIdx,
             "build_profile_vector must execute before explain_from_trace");
 
+        const tesBuilderNode = RECOMMENDATION_GRAPH.nodes.find((n) => n.id === "tes_builder");
+        assert.ok(tesBuilderNode, "tes_builder node must exist");
+        assert.strictEqual(
+            tesBuilderNode.inputFrom.vision_type,
+            "vision_describe.vision_type",
+            "tes_builder must read canonical vision_type field from vision_describe output"
+        );
+
+        const memoryWeightNode = RECOMMENDATION_GRAPH.nodes.find((n) => n.id === "memory_weight_adjust");
+        assert.ok(memoryWeightNode, "memory_weight_adjust node must exist");
+        assert.strictEqual(
+            memoryWeightNode.inputFrom.query_type,
+            "extract_intent.type",
+            "memory_weight_adjust must receive query_type from extract_intent.type for memory pooling"
+        );
+
+        const fetchNode = RECOMMENDATION_GRAPH.nodes.find((n) => n.id === "fetch_recommendation");
+        assert.ok(fetchNode, "fetch_recommendation node must exist");
+        assert.strictEqual(
+            fetchNode.inputFrom.memory_pool,
+            "extract_intent.type",
+            "fetch_recommendation must receive memory_pool hint from extract_intent.type"
+        );
+
         // Graph still validates
         const errors = validateGraph(RECOMMENDATION_GRAPH);
         assert.strictEqual(errors.length, 0, "graph valid: " + errors.join(", "));
@@ -558,6 +582,7 @@ async function runAll() {
             execute: async () => ({
                 output: {
                     vision_features: [],
+                    vision_type: "scenery",
                     used: false,
                     tags_count: 0,
                     fallback_used: true,
@@ -624,25 +649,32 @@ async function runAll() {
             name: "tes_builder",
             inputSchema: { description: "", required: [] },
             outputSchema: { description: "", required: [] },
-            execute: async () => ({
-                output: {
-                    tes_vector: Array.from({ length: 512 }, (_, i) => (i === 0 ? 1 : 0)),
-                    tes_dim: 512,
-                    normalized: true,
-                    backend: "hash_v2",
-                    tes_version: "2.0",
-                    input_anchor_tags: ["food"],
-                    used_anchor_tags: ["food"],
-                    fallback_used: false,
-                    decision_trace: {
-                        tes_builder: {
-                            rule_id: "tes_builder_v1",
-                            schema_version: "1.0",
+            execute: async (input) => {
+                assert.strictEqual(
+                    input.vision_type,
+                    "scenery",
+                    "graph mapping should pass vision_describe.vision_type into tes_builder"
+                );
+                return {
+                    output: {
+                        tes_vector: Array.from({ length: 512 }, (_, i) => (i === 0 ? 1 : 0)),
+                        tes_dim: 512,
+                        normalized: true,
+                        backend: "hash_v2",
+                        tes_version: "2.0",
+                        input_anchor_tags: ["food"],
+                        used_anchor_tags: ["food"],
+                        fallback_used: false,
+                        decision_trace: {
+                            tes_builder: {
+                                rule_id: "tes_builder_v1",
+                                schema_version: "1.0",
+                            },
                         },
                     },
-                },
-                trace: { rule_id: "tes_builder_v1", schema_version: "1.0" },
-            }),
+                    trace: { rule_id: "tes_builder_v1", schema_version: "1.0" },
+                };
+            },
         });
 
         // Stub remaining skills to complete pipeline

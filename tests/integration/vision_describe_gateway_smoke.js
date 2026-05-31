@@ -13,7 +13,7 @@
  *
  * Prerequisites:
  *   - Gateway running on localhost:8080
- *   - Vision service running (VISION_BACKEND=rule_v0 is sufficient)
+ *   - Vision service running (VISION_BACKEND=clip_v1)
  *
  * Run:
  *   node tests/integration/vision_describe_gateway_smoke.js

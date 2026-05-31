@@ -1,5 +1,5 @@
 # Vision Service Dependencies (v2)
-# Supports rule_v0 (keyword) and clip_v1 (local CLIP model) backends.
+# CLIP-only vision backend (clip_v1).
 
 # Core — always required
 fastapi>=0.104.0
@@ -7,7 +7,7 @@ uvicorn>=0.24.0
 pydantic>=2.0.0
 Pillow>=10.0.0
 
-# clip_v1 backend — required when VISION_BACKEND=clip_v1 (default)
-# Pulls in PyTorch (~2 GB on first install); skip if using VISION_BACKEND=rule_v0.
+# clip_v1 backend — required (default and only supported backend)
+# Pulls in PyTorch (~2 GB on first install).
 # Install: pip install open_clip_torch
 open_clip_torch>=2.20.0

@@ -44,9 +44,10 @@ function createOrchestrator(config = {}) {
     registry.register(skills_1.extractIntentSkill);
     registry.register(skills_1.decideTagBudgetSkill);
     registry.register((0, skills_1.createTagExpandSkill)(llmAdapter));
-    registry.register((0, skills_1.createTagNormalizeSkill)());
+    registry.register((0, skills_1.createTagNormalizeSkill)(toolClient));
     registry.register((0, skills_1.createMemorySignalSkill)(toolClient));
     registry.register((0, skills_1.createMemoryWeightAdjustSkill)(toolClient));
+    registry.register((0, skills_1.createBuildProfileVectorSkill)()); // no tool client needed — pure computation
     registry.register((0, skills_1.createVisionDescribeSkill)(toolClient));
     registry.register((0, skills_1.createTesBuilderSkill)(toolClient));
     registry.register((0, skills_1.createFetchRecommendationSkill)(toolClient));

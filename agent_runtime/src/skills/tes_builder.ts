@@ -30,6 +30,7 @@ const NORM_UPPER = 1.01;
 type FallbackReason = "no_tags" | "tool_error" | "invalid_output" | "invalid_vector";
 type TagSource = "anchor_tags" | "normalized_tags_fallback" | "none";
 type MemoryWriteTimestampSource = "input_timestamp" | "context_request_ts" | "fixed_epoch";
+type SentimentSource = "vision" | "neutral_default";
 
 function asObject(value: unknown): Record<string, unknown> | null {
     if (!value || typeof value !== "object" || Array.isArray(value)) {
@@ -97,6 +98,29 @@ function createZeroVector(): number[] {
     return Array.from({ length: DIM_EXPECTED }, () => 0);
 }
 
+function resolveVisionSentiment(value: unknown): { value: number; source: SentimentSource } {
+    if (typeof value !== "number" || !Number.isFinite(value)) {
+        return { value: 0.5, source: "neutral_default" };
+    }
+    return {
+        value: Number(Math.max(0, Math.min(1, value)).toFixed(4)),
+        source: "vision",
+    };
+}
+
+function extractCaptionText(input: TesBuilderInput, context: ExecutionContext): string {
+    if (typeof input.caption_text === "string" && input.caption_text.trim()) {
+        return input.caption_text.trim();
+    }
+    if (typeof context.input.caption === "string" && context.input.caption.trim()) {
+        return context.input.caption.trim();
+    }
+    if (typeof context.input.text === "string" && context.input.text.trim()) {
+        return context.input.text.trim();
+    }
+    return "";
+}
+
 function computeNorm(vector: number[]): number | null {
     if (!Array.isArray(vector) || vector.length === 0) {
         return null;
@@ -113,13 +137,32 @@ function computeNorm(vector: number[]): number | null {
 
 function hasUploadImageSignal(context: ExecutionContext): boolean {
     const root = context as ExecutionContext & { image?: unknown };
-    const input = context.input as typeof context.input & { image?: unknown };
+    const input = context.input as typeof context.input & {
+        image?: unknown;
+        image_original_base64?: unknown;
+    };
     return !!(
         root.image ||
         input?.image ||
         (typeof input?.image_url === "string" && input.image_url.trim()) ||
+        (typeof input?.image_original_base64 === "string" && input.image_original_base64.trim()) ||
         (typeof input?.image_base64 === "string" && input.image_base64.trim())
     );
+}
+
+function normalizeDataUrl(value: unknown, defaultMime: "image/jpeg" | "image/webp"): string {
+    if (typeof value !== "string") {
+        return "";
+    }
+    const trimmed = value.trim();
+    if (!trimmed) {
+        return "";
+    }
+    if (/^data:image\/[a-z0-9.+-]+;base64,/i.test(trimmed)) {
+        return trimmed;
+    }
+    // Accept raw base64 payloads from test or non-UI callers.
+    return `data:${defaultMime};base64,${trimmed}`;
 }
 
 function buildTrace(
@@ -297,7 +340,7 @@ async function writeMemoryRecord(body: Record<string, unknown>): Promise<"ok" | 
 // ---------------------------------------------------------------------------
 
 export function createTesBuilderSkill(
-    toolClient: ToolClient
+    toolClient: ToolClient,
 ): Skill<TesBuilderInput, TesBuilderOutput> {
     return {
         name: "tes_builder",
@@ -305,7 +348,7 @@ export function createTesBuilderSkill(
         inputSchema: {
             description: "Build TES vector from memory_signal anchor tags and optional vision features",
             required: [],
-            optional: ["anchor_tags", "normalized_tags", "vision_features", "request_ts", "user_city", "decision_trace"],
+            optional: ["anchor_tags", "normalized_tags", "vision_features", "vision_tags", "sentiment", "request_ts", "user_city", "decision_trace"],
         },
 
         outputSchema: {
@@ -331,6 +374,7 @@ export function createTesBuilderSkill(
             const anchorTags = normalizeAnchorTags(input.anchor_tags);
             const normalizedTags = normalizeAnchorTags(input.normalized_tags);
             const visionFeatures = normalizeAnchorTags(input.vision_features);
+            const visionTags = normalizeAnchorTags(input.vision_tags);
             const tagsForTes = anchorTags.length > 0 ? anchorTags : normalizedTags;
             const tagSource: TagSource = anchorTags.length > 0
                 ? "anchor_tags"
@@ -511,9 +555,16 @@ export function createTesBuilderSkill(
                 traceNode.memory_persisted = isUploadFlow;
                 if (isUploadFlow) {
                     const writeTimestamp = resolveMemoryWriteTimestamp(context);
-                    const writeTags = tagsForTes.length > 0 ? tagsForTes : [];
+                    const captionText = extractCaptionText(input, context);
+                    const sentiment = resolveVisionSentiment(input.sentiment);
+                    const visionSemanticTags = visionTags.length > 0 ? visionTags : visionFeatures;
+                    const writeTags = visionTags.length > 0
+                        ? visionTags
+                        : (tagsForTes.length > 0 ? tagsForTes : visionSemanticTags);
                     const writeNormalizedTags =
-                        normalizedTags.length > 0 ? normalizedTags : writeTags;
+                        visionTags.length > 0
+                            ? visionTags
+                            : (normalizedTags.length > 0 ? normalizedTags : writeTags);
                     const writeBody: Record<string, unknown> = {
                         user_id: context.input.user_id ?? "demo_user",
                         timestamp: writeTimestamp.timestamp,
@@ -521,14 +572,38 @@ export function createTesBuilderSkill(
                         normalized_tags: writeNormalizedTags,
                         embedding: numericVector,
                         source: "upload",
-                        sentiment: 0.0,
+                        sentiment: sentiment.value,
                     };
+                    if (captionText) {
+                        writeBody.caption_text = captionText;
+                    }
+                    if (typeof input.vision_type === "string" && input.vision_type.length > 0) {
+                        writeBody.vision_type = input.vision_type;
+                    }
+                    const originalImageBase64 = normalizeDataUrl(
+                        context.input.image_original_base64 ?? context.input.image_base64,
+                        "image/jpeg"
+                    );
+                    if (originalImageBase64) {
+                        writeBody.image_base64 = originalImageBase64;
+                    }
+                    const visionInputBase64 = normalizeDataUrl(context.input.image_base64, "image/webp");
+                    if (visionInputBase64 && visionInputBase64 !== originalImageBase64) {
+                        writeBody.image_vision_input_base64 = visionInputBase64;
+                    }
+                    if (typeof context.input.image_url === "string" && context.input.image_url.trim()) {
+                        writeBody.image_url = context.input.image_url;
+                    }
                     if (typeof input.user_city === "string" && input.user_city.length > 0) {
                         writeBody.city = input.user_city;
+                    } else if (typeof context.input.city === "string" && context.input.city.trim().length > 0) {
+                        writeBody.city = context.input.city.trim();
                     }
                     // Fire-and-forget: do not block the pipeline.
                     // Status is set to "queued" deterministically; actual result is discarded.
                     traceNode.timestamp_source = writeTimestamp.source;
+                    traceNode.sentiment_source = sentiment.source;
+                    traceNode.sentiment_value = sentiment.value;
                     traceNode.memory_write_status = "queued";
                     writeMemoryRecord(writeBody).catch(() => void 0);
                 }

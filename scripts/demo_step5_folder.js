@@ -13,6 +13,7 @@ const STEP5_INPUT_DIR = process.env.STEP5_INPUT_DIR ||
     path.join(process.cwd(), "demo_inputs", "step5");
 const STEP5_QUERY = process.env.STEP5_QUERY || "I want ramen in tokyo";
 const STEP5_USER_ID = process.env.STEP5_USER_ID || "step5_demo_user";
+const STEP5_CITY = process.env.STEP5_CITY || "tokyo";
 const UPLOAD_TEXT_PREFIX = "Please remember this tokyo ramen food photo for my taste profile.";
 const SUPPORTED_EXTS = new Set([".jpg", ".jpeg", ".png", ".webp"]);
 
@@ -41,6 +42,21 @@ function mimeFromExt(filePath) {
 function toDataUrl(filePath) {
     const buf = fs.readFileSync(filePath);
     return `data:${mimeFromExt(filePath)};base64,${buf.toString("base64")}`;
+}
+
+function readCaptionForImage(filePath, index) {
+    const ext = path.extname(filePath);
+    const baseWithoutExt = filePath.slice(0, filePath.length - ext.length);
+    const sidecarPaths = [
+        `${baseWithoutExt}.txt`,
+        `${filePath}.txt`,
+    ];
+    for (const p of sidecarPaths) {
+        if (!fs.existsSync(p)) continue;
+        const value = fs.readFileSync(p, "utf8").trim();
+        if (value) return value;
+    }
+    return `Photo ${index + 1}: travel memory in ${STEP5_CITY}.`;
 }
 
 function postJson(urlString, body) {
@@ -106,6 +122,27 @@ function getJson(urlString) {
                 }
                 resolve({ status: res.statusCode || 0, body: parsed, raw });
             });
+        });
+        req.on("error", reject);
+        req.on("timeout", () => req.destroy(new Error(`Request timed out: ${urlString}`)));
+        req.end();
+    });
+}
+
+function getStatus(urlString) {
+    return new Promise((resolve, reject) => {
+        const url = new URL(urlString);
+        const client = url.protocol === "https:" ? https : http;
+        const req = client.request({
+            protocol: url.protocol,
+            hostname: url.hostname,
+            port: url.port || (url.protocol === "https:" ? 443 : 80),
+            path: url.pathname + url.search,
+            method: "GET",
+            timeout: 10000,
+        }, (res) => {
+            res.resume();
+            res.on("end", () => resolve(res.statusCode || 0));
         });
         req.on("error", reject);
         req.on("timeout", () => req.destroy(new Error(`Request timed out: ${urlString}`)));
@@ -373,8 +410,11 @@ async function waitForMemoryVisible(uploadStartMs, queryTags, city) {
 
 async function uploadOne(runUrl, filePath, index) {
     const uploadStartMs = Date.now();
+    const caption = readCaptionForImage(filePath, index);
     const resp = await postJson(runUrl, {
         text: `${UPLOAD_TEXT_PREFIX} [${index + 1}] ${path.basename(filePath)}`,
+        caption,
+        city: STEP5_CITY,
         user_id: STEP5_USER_ID,
         image_base64: toDataUrl(filePath),
     });
@@ -413,7 +453,12 @@ async function uploadOne(runUrl, filePath, index) {
     const visible = await waitForMemoryVisible(uploadStartMs, queryTags, city);
     console.log("[step5] upload visible:");
     for (const memory of visible.slice(0, 2)) {
-        console.log(`  - ${memory.memory_id} timestamp=${memory.timestamp} source=${memory.source}`);
+        const fileUrl = new URL(`/files/${encodeURIComponent(memory.memory_id)}`, MEMORY_BASE_URL).toString();
+        const fileStatus = await getStatus(fileUrl).catch(() => 0);
+        console.log(
+            `  - ${memory.memory_id} timestamp=${memory.timestamp} source=${memory.source} ` +
+            `file_url=${fileUrl} status=${fileStatus}`
+        );
     }
     return { resp, visible, queryTags, city };
 }
@@ -547,7 +592,8 @@ async function main() {
 
     console.log("[step5] visible uploads:");
     for (const memory of visibleUploads) {
-        console.log(`  - ${memory.memory_id} timestamp=${memory.timestamp} source=${memory.source}`);
+        const fileUrl = new URL(`/files/${encodeURIComponent(memory.memory_id)}`, MEMORY_BASE_URL).toString();
+        console.log(`  - ${memory.memory_id} timestamp=${memory.timestamp} source=${memory.source} file_url=${fileUrl}`);
     }
     console.log("[step5] recall top memories:");
     if (recallTop.length === 0) {

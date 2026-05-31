@@ -5,7 +5,7 @@
  * Gates verified on each /run call with image_base64:
  *   1. decision_trace.vision_describe.used === true
  *   2. decision_trace.vision_describe.backend === "clip_v1"
- *   3. decision_trace.vision_describe.vision_type is "food"|"scenery"|"unknown"
+ *   3. decision_trace.vision_describe.vision_type is "food"|"scenery"|"other"|"unknown"
  *   4. decision_trace.tes_builder.tes_build_payload_keys always present and correct
  *      (unconditional — must not be bypassable by fallback_used=true)
  *   5. Forbidden non-deterministic keys absent from top-level decision_trace
@@ -51,7 +51,7 @@ var FORBIDDEN_TOP_KEYS = new Set([
 ]);
 
 // Valid vision_type values
-var VALID_VISION_TYPES = new Set(["food", "scenery", "unknown"]);
+var VALID_VISION_TYPES = new Set(["food", "scenery", "other", "unknown"]);
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -192,7 +192,7 @@ function validateResponse(resp, callLabel) {
     var visionType = vd.vision_type;
     if (visionType !== undefined && !VALID_VISION_TYPES.has(visionType)) {
         fail(
-            callLabel + ": vision_describe.vision_type must be 'food'|'scenery'|'unknown', got " +
+            callLabel + ": vision_describe.vision_type must be 'food'|'scenery'|'other'|'unknown', got " +
             JSON.stringify(visionType),
             { url: runUrl, bodyPreview: String(resp.raw || "").slice(0, 500) }
         );

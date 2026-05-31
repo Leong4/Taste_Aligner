@@ -85,6 +85,19 @@ const server = node_http_1.default.createServer(async (req, res) => {
         if (typeof body.image_base64 === "string" && body.image_base64.trim()) {
             orchInput.image_base64 = body.image_base64;
         }
+        if (typeof body.image_original_base64 === "string" && body.image_original_base64.trim()) {
+            orchInput.image_original_base64 = body.image_original_base64;
+        }
+        if (!orchInput.image_base64 && orchInput.image_original_base64) {
+            // Backward-compat: if caller only provides original image, keep previous behavior.
+            orchInput.image_base64 = orchInput.image_original_base64;
+        }
+        if (typeof body.caption === "string") {
+            orchInput.caption = body.caption;
+        }
+        if (typeof body.city === "string") {
+            orchInput.city = body.city;
+        }
         const result = await orchestrator.runWithTrace(orchInput);
         // Build response maintaining backward compatibility with the
         // existing frontend contract. The old response shape:

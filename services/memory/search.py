@@ -222,6 +222,7 @@ def search_memories(
     query_tags: Optional[List[str]],
     query_city: Optional[str],
     now_ts: str,
+    memory_pool: Optional[str] = None,
     top_k: int = 10
 ) -> List[Dict[str, Any]]:
     """
@@ -235,16 +236,24 @@ def search_memories(
         query_tags: Query tags (fallback if no embedding)
         query_city: Query city (for context boost)
         now_ts: Current timestamp (for time decay)
+        memory_pool: Optional pool filter (food|scenery|all)
         top_k: Number of results to return
 
     Returns:
         List of search results sorted by final_score DESC, each with full explainability
     """
     results = []
+    normalized_pool = (memory_pool or "all").strip().lower()
+    pool_filter_enabled = normalized_pool in {"food", "scenery"}
 
     use_embedding = query_embedding is not None and len(query_embedding) > 0
 
     for memory in memories:
+        if pool_filter_enabled:
+            memory_type = str(memory.get("vision_type", "")).strip().lower()
+            if memory_type != normalized_pool:
+                continue
+
         memory_id = memory["memory_id"]
         memory_embedding = memory.get("embedding", [])
         memory_tags = memory.get("normalized_tags", [])

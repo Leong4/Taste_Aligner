@@ -43,7 +43,12 @@ import uuid
 from .recall import recall_candidates
 from .rerank import rerank_candidates
 from .mix_policy import compute_mix_policy
-from .db import get_database_stats, sanitize_titles_in_db, ensure_item_embeddings_table
+from .db import (
+    get_database_stats,
+    sanitize_titles_in_db,
+    ensure_item_embeddings_table,
+    get_candidate_source_table,
+)
 from .number_safety import sanitize_floats
 from .config import (
     CZ_ALPHA, CZ_BETA, CZ_GAMMA,
@@ -54,7 +59,9 @@ from .config import (
     RECO_DB_PATH,
     RECO_SERVICE_VERSION,
     MEM_INFLUENCE_MODE,
-    EMBEDDING_URL
+    EMBEDDING_TES_V1_URL,
+    EMBEDDING_TES_V2_URL,
+    EMBEDDING_URL,
 )
 
 # Configure logging
@@ -80,6 +87,8 @@ class ScoreRequestData(BaseModel):
     # v1.1: Optional mix policy control
     intent: Optional[str] = Field(None, description="User intent: 'comfort', 'explore', or 'balanced'")
     memory_confidence: Optional[float] = Field(None, description="Confidence in memory data [0, 1]")
+    memory_pool: Optional[str] = Field(None, description="Memory pool hint: food|scenery|all")
+    anchor_tags: List[str] = Field(default_factory=list, description="Persisted memory anchor tags")
 
 
 class ScoreRequest(BaseModel):
@@ -216,7 +225,8 @@ async def score_endpoint(request: ScoreRequest):
         f"city={request.data.city}, "
         f"tags={request.data.tags}, "
         f"intent={request.data.intent}, "
-        f"memory_confidence={request.data.memory_confidence}"
+        f"memory_confidence={request.data.memory_confidence}, "
+        f"memory_pool={request.data.memory_pool}"
     )
 
     try:
@@ -226,6 +236,8 @@ async def score_endpoint(request: ScoreRequest):
         tags = request.data.tags
         intent = request.data.intent
         memory_confidence = request.data.memory_confidence
+        memory_pool = request.data.memory_pool
+        anchor_tags = request.data.anchor_tags
 
         # TODO: In production, call Ontology Service to normalize tags
         normalized_tags = tags
@@ -257,7 +269,8 @@ async def score_endpoint(request: ScoreRequest):
             recall_results=recall_results,
             user_id=user_id,
             user_city=city,
-            user_tags=normalized_tags
+            user_tags=normalized_tags,
+            anchor_tags=anchor_tags
         )
 
         cz_ranked = rerank_results["cz_ranked"]
@@ -321,7 +334,8 @@ async def score_endpoint(request: ScoreRequest):
                 "tags": tags,
                 "normalized_tags": normalized_tags,
                 "intent": intent,
-                "memory_confidence": memory_confidence
+                "memory_confidence": memory_confidence,
+                "memory_pool": memory_pool,
             },
 
             "recall": {
@@ -370,10 +384,17 @@ async def score_endpoint(request: ScoreRequest):
                 },
                 "mem_influence_mode": MEM_INFLUENCE_MODE,
                 "embedding_url": EMBEDDING_URL,
+                "embedding_tes_v2_url": EMBEDDING_TES_V2_URL,
+                "embedding_tes_v1_fallback_url": EMBEDDING_TES_V1_URL,
                 "embedding_ok_count": rerank_results["stats"].get("embedding_ok_count"),
                 "embedding_fail_count": rerank_results["stats"].get("embedding_fail_count"),
                 "embedding_last_error": rerank_results["stats"].get("embedding_last_error"),
+                "embedding_space": rerank_results["stats"].get("embedding_space"),
+                "embedding_space_counts": rerank_results["stats"].get("embedding_space_counts"),
+                "embedding_fallback_reason": rerank_results["stats"].get("embedding_fallback_reason"),
+                "memory_pool": memory_pool,
                 "dataset_source": "sqlite",
+                "candidate_source_table": get_candidate_source_table(),
                 "db_path": str(RECO_DB_PATH),
                 "rerank_stats": rerank_results["stats"]
             }

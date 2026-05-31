@@ -64,6 +64,16 @@ export async function readMemory(memoryId: string): Promise<MemoryDetail | null>
   return res.json() as Promise<MemoryDetail>;
 }
 
+export async function deleteMemory(memoryId: string): Promise<void> {
+  const res = await fetch(`${MEMORY}/memories/${encodeURIComponent(memoryId)}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "(no body)");
+    throw new Error(`HTTP ${res.status} deleting memory ${memoryId}: ${text.slice(0, 200)}`);
+  }
+}
+
 // Poll /search until a newly-written memory is visible (max 5 s)
 export async function pollForNewMemory(
   uploadStartMs: number,
