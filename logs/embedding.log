@@ -1,409 +1,147 @@
-INFO:     Started server process [10846]
+INFO:     Started server process [39923]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:5004 (Press CTRL+C to quit)
-2026-05-31 19:04:37,564 - services.embedding.backends - INFO - Embedding backend ready: st_v1
-INFO:     127.0.0.1:64837 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64839 - "GET /health HTTP/1.1" 200 OK
-2026-05-31 19:04:39,630 - services.embedding.backends - INFO - Loading SentenceTransformer 'sentence-transformers/all-MiniLM-L6-v2' on device 'cpu'
-2026-05-31 19:04:42,419 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2026-05-31 19:04:43,872 - services.embedding.backends - INFO - SentenceTransformer loaded – native embedding_dim=384
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 95.29it/s]
-INFO:     127.0.0.1:64845 - "POST /tes/build HTTP/1.1" 200 OK
-INFO:     127.0.0.1:64860 - "GET /health HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 170.89it/s]
-INFO:     127.0.0.1:64884 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 124.29it/s]
-INFO:     127.0.0.1:64884 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 195.39it/s]
-INFO:     127.0.0.1:64897 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 180.45it/s]
-INFO:     127.0.0.1:64899 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 201.69it/s]
-INFO:     127.0.0.1:64901 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 216.49it/s]
-INFO:     127.0.0.1:64903 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 221.38it/s]
-INFO:     127.0.0.1:64905 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 186.08it/s]
-INFO:     127.0.0.1:64907 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 186.81it/s]
-INFO:     127.0.0.1:64909 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 201.66it/s]
-INFO:     127.0.0.1:64911 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 104.42it/s]
-INFO:     127.0.0.1:64913 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 174.12it/s]
-INFO:     127.0.0.1:64915 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 199.57it/s]
-INFO:     127.0.0.1:64917 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 209.42it/s]
-INFO:     127.0.0.1:64919 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 190.23it/s]
-INFO:     127.0.0.1:64921 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 170.40it/s]
-INFO:     127.0.0.1:64923 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 193.54it/s]
-INFO:     127.0.0.1:64925 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 179.57it/s]
-INFO:     127.0.0.1:64927 - "POST /tes/build HTTP/1.1" 200 OK
+2026-05-31 23:34:36,553 - services.embedding.backends - INFO - Embedding backend ready: st_v1
+INFO:     127.0.0.1:54802 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54804 - "GET /health HTTP/1.1" 200 OK
+2026-05-31 23:34:38,617 - services.embedding.backends - INFO - Loading SentenceTransformer 'sentence-transformers/all-MiniLM-L6-v2' on device 'cpu'
+2026-05-31 23:34:41,568 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
+2026-05-31 23:34:43,140 - services.embedding.backends - INFO - SentenceTransformer loaded – native embedding_dim=384
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 11.90it/s]
+INFO:     127.0.0.1:54807 - "POST /tes/build HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54822 - "GET /health HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 96.05it/s]
+INFO:     127.0.0.1:54842 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 157.47it/s]
+INFO:     127.0.0.1:54842 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 183.56it/s]
+INFO:     127.0.0.1:54845 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 203.72it/s]
+INFO:     127.0.0.1:54847 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 197.17it/s]
+INFO:     127.0.0.1:54849 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 180.90it/s]
+INFO:     127.0.0.1:54851 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 183.72it/s]
+INFO:     127.0.0.1:54853 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 213.64it/s]
+INFO:     127.0.0.1:54855 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 186.99it/s]
+INFO:     127.0.0.1:54857 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 178.57it/s]
+INFO:     127.0.0.1:54859 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 194.06it/s]
+INFO:     127.0.0.1:54861 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 181.58it/s]
+INFO:     127.0.0.1:54863 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 216.84it/s]
+INFO:     127.0.0.1:54865 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 181.19it/s]
+INFO:     127.0.0.1:54867 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 205.90it/s]
+INFO:     127.0.0.1:54869 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 189.68it/s]
+INFO:     127.0.0.1:54871 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 195.84it/s]
+INFO:     127.0.0.1:54873 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 187.16it/s]
+INFO:     127.0.0.1:54875 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 176.65it/s]
+INFO:     127.0.0.1:54877 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 192.68it/s]
+INFO:     127.0.0.1:54879 - "POST /tes/build HTTP/1.1" 200 OK
 Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 182.75it/s]
-INFO:     127.0.0.1:64929 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 208.55it/s]
-INFO:     127.0.0.1:64931 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 183.42it/s]
-INFO:     127.0.0.1:64933 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 207.61it/s]
-INFO:     127.0.0.1:64935 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 224.45it/s]
-INFO:     127.0.0.1:64937 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 212.05it/s]
-INFO:     127.0.0.1:64939 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 194.32it/s]
-INFO:     127.0.0.1:64941 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 202.92it/s]
-INFO:     127.0.0.1:64943 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 206.82it/s]
-INFO:     127.0.0.1:64945 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 210.61it/s]
-INFO:     127.0.0.1:64947 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 187.99it/s]
-INFO:     127.0.0.1:64949 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 190.66it/s]
-INFO:     127.0.0.1:64951 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 206.45it/s]
-INFO:     127.0.0.1:64953 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 203.45it/s]
-INFO:     127.0.0.1:64955 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 213.35it/s]
-INFO:     127.0.0.1:64957 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 204.71it/s]
-INFO:     127.0.0.1:64959 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 207.16it/s]
-INFO:     127.0.0.1:64961 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 203.63it/s]
-INFO:     127.0.0.1:64963 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 203.87it/s]
-INFO:     127.0.0.1:64965 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 228.90it/s]
-INFO:     127.0.0.1:64967 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 188.69it/s]
-INFO:     127.0.0.1:64969 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 229.15it/s]
-INFO:     127.0.0.1:64971 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 189.26it/s]
-INFO:     127.0.0.1:64973 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 198.03it/s]
-INFO:     127.0.0.1:64975 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 227.27it/s]
-INFO:     127.0.0.1:64977 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 225.03it/s]
-INFO:     127.0.0.1:64979 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 190.33it/s]
-INFO:     127.0.0.1:64981 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 194.37it/s]
-INFO:     127.0.0.1:64983 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 196.20it/s]
-INFO:     127.0.0.1:64985 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 192.64it/s]
-INFO:     127.0.0.1:64987 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 195.89it/s]
-INFO:     127.0.0.1:64989 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 210.78it/s]
-INFO:     127.0.0.1:64991 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 216.22it/s]
-INFO:     127.0.0.1:64993 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 210.53it/s]
-INFO:     127.0.0.1:64995 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 192.00it/s]
-INFO:     127.0.0.1:64884 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 199.96it/s]
-INFO:     127.0.0.1:64884 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 204.29it/s]
-INFO:     127.0.0.1:64884 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 224.37it/s]
-INFO:     127.0.0.1:64884 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 202.23it/s]
-INFO:     127.0.0.1:64884 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 220.45it/s]
-INFO:     127.0.0.1:64884 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 213.54it/s]
-INFO:     127.0.0.1:64884 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 198.42it/s]
-INFO:     127.0.0.1:64884 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 201.98it/s]
-INFO:     127.0.0.1:64884 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 208.72it/s]
-INFO:     127.0.0.1:64884 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 194.05it/s]
-INFO:     127.0.0.1:65000 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 203.64it/s]
-INFO:     127.0.0.1:65004 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 202.34it/s]
-INFO:     127.0.0.1:65008 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 182.71it/s]
-INFO:     127.0.0.1:65047 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 141.11it/s]
-INFO:     127.0.0.1:65047 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 158.20it/s]
-INFO:     127.0.0.1:65055 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 189.65it/s]
-INFO:     127.0.0.1:65057 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 154.63it/s]
-INFO:     127.0.0.1:65059 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 195.46it/s]
-INFO:     127.0.0.1:65061 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 213.08it/s]
-INFO:     127.0.0.1:65063 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 145.92it/s]
-INFO:     127.0.0.1:65065 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 182.35it/s]
-INFO:     127.0.0.1:65067 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 216.45it/s]
-INFO:     127.0.0.1:65069 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 199.71it/s]
-INFO:     127.0.0.1:65071 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 197.16it/s]
-INFO:     127.0.0.1:65073 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 222.77it/s]
-INFO:     127.0.0.1:65075 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 212.55it/s]
-INFO:     127.0.0.1:65077 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 198.80it/s]
-INFO:     127.0.0.1:65079 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 204.33it/s]
-INFO:     127.0.0.1:65081 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 204.13it/s]
-INFO:     127.0.0.1:65083 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 221.06it/s]
-INFO:     127.0.0.1:65085 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 206.99it/s]
-INFO:     127.0.0.1:65087 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 210.61it/s]
-INFO:     127.0.0.1:65089 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 185.39it/s]
-INFO:     127.0.0.1:65091 - "POST /tes/build HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54881 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 185.09it/s]
+INFO:     127.0.0.1:54883 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 197.70it/s]
+INFO:     127.0.0.1:54885 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 200.89it/s]
+INFO:     127.0.0.1:54887 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 194.06it/s]
+INFO:     127.0.0.1:54889 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 186.21it/s]
+INFO:     127.0.0.1:54891 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 205.76it/s]
+INFO:     127.0.0.1:54893 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 195.50it/s]
+INFO:     127.0.0.1:54895 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 230.37it/s]
+INFO:     127.0.0.1:54897 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 185.27it/s]
+INFO:     127.0.0.1:54899 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 194.86it/s]
+INFO:     127.0.0.1:54901 - "POST /tes/build HTTP/1.1" 200 OK
 Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 199.24it/s]
-INFO:     127.0.0.1:65093 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 208.25it/s]
-INFO:     127.0.0.1:65095 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 202.67it/s]
-INFO:     127.0.0.1:65097 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 207.31it/s]
-INFO:     127.0.0.1:65099 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 192.94it/s]
-INFO:     127.0.0.1:65101 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 199.83it/s]
-INFO:     127.0.0.1:65103 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 200.85it/s]
-INFO:     127.0.0.1:65105 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 193.02it/s]
-INFO:     127.0.0.1:65107 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 209.53it/s]
-INFO:     127.0.0.1:65109 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 191.85it/s]
-INFO:     127.0.0.1:65111 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 214.45it/s]
-INFO:     127.0.0.1:65113 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 206.23it/s]
-INFO:     127.0.0.1:65115 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 205.82it/s]
-INFO:     127.0.0.1:65117 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 213.30it/s]
-INFO:     127.0.0.1:65119 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 227.08it/s]
-INFO:     127.0.0.1:65121 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 195.47it/s]
-INFO:     127.0.0.1:65123 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 207.33it/s]
-INFO:     127.0.0.1:65125 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 223.36it/s]
-INFO:     127.0.0.1:65127 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 227.89it/s]
-INFO:     127.0.0.1:65129 - "POST /tes/build HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54903 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 194.06it/s]
+INFO:     127.0.0.1:54905 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 181.23it/s]
+INFO:     127.0.0.1:54907 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 186.75it/s]
+INFO:     127.0.0.1:54909 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 194.81it/s]
+INFO:     127.0.0.1:54911 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 194.71it/s]
+INFO:     127.0.0.1:54913 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 179.47it/s]
+INFO:     127.0.0.1:54915 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 188.21it/s]
+INFO:     127.0.0.1:54917 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 203.96it/s]
+INFO:     127.0.0.1:54919 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 189.36it/s]
+INFO:     127.0.0.1:54921 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 182.99it/s]
+INFO:     127.0.0.1:54923 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 195.89it/s]
+INFO:     127.0.0.1:54925 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 208.86it/s]
+INFO:     127.0.0.1:54927 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 180.47it/s]
+INFO:     127.0.0.1:54929 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 170.33it/s]
+INFO:     127.0.0.1:54931 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 192.79it/s]
+INFO:     127.0.0.1:54933 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 187.36it/s]
+INFO:     127.0.0.1:54935 - "POST /tes/build HTTP/1.1" 200 OK
 Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 205.42it/s]
-INFO:     127.0.0.1:65131 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 198.03it/s]
-INFO:     127.0.0.1:65133 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 217.87it/s]
-INFO:     127.0.0.1:65135 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 204.21it/s]
-INFO:     127.0.0.1:65137 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 197.46it/s]
-INFO:     127.0.0.1:65139 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 194.67it/s]
-INFO:     127.0.0.1:65141 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 218.01it/s]
-INFO:     127.0.0.1:65143 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 222.91it/s]
-INFO:     127.0.0.1:65145 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 202.14it/s]
-INFO:     127.0.0.1:65147 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 217.73it/s]
-INFO:     127.0.0.1:65149 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 227.12it/s]
-INFO:     127.0.0.1:65151 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 217.02it/s]
-INFO:     127.0.0.1:65153 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 209.86it/s]
-INFO:     127.0.0.1:65047 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 210.89it/s]
-INFO:     127.0.0.1:65047 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 208.46it/s]
-INFO:     127.0.0.1:65047 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 200.64it/s]
-INFO:     127.0.0.1:65047 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 199.08it/s]
-INFO:     127.0.0.1:65047 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 200.00it/s]
-INFO:     127.0.0.1:65047 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 195.63it/s]
-INFO:     127.0.0.1:65047 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 206.74it/s]
-INFO:     127.0.0.1:65047 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 215.75it/s]
-INFO:     127.0.0.1:65047 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 207.34it/s]
-INFO:     127.0.0.1:65047 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 186.36it/s]
-INFO:     127.0.0.1:65158 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 205.21it/s]
-INFO:     127.0.0.1:65162 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 199.20it/s]
-INFO:     127.0.0.1:65166 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 120.29it/s]
-INFO:     127.0.0.1:65211 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 136.19it/s]
-INFO:     127.0.0.1:65211 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 181.32it/s]
-INFO:     127.0.0.1:65219 - "POST /tes/build HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54937 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 211.64it/s]
+INFO:     127.0.0.1:54939 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 198.11it/s]
+INFO:     127.0.0.1:54941 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 172.83it/s]
+INFO:     127.0.0.1:54842 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 169.78it/s]
+INFO:     127.0.0.1:54842 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 173.91it/s]
+INFO:     127.0.0.1:54842 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 186.46it/s]
+INFO:     127.0.0.1:54842 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 185.77it/s]
+INFO:     127.0.0.1:54842 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 159.78it/s]
+INFO:     127.0.0.1:54842 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 180.73it/s]
+INFO:     127.0.0.1:54842 - "POST /tes/build HTTP/1.1" 200 OK
 Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 185.98it/s]
-INFO:     127.0.0.1:65221 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 185.25it/s]
-INFO:     127.0.0.1:65223 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 201.73it/s]
-INFO:     127.0.0.1:65225 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 181.62it/s]
-INFO:     127.0.0.1:65227 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 201.62it/s]
-INFO:     127.0.0.1:65229 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 188.86it/s]
-INFO:     127.0.0.1:65231 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 207.81it/s]
-INFO:     127.0.0.1:65233 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 215.28it/s]
-INFO:     127.0.0.1:65235 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 189.39it/s]
-INFO:     127.0.0.1:65237 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 195.12it/s]
-INFO:     127.0.0.1:65239 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 207.90it/s]
-INFO:     127.0.0.1:65241 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 203.24it/s]
-INFO:     127.0.0.1:65243 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 200.80it/s]
-INFO:     127.0.0.1:65245 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 200.97it/s]
-INFO:     127.0.0.1:65247 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 207.52it/s]
-INFO:     127.0.0.1:65249 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 213.40it/s]
-INFO:     127.0.0.1:65251 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 216.69it/s]
-INFO:     127.0.0.1:65253 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 197.20it/s]
-INFO:     127.0.0.1:65255 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 213.61it/s]
-INFO:     127.0.0.1:65257 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 231.54it/s]
-INFO:     127.0.0.1:65259 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 182.88it/s]
-INFO:     127.0.0.1:65261 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 186.36it/s]
-INFO:     127.0.0.1:65263 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 208.46it/s]
-INFO:     127.0.0.1:65265 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 217.67it/s]
-INFO:     127.0.0.1:65267 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 222.32it/s]
-INFO:     127.0.0.1:65269 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 210.05it/s]
-INFO:     127.0.0.1:65271 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 214.38it/s]
-INFO:     127.0.0.1:65273 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 225.48it/s]
-INFO:     127.0.0.1:65275 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 225.73it/s]
-INFO:     127.0.0.1:65277 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 195.66it/s]
-INFO:     127.0.0.1:65279 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 211.33it/s]
-INFO:     127.0.0.1:65281 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 215.61it/s]
-INFO:     127.0.0.1:65283 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 208.85it/s]
-INFO:     127.0.0.1:65285 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 187.09it/s]
-INFO:     127.0.0.1:65287 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 205.34it/s]
-INFO:     127.0.0.1:65289 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 207.52it/s]
-INFO:     127.0.0.1:65291 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 216.87it/s]
-INFO:     127.0.0.1:65293 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 208.29it/s]
-INFO:     127.0.0.1:65295 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 211.76it/s]
-INFO:     127.0.0.1:65297 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 200.53it/s]
-INFO:     127.0.0.1:65299 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 198.38it/s]
-INFO:     127.0.0.1:65301 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 192.46it/s]
-INFO:     127.0.0.1:65303 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 217.16it/s]
-INFO:     127.0.0.1:65305 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 219.54it/s]
-INFO:     127.0.0.1:65307 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 206.91it/s]
-INFO:     127.0.0.1:65309 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 198.60it/s]
-INFO:     127.0.0.1:65311 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 189.81it/s]
-INFO:     127.0.0.1:65313 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 218.39it/s]
-INFO:     127.0.0.1:65315 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 195.80it/s]
-INFO:     127.0.0.1:65317 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 217.63it/s]
-INFO:     127.0.0.1:65211 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 215.42it/s]
-INFO:     127.0.0.1:65211 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 199.15it/s]
-INFO:     127.0.0.1:65211 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 205.93it/s]
-INFO:     127.0.0.1:65211 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 212.53it/s]
-INFO:     127.0.0.1:65211 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 205.94it/s]
-INFO:     127.0.0.1:65211 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 210.35it/s]
-INFO:     127.0.0.1:65211 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 198.60it/s]
-INFO:     127.0.0.1:65211 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 212.73it/s]
-INFO:     127.0.0.1:65211 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 215.71it/s]
-INFO:     127.0.0.1:65211 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 192.76it/s]
-INFO:     127.0.0.1:65322 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 198.73it/s]
-INFO:     127.0.0.1:65326 - "POST /tes/build HTTP/1.1" 200 OK
-Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 219.36it/s]
-INFO:     127.0.0.1:65330 - "POST /tes/build HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54842 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 181.03it/s]
+INFO:     127.0.0.1:54842 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 160.03it/s]
+INFO:     127.0.0.1:54842 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 181.23it/s]
+INFO:     127.0.0.1:54946 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 174.49it/s]
+INFO:     127.0.0.1:54950 - "POST /tes/build HTTP/1.1" 200 OK
+Batches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 187.25it/s]
+INFO:     127.0.0.1:54954 - "POST /tes/build HTTP/1.1" 200 OK
 INFO:     Shutting down
 INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
-INFO:     Finished server process [10846]
-/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/multiprocessing/resource_tracker.py:276: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown: {'/loky-10846-p83h5smw'}
+INFO:     Finished server process [39923]
+/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/multiprocessing/resource_tracker.py:276: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown: {'/loky-39923-4kyf56uv'}
   warnings.warn(

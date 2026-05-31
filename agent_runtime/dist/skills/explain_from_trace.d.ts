@@ -12,6 +12,9 @@
  *   2. Calls the LLM adapter for structured JSON output
  *   3. Returns explanation + bullets + full call trace for auditing
  *   4. On adapter failure, returns a graceful fallback (never throws)
+ *
+ * The adapter factory defaults to mock. Start with
+ * `./scripts/dev_restart.sh --all --with-llm` to use the real openai_compat adapter.
  */
 import { Skill, ExplainFromTraceInput, ExplainFromTraceOutput } from "../core/types";
 import { LLMAdapter } from "../llm/llm_adapter";

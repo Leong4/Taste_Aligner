@@ -246,6 +246,9 @@ function mapResult(raw) {
     if (typeof raw.city === "string") {
         result.city = raw.city;
     }
+    if (typeof raw.vision_type === "string") {
+        result.vision_type = raw.vision_type;
+    }
     if (Array.isArray(raw.normalized_tags)) {
         result.normalized_tags = raw.normalized_tags
             .filter((t) => typeof t === "string").sort();

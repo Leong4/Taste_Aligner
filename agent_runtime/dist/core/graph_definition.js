@@ -363,6 +363,7 @@ exports.RECOMMENDATION_GRAPH = {
             inputFrom: {
                 decision_trace: "build_cards.decision_trace",
                 user_text: "input.text",
+                cards: "build_cards.cards",
             },
         },
     ],

@@ -13,6 +13,9 @@
  *   2. Calls the LLM adapter for structured JSON output
  *   3. Returns explanation + bullets + full call trace for auditing
  *   4. On adapter failure, returns a graceful fallback (never throws)
+ *
+ * The adapter factory defaults to mock. Start with
+ * `./scripts/dev_restart.sh --all --with-llm` to use the real openai_compat adapter.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createExplainFromTraceSkill = createExplainFromTraceSkill;
@@ -140,6 +143,12 @@ function extractAnchorEvidence(trace) {
             memory_id: memoryId,
             tags,
         };
+        if (typeof weighted?.city === "string" && weighted.city.trim()) {
+            row.city = weighted.city.trim();
+        }
+        if (typeof weighted?.vision_type === "string" && weighted.vision_type.trim()) {
+            row.vision_type = weighted.vision_type.trim();
+        }
         const wTime = toNumber4(anchor.w_time ?? weighted?.w_time);
         if (wTime !== undefined)
             row.w_time = wTime;
@@ -170,11 +179,14 @@ function hasProfileVectorNode(trace) {
     return asObject(trace.profile_vector_node) !== null;
 }
 function formatEvidenceLine(e) {
+    const city = e.city ?? "unknown";
+    const visionType = e.vision_type ?? "unknown";
     const tags = e.tags.length > 0 ? e.tags.join("|") : "none";
+    const sentiment = e.sentiment !== undefined ? String(e.sentiment) : "n/a";
     const wTime = e.w_time !== undefined ? String(e.w_time) : "n/a";
     const wSent = e.w_sent !== undefined ? String(e.w_sent) : "n/a";
     const finalWeight = e.final_weight !== undefined ? String(e.final_weight) : "n/a";
-    return `memory_id=${e.memory_id}, tags=${tags}, w_time=${wTime}, w_sent=${wSent}, final_weight=${finalWeight}`;
+    return `memory_id=${e.memory_id}, city=${city}, vision_type=${visionType}, tags=${tags}, sentiment=${sentiment}, w_time=${wTime}, w_sent=${wSent}, final_weight=${finalWeight}`;
 }
 function buildEvidenceBullets(evidence) {
     return evidence.slice(0, 2).map((e, i) => `Evidence ${i + 1}: ${formatEvidenceLine(e)}`);
@@ -219,7 +231,50 @@ function buildInsufficientEvidenceFallback(anchorCount) {
         ],
     };
 }
-function compactTrace(trace) {
+function extractRecommendedItems(cards) {
+    if (!Array.isArray(cards))
+        return [];
+    const items = [];
+    for (const cardRaw of cards) {
+        const card = asObject(cardRaw);
+        if (!card || !Array.isArray(card.items))
+            continue;
+        for (const itemRaw of card.items) {
+            const item = asObject(itemRaw);
+            if (!item)
+                continue;
+            const name = typeof item.name === "string" && item.name.trim()
+                ? item.name.trim()
+                : (typeof item.item_id === "string" ? item.item_id : "");
+            if (!name)
+                continue;
+            const type = typeof item.type === "string" && item.type.trim()
+                ? item.type.trim()
+                : "unknown";
+            const tags = Array.isArray(item.tags)
+                ? item.tags
+                    .filter((tag) => typeof tag === "string" && tag.trim().length > 0)
+                    .map((tag) => tag.trim().toLowerCase())
+                    .slice(0, MAX_TAGS_PER_ITEM)
+                : [];
+            items.push({ name, type, tags });
+        }
+    }
+    return items.slice(0, MAX_CARDS * MAX_ITEMS_PER_CARD);
+}
+function buildPersonalizedExplanationPrompt(compact) {
+    const memoryAnchors = Array.isArray(compact.memory_anchors) ? compact.memory_anchors : [];
+    const recommendedItems = Array.isArray(compact.recommended_items) ? compact.recommended_items : [];
+    return [
+        `User memory anchors:\n${JSON.stringify(memoryAnchors, null, 2)}`,
+        `Recommended items:\n${JSON.stringify(recommendedItems, null, 2)}`,
+        "Generate a personalised explanation connecting the user's past memory anchors to the current recommendations. " +
+            "Use each relevant anchor's city, vision_type, tags, and sentiment score. Mention recommended item names, types, " +
+            "and tags when explaining the connection. Example style: \"Based on your seafood experience in Barcelona " +
+            "(sentiment: high), we recommended Tsukiji Sushi Counter in Tokyo...\"",
+    ].join("\n\n");
+}
+function compactTrace(trace, cards) {
     const compact = {};
     const anchorEvidence = extractAnchorEvidence(trace);
     // extract_intent summary
@@ -291,6 +346,9 @@ function compactTrace(trace) {
             total_memories_considered: p.total_memories_considered,
         };
     }
+    if (anchorEvidence.length > 0) {
+        compact.memory_anchors = anchorEvidence;
+    }
     // planner / build_cards summary — cap cards and items per card
     for (const key of ["planner", "build_cards"]) {
         const node = trace[key];
@@ -341,6 +399,10 @@ function compactTrace(trace) {
             break;
         }
     }
+    const recommendedItems = extractRecommendedItems(cards);
+    if (recommendedItems.length > 0) {
+        compact.recommended_items = recommendedItems;
+    }
     // 8 KB hard cap — deterministically remove largest fields first
     const enforceByteLimit = (obj) => {
         if (JSON.stringify(obj).length <= MAX_COMPACT_JSON_BYTES)
@@ -379,7 +441,7 @@ function createExplainFromTraceSkill(adapter) {
         inputSchema: {
             description: "Decision trace + optional user text for explanation generation",
             required: ["decision_trace"],
-            optional: ["user_text", "locale", "style"],
+            optional: ["user_text", "locale", "style", "cards"],
         },
         outputSchema: {
             description: "Human-readable explanation with bullet points",
@@ -396,8 +458,11 @@ function createExplainFromTraceSkill(adapter) {
                 : _context.decision_trace;
             const profileNodePresent = hasProfileVectorNode(traceSource);
             const anchorEvidence = extractAnchorEvidence(traceSource);
-            const compact = compactTrace(traceSource);
-            const userPrompt = (0, explain_from_trace_v1_1.buildUserPrompt)(compact, locale, style, input.user_text);
+            const compact = compactTrace(traceSource, input.cards);
+            const userPrompt = [
+                (0, explain_from_trace_v1_1.buildUserPrompt)(compact, locale, style, input.user_text),
+                buildPersonalizedExplanationPrompt(compact),
+            ].join("\n\n");
             let explanation;
             let bullets;
             let callTrace = null;

@@ -461,6 +461,8 @@ export interface ExplainFromTraceInput {
     decision_trace: Record<string, unknown>;
     /** Original user text (optional context). */
     user_text?: string;
+    /** Generated recommendation cards used to explain specific items. */
+    cards?: unknown;
     /** Locale for the explanation. */
     locale?: "en" | "zh";
     /** Style of explanation. */
@@ -647,6 +649,7 @@ export interface MemoryWeightedResult {
     tag_boost?: number;
     timestamp?: string | number;
     city?: string;
+    vision_type?: string;
     normalized_tags?: string[];
     sentiment?: number;
 }

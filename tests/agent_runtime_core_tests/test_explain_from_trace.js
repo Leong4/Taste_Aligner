@@ -325,11 +325,13 @@ async function runAll() {
 
     await test("compaction: oversized trace (10 cards) is capped — cards<=6, items<=3, tags<=5, JSON<=8KB", async () => {
         let capturedTraceContext = null;
+        let capturedUserPrompt = null;
 
         class CapturingAdapter {
             get modelInfo() { return { provider: "mock", model_name: "mock-capture", version: "1.0.0" }; }
             async generateStructuredJSON(input) {
                 capturedTraceContext = input.traceContext;
+                capturedUserPrompt = input.userPrompt;
                 return {
                     data: {
                         explanation: "Capped trace explanation.",
@@ -367,6 +369,18 @@ async function runAll() {
         const input = {
             decision_trace: {
                 extract_intent: { city: "seoul", type: "bbq", tags: ["grilled", "meat", "beef", "pork", "chicken", "spicy", "side", "banchan"], confidence: 0.95 },
+                memory_weight_adjust: {
+                    weighted_results: [{
+                        memory_id: "m_barcelona",
+                        city: "barcelona",
+                        vision_type: "food",
+                        normalized_tags: ["paella", "seafood"],
+                        sentiment: 0.85,
+                    }],
+                },
+                profile_vector_node: {
+                    anchors: [{ memory_id: "m_barcelona", final_weight: 0.9 }],
+                },
                 build_cards: {
                     rule_id: "planner_v1",
                     cards_count: 10,
@@ -374,11 +388,18 @@ async function runAll() {
                 },
             },
             user_text: "bbq in seoul",
+            cards: oversizedCards,
         };
 
         await skill.execute(input, ctx);
 
         assert.ok(capturedTraceContext !== null, "traceContext was captured");
+        assert.strictEqual(capturedTraceContext.memory_anchors[0].city, "barcelona");
+        assert.strictEqual(capturedTraceContext.memory_anchors[0].vision_type, "food");
+        assert.deepStrictEqual(capturedTraceContext.memory_anchors[0].tags, ["paella", "seafood"]);
+        assert.strictEqual(capturedTraceContext.memory_anchors[0].sentiment, 0.85);
+        assert.strictEqual(capturedTraceContext.recommended_items[0].name, "Restaurant 0-0");
+        assert.ok(capturedUserPrompt.includes("Based on your seafood experience in Barcelona"));
 
         // intent.tags should be capped at 5
         const intentTags = capturedTraceContext.intent?.tags;

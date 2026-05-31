@@ -2,7 +2,7 @@
 > agent_runtime@1.0.0 dev
 > ts-node-dev --respawn --transpile-only src/server.ts
 
-[INFO] 19:04:34 ts-node-dev ver. 2.0.0 (using ts-node ver. 10.9.2, typescript ver. 5.9.3)
+[INFO] 23:34:32 ts-node-dev ver. 2.0.0 (using ts-node ver. 10.9.2, typescript ver. 5.9.3)
 [bootstrap] LLM adapter: openai_compat/gpt-4o-mini
 [bootstrap] Registered 14 skills: [extract_intent, decide_tag_budget, tag_expand, tag_normalize, memory_signal, memory_weight_adjust, build_profile_vector, vision_describe, tes_builder, fetch_recommendation, rerank, mix_policy, build_cards, explain_from_trace]
 [bootstrap] Orchestrator ready with graph "recommendation_pipeline" v13.0.0
@@ -13,32 +13,50 @@
 [Orchestrator] Executing node: decide_tag_budget (skill: decide_tag_budget)
 [Orchestrator] Node "decide_tag_budget" completed in 0ms
 [Orchestrator] Executing node: tag_expand (skill: tag_expand)
-[Orchestrator] Node "tag_expand" completed in 1712ms
+[Orchestrator] Node "tag_expand" completed in 1349ms
 [Orchestrator] Executing node: tag_normalize (skill: tag_normalize)
 [toolClient] -> /tool/ontology.normalize {
-  traceId: 't_mpu3b3i3_shxln9',
+  traceId: 't_mpucxzzn_6hbdwd',
   timeoutMs: 3000,
   input: { data: { tags: [Array], lang: 'auto', strict: true } }
 }
-[Orchestrator] Node "tag_normalize" completed in 19ms
+[Orchestrator] Node "tag_normalize" completed in 26ms
 [Orchestrator] Executing node: memory_weight_adjust (skill: memory_weight_adjust)
+[toolClient] -> /tool/memory.search {
+  traceId: 't_mpucy00d_6j30vw',
+  timeoutMs: 3000,
+  input: {
+    data: {
+      user_id: 'ui_demo_user',
+      query_tags: [Array],
+      top_k: 50,
+      memory_pool: 'all',
+      city: 'tokyo',
+      now_ts: '2026-05-31T22:34:54.123Z'
+    }
+  }
+}
 [toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3b3is_51qbic',
+  traceId: 't_mpucy00k_dj6bld',
   timeoutMs: 7000,
   input: {
     tags: [
-      'average',
-      'curious',
-      'engaging',
-      'interesting',
-      'mediocre',
-      'mixed feelings'
+      'beachfront',
+      'coastal landmark',
+      'modern architecture',
+      'octopus',
+      'paella',
+      'scallops',
+      'seafood',
+      'skyline',
+      'spanish cuisine',
+      'urban design'
     ],
     normalize: true
   }
 }
 [toolClient] -> /tool/memory.search {
-  traceId: 't_mpu3b3j3_0uslll',
+  traceId: 't_mpucy010_65qqt2',
   timeoutMs: 3000,
   input: {
     data: {
@@ -47,172 +65,149 @@
       top_k: 10,
       memory_pool: 'all',
       query_embedding: [Array],
-      city: 'barcelona',
-      now_ts: '2026-05-31T18:05:08.682Z'
+      city: 'tokyo',
+      now_ts: '2026-05-31T22:34:54.123Z'
     }
   }
 }
-[Orchestrator] Node "memory_weight_adjust" completed in 29ms
+[Orchestrator] Node "memory_weight_adjust" completed in 35ms
 [Orchestrator] Executing node: build_profile_vector (skill: build_profile_vector)
 [Orchestrator] Node "build_profile_vector" completed in 0ms
 [Orchestrator] Executing node: vision_describe (skill: vision_describe)
-[toolClient] -> /tool/vision.describe {
-  traceId: 't_mpu3b3jf_5wkvqr',
-  timeoutMs: 15000,
-  input: {
-    data: {
-      top_k: 10,
-      image_base64: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABAAAAAJACAYAAAATlRTVAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAEAKADAAQAAAABAAACQAAAAABdd1FJAABAAElEQVR4AVz92Y5k25be+Vl4uHtE7PackyeTZBWpLEACBFFCSU+gN9OL6HUEXdSFVNCNLlUCKRIgMk+3u2g83EP/3zfN9k5ymZvbsrnmHP0Yc8xmLXv1f/2//J+/vLrcndfd3eXly8vlrpLn55fLy8vT5YvX88fLy4dfuna5fLmrdvUe3351ef3wePny5fny5fOny6ePH2vzujavLvdvX1/u70G9v7x+HczafHn1urqXy+VVf32+flUZgH3fZ5cu1Xvu1Ukwny8PXXy5e6ldNGisvX+vw3uF8+r5c9Xvu46HYKoRTZdXn8P+5vL8BQ8vfXf1oavq9HqBxzl+nD5F/+fLh49fLn/608fLf/z/vr/8+f3ry+fqwf38/Hx5ifBXve5fx1f43zzeXf713393+df/9n9z+f2//sPlzduHy+v715dXz9VLjmhE79PT58svye/9D/98+fnHv10+fnh/eXkKf7L68nJ3eYrXn356uvzY+2/vf4nmL5fPwUAfWY335PUKoV27C/abh6QbO3d3X5Lx68tj3+/uPl++fvvm8vW7x8s333x9+fqb7y5v3767PD6+uXz7zVeXh/voulO383T3EK2X4N4l91fkM3qjKZwkA/lLovviXxfjKLo+j56b7kL/66Gd49AbruB9iUcHHLfr7Od2rG5fDv7KAdRkRAAAaJ8r62svcnjJdu4gQHs83V3roRG9Fa8JPC+jP5uqzqvafOnt88X3XU+GO2Fvtau+a4CkzdVf22v7l+wLvTmD1kMEpzaHzyuewSdJNKH74AUL7eof2z+CO5wee0f34YBeqouHa5HvgfQXT5+vfIKHb4x3zl5HDxpBUq6BNnD4RGc20KGtOonShWi9X/ld/nd393i57/treouHh+z/4f5+dPGtuxd+8uXy6fnp8vHjj5enPn/55adiws+XH3/86fL+w9Pl/afny19++rHvP19+/vn95edfPl8+/Xy5/JJvfC5uPH9+CvddsOlpLIw//x4e7i/fffX68q//+PXlj//wu8vv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'... 1664578 more characters,
-      caption_text: 'just so so...but it is interesting'
-    }
-  }
-}
-[Orchestrator] Node "vision_describe" completed in 3951ms
+[Orchestrator] Node "vision_describe" completed in 0ms
 [Orchestrator] Executing node: tes_builder (skill: tes_builder)
 [toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3b6l6_nx98ml',
+  traceId: 't_mpucy01c_gfkpyz',
   timeoutMs: 7000,
   input: {
-    vision_features: [
-      'cooked seafood',
-      'octopus',
-      'paella',
-      'restaurant setting',
-      'scallops',
-      'seafood',
-      'sliced lemon garnish',
-      'spanish cuisine',
-      'traditional dish',
-      'vibrant presentation'
-    ],
+    vision_features: [],
     tags: [
       'beachfront',
       'coastal landmark',
       'modern architecture',
+      'octopus',
+      'paella',
+      'scallops',
+      'seafood',
       'skyline',
+      'spanish cuisine',
       'urban design'
     ],
     normalize: true
   }
 }
-[Orchestrator] Node "tes_builder" completed in 27ms
+[Orchestrator] Node "tes_builder" completed in 12ms
 [Orchestrator] Executing node: fetch_recommendation (skill: fetch_recommendation)
 [toolClient] -> /tool/recommendation.score {
-  traceId: 't_mpu3b6lx_ntjebl',
+  traceId: 't_mpucy01n_fg57rt',
   timeoutMs: 3000,
   input: {
     data: {
       user_id: 'ui_demo_user',
-      city: 'barcelona',
+      city: 'tokyo',
       tags: [Array],
       intent: 'balanced',
-      memory_confidence: 0.33334,
+      memory_confidence: 1,
       memory_pool: 'all',
       anchor_tags: [Array]
     }
   }
 }
-[Orchestrator] Node "fetch_recommendation" completed in 529ms
+[Orchestrator] Node "fetch_recommendation" completed in 483ms
 [Orchestrator] Executing node: rerank (skill: rerank)
 [toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3b70m_vw8hl2',
+  traceId: 't_mpucy0f2_g643z6',
   timeoutMs: 7000,
   input: {
-    tags: [ 'beach', 'daytime', 'leisure', 'social', 'urban_coast' ],
+    tags: [ 'landmark', 'modern', 'observation', 'skyline', 'skyscraper' ],
     normalize: true
   }
 }
 [toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3b70w_cxfzrk',
+  traceId: 't_mpucy0fc_1h5xbu',
   timeoutMs: 7000,
   input: {
-    tags: [ 'architecture', 'heritage', 'modernisme', 'museum', 'rooftop' ],
+    tags: [ 'family', 'modern', 'park', 'seaside', 'view' ],
     normalize: true
   }
 }
 [toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3b714_blmgmx',
+  traceId: 't_mpucy0fl_h0ttsf',
   timeoutMs: 7000,
   input: {
-    tags: [ 'breeze', 'daytime', 'leisure', 'seaside', 'walk' ],
+    tags: [ 'creative', 'dinner', 'fine_dining', 'fusion', 'modern' ],
     normalize: true
   }
 }
 [toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3b71e_jwp7bo',
+  traceId: 't_mpucy0fw_21yttg',
   timeoutMs: 7000,
   input: {
-    tags: [ 'architecture', 'gaudi', 'iconic', 'modernisme', 'museum' ],
+    tags: [ 'breakfast', 'local', 'seafood', 'sushi', 'traditional' ],
     normalize: true
   }
 }
 [toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3b71m_8a67tr',
+  traceId: 't_mpucy0g4_har2ax',
   timeoutMs: 7000,
   input: {
-    tags: [ 'architecture', 'heritage', 'landmark', 'modernisme', 'unesco' ],
+    tags: [ 'leisure', 'modern', 'seaside', 'sunset', 'walk' ],
     normalize: true
   }
 }
 [toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3b71u_xjx1bf',
+  traceId: 't_mpucy0gd_7ee28p',
   timeoutMs: 7000,
   input: {
-    tags: [ 'architecture', 'daytime', 'luxury', 'urban', 'walk' ],
+    tags: [ 'chef’s_choice', 'elegant', 'omakase', 'premium', 'sushi' ],
     normalize: true
   }
 }
 [toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3b722_o1ikg4',
+  traceId: 't_mpucy0gn_8pn7yb',
   timeoutMs: 7000,
   input: {
-    tags: [
-      'architecture',
-      'concert_hall',
-      'heritage',
-      'modernisme',
-      'music'
-    ],
+    tags: [ 'casual', 'italian', 'lunch', 'pasta', 'western' ],
     normalize: true
   }
 }
 [toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3b72a_569ny6',
+  traceId: 't_mpucy0gw_klf52r',
   timeoutMs: 7000,
   input: {
-    tags: [ 'cultural', 'heritage', 'medieval', 'old_town', 'streets' ],
+    tags: [ 'cruise', 'evening', 'experience', 'river', 'scenery' ],
     normalize: true
   }
 }
 [toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3b72j_ozxsps',
+  traceId: 't_mpucy0h4_0fggq9',
   timeoutMs: 7000,
   input: {
-    tags: [ 'architecture', 'basilica', 'gaudi', 'iconic', 'landmark' ],
+    tags: [ 'city_life', 'iconic', 'intersection', 'modern', 'photo' ],
     normalize: true
   }
 }
 [toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3b72r_l2khtm',
+  traceId: 't_mpucy0hd_jrosx3',
   timeoutMs: 7000,
   input: {
-    tags: [ 'gaudi', 'heritage', 'mosaic', 'park', 'viewpoint' ],
+    tags: [ 'casual', 'noodles', 'quick', 'street_food', 'yakisoba' ],
     normalize: true
   }
 }
-[Orchestrator] Node "rerank" completed in 85ms
+[Orchestrator] Node "rerank" completed in 93ms
 [Orchestrator] Executing node: mix_policy (skill: mix_policy)
-[Orchestrator] Node "mix_policy" completed in 1ms
+[Orchestrator] Node "mix_policy" completed in 0ms
 [Orchestrator] Executing node: build_cards (skill: build_cards)
 [toolClient] -> /tool/planner.compose {
-  traceId: 't_mpu3b730_vayjay',
+  traceId: 't_mpucy0hn_9a536n',
   timeoutMs: 3000,
   input: {
     data: {
-      city: 'barcelona',
+      city: 'tokyo',
       cz: [Array],
       ez: [Array],
-      tags: [],
+      tags: [Array],
       user_id: 'ui_demo_user',
       intent: {},
       cz_ranked: [Array],
@@ -225,453 +220,6 @@
 }
 [Orchestrator] Node "build_cards" completed in 48ms
 [Orchestrator] Executing node: explain_from_trace (skill: explain_from_trace)
-[Orchestrator] Node "explain_from_trace" completed in 3593ms
-[Orchestrator] Starting pipeline "recommendation_pipeline" v13.0.0 with 13 nodes
-[Orchestrator] Executing node: extract_intent (skill: extract_intent)
-[Orchestrator] Node "extract_intent" completed in 0ms
-[Orchestrator] Executing node: decide_tag_budget (skill: decide_tag_budget)
-[Orchestrator] Node "decide_tag_budget" completed in 0ms
-[Orchestrator] Executing node: tag_expand (skill: tag_expand)
-[Orchestrator] Node "tag_expand" completed in 2212ms
-[Orchestrator] Executing node: tag_normalize (skill: tag_normalize)
-[toolClient] -> /tool/ontology.normalize {
-  traceId: 't_mpu3cbo5_gpu5rr',
-  timeoutMs: 3000,
-  input: { data: { tags: [Array], lang: 'auto', strict: true } }
-}
-[Orchestrator] Node "tag_normalize" completed in 7ms
-[Orchestrator] Executing node: memory_weight_adjust (skill: memory_weight_adjust)
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3cboc_qa7pbl',
-  timeoutMs: 7000,
-  input: { tags: [ 'fine_dining' ], normalize: true }
-}
-[toolClient] -> /tool/memory.search {
-  traceId: 't_mpu3cbol_cpkjrf',
-  timeoutMs: 3000,
-  input: {
-    data: {
-      user_id: 'ui_demo_user',
-      query_tags: [Array],
-      top_k: 10,
-      memory_pool: 'food',
-      query_embedding: [Array],
-      city: 'barcelona',
-      now_ts: '2026-05-31T18:06:05.425Z'
-    }
-  }
-}
-[toolClient] -> /tool/memory.search {
-  traceId: 't_mpu3cbos_86ghse',
-  timeoutMs: 3000,
-  input: {
-    data: {
-      user_id: 'ui_demo_user',
-      query_tags: [Array],
-      top_k: 10,
-      memory_pool: 'all',
-      query_embedding: [Array],
-      city: 'barcelona',
-      now_ts: '2026-05-31T18:06:05.425Z'
-    }
-  }
-}
-[Orchestrator] Node "memory_weight_adjust" completed in 20ms
-[Orchestrator] Executing node: build_profile_vector (skill: build_profile_vector)
-[Orchestrator] Node "build_profile_vector" completed in 0ms
-[Orchestrator] Executing node: vision_describe (skill: vision_describe)
-[toolClient] -> /tool/vision.describe {
-  traceId: 't_mpu3cbow_m5u0m4',
-  timeoutMs: 15000,
-  input: {
-    data: {
-      top_k: 10,
-      image_base64: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABAAAAAJACAYAAAATlRTVAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAEAKADAAQAAAABAAACQAAAAABdd1FJAABAAElEQVR4AVz92Y5k25be+Vl4uHtE7PackyeTZBWpLEACBFFCSU+gN9OL6HUEXdSFVNCNLlUCKRIgMk+3u2g83EP/3zfN9k5ymZvbsrnmHP0Yc8xmLXv1f/2//J+/vLrcndfd3eXly8vlrpLn55fLy8vT5YvX88fLy4dfuna5fLmrdvUe3351ef3wePny5fny5fOny6ePH2vzujavLvdvX1/u70G9v7x+HczafHn1urqXy+VVf32+flUZgH3fZ5cu1Xvu1Ukwny8PXXy5e6ldNGisvX+vw3uF8+r5c9Xvu46HYKoRTZdXn8P+5vL8BQ8vfXf1oavq9HqBxzl+nD5F/+fLh49fLn/608fLf/z/vr/8+f3ry+fqwf38/Hx5ifBXve5fx1f43zzeXf713393+df/9n9z+f2//sPlzduHy+v715dXz9VLjmhE79PT58svye/9D/98+fnHv10+fnh/eXkKf7L68nJ3eYrXn356uvzY+2/vf4nmL5fPwUAfWY335PUKoV27C/abh6QbO3d3X5Lx68tj3+/uPl++fvvm8vW7x8s333x9+fqb7y5v3767PD6+uXz7zVeXh/voulO383T3EK2X4N4l91fkM3qjKZwkA/lLovviXxfjKLo+j56b7kL/66Gd49AbruB9iUcHHLfr7Od2rG5fDv7KAdRkRAAAaJ8r62svcnjJdu4gQHs83V3roRG9Fa8JPC+jP5uqzqvafOnt88X3XU+GO2Fvtau+a4CkzdVf22v7l+wLvTmD1kMEpzaHzyuewSdJNKH74AUL7eof2z+CO5wee0f34YBeqouHa5HvgfQXT5+vfIKHb4x3zl5HDxpBUq6BNnD4RGc20KGtOonShWi9X/ld/nd393i57/treouHh+z/4f5+dPGtuxd+8uXy6fnp8vHjj5enPn/55adiws+XH3/86fL+w9Pl/afny19++rHvP19+/vn95edfPl8+/Xy5/JJvfC5uPH9+CvddsOlpLIw//x4e7i/fffX68q//+PXlj//wu8vv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'... 1664578 more characters,
-      caption_text: 'nice food!!'
-    }
-  }
-}
-[Orchestrator] Node "vision_describe" completed in 4056ms
-[Orchestrator] Executing node: tes_builder (skill: tes_builder)
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3cetk_s4olye',
-  timeoutMs: 7000,
-  input: {
-    vision_features: [
-      'grilled scallops',
-      'lemon wedges',
-      'mediterranean cuisine',
-      'mixed seafood paella',
-      'octopus',
-      'octopus with potatoes',
-      'paella',
-      'rustic table setting',
-      'scallops',
-      'seafood'
-    ],
-    tags: [
-      'beachfront',
-      'coastal landmark',
-      'modern architecture',
-      'skyline',
-      'urban design'
-    ],
-    normalize: true
-  }
-}
-[Orchestrator] Node "tes_builder" completed in 25ms
-[Orchestrator] Executing node: fetch_recommendation (skill: fetch_recommendation)
-[toolClient] -> /tool/recommendation.score {
-  traceId: 't_mpu3ceu9_w3cnqy',
-  timeoutMs: 3000,
-  input: {
-    data: {
-      user_id: 'ui_demo_user',
-      city: 'barcelona',
-      tags: [Array],
-      intent: 'balanced',
-      memory_confidence: 0.472621,
-      memory_pool: 'food',
-      anchor_tags: [Array]
-    }
-  }
-}
-[Orchestrator] Node "fetch_recommendation" completed in 491ms
-[Orchestrator] Executing node: rerank (skill: rerank)
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3cf7w_343jpb',
-  timeoutMs: 7000,
-  input: {
-    tags: [
-      'avant_garde',
-      'creative',
-      'dinner',
-      'fine_dining',
-      'tasting_menu'
-    ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3cf84_csns3c',
-  timeoutMs: 7000,
-  input: {
-    tags: [ 'beach', 'daytime', 'leisure', 'social', 'urban_coast' ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3cf8c_b7h266',
-  timeoutMs: 7000,
-  input: {
-    tags: [ 'architecture', 'heritage', 'modernisme', 'museum', 'rooftop' ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3cf8k_ymwrmd',
-  timeoutMs: 7000,
-  input: {
-    tags: [ 'breeze', 'daytime', 'leisure', 'seaside', 'walk' ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3cf8s_r21pac',
-  timeoutMs: 7000,
-  input: {
-    tags: [ 'architecture', 'gaudi', 'iconic', 'modernisme', 'museum' ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3cf91_qm1di0',
-  timeoutMs: 7000,
-  input: {
-    tags: [ 'architecture', 'heritage', 'landmark', 'modernisme', 'unesco' ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3cf99_wz2tax',
-  timeoutMs: 7000,
-  input: {
-    tags: [ 'architecture', 'daytime', 'luxury', 'urban', 'walk' ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3cf9i_oy3xdd',
-  timeoutMs: 7000,
-  input: {
-    tags: [
-      'architecture',
-      'concert_hall',
-      'heritage',
-      'modernisme',
-      'music'
-    ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3cf9q_akz23c',
-  timeoutMs: 7000,
-  input: {
-    tags: [ 'cultural', 'heritage', 'medieval', 'old_town', 'streets' ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3cf9y_ffwdai',
-  timeoutMs: 7000,
-  input: {
-    tags: [ 'architecture', 'basilica', 'gaudi', 'iconic', 'landmark' ],
-    normalize: true
-  }
-}
-[Orchestrator] Node "rerank" completed in 82ms
-[Orchestrator] Executing node: mix_policy (skill: mix_policy)
-[Orchestrator] Node "mix_policy" completed in 0ms
-[Orchestrator] Executing node: build_cards (skill: build_cards)
-[toolClient] -> /tool/planner.compose {
-  traceId: 't_mpu3cfa6_bte63k',
-  timeoutMs: 3000,
-  input: {
-    data: {
-      city: 'barcelona',
-      cz: [Array],
-      ez: [],
-      tags: [Array],
-      user_id: 'ui_demo_user',
-      intent: {},
-      cz_ranked: [Array],
-      ez_ranked: [],
-      mix_policy: [Object],
-      decision_trace: [Object],
-      meta: [Object]
-    }
-  }
-}
-[Orchestrator] Node "build_cards" completed in 49ms
-[Orchestrator] Executing node: explain_from_trace (skill: explain_from_trace)
-[Orchestrator] Node "explain_from_trace" completed in 2643ms
-[Orchestrator] Starting pipeline "recommendation_pipeline" v13.0.0 with 13 nodes
-[Orchestrator] Executing node: extract_intent (skill: extract_intent)
-[Orchestrator] Node "extract_intent" completed in 0ms
-[Orchestrator] Executing node: decide_tag_budget (skill: decide_tag_budget)
-[Orchestrator] Node "decide_tag_budget" completed in 1ms
-[Orchestrator] Executing node: tag_expand (skill: tag_expand)
-[Orchestrator] Node "tag_expand" completed in 2328ms
-[Orchestrator] Executing node: tag_normalize (skill: tag_normalize)
-[toolClient] -> /tool/ontology.normalize {
-  traceId: 't_mpu3dgu5_cbsa6h',
-  timeoutMs: 3000,
-  input: { data: { tags: [Array], lang: 'auto', strict: true } }
-}
-[Orchestrator] Node "tag_normalize" completed in 4ms
-[Orchestrator] Executing node: memory_weight_adjust (skill: memory_weight_adjust)
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3dgu9_v2cxwu',
-  timeoutMs: 7000,
-  input: {
-    tags: [
-      'average taste',
-      'disappointing',
-      'lacks flavor',
-      'mediocre flavor',
-      'not tasty',
-      'unimpressive'
-    ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/memory.search {
-  traceId: 't_mpu3dgul_yd4emw',
-  timeoutMs: 3000,
-  input: {
-    data: {
-      user_id: 'ui_demo_user',
-      query_tags: [Array],
-      top_k: 10,
-      memory_pool: 'all',
-      query_embedding: [Array],
-      city: 'barcelona',
-      now_ts: '2026-05-31T18:06:58.660Z'
-    }
-  }
-}
-[Orchestrator] Node "memory_weight_adjust" completed in 22ms
-[Orchestrator] Executing node: build_profile_vector (skill: build_profile_vector)
-[Orchestrator] Node "build_profile_vector" completed in 0ms
-[Orchestrator] Executing node: vision_describe (skill: vision_describe)
-[toolClient] -> /tool/vision.describe {
-  traceId: 't_mpu3dguv_qmlkj1',
-  timeoutMs: 15000,
-  input: {
-    data: {
-      top_k: 10,
-      image_base64: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABAAAAAJACAYAAAATlRTVAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAEAKADAAQAAAABAAACQAAAAABdd1FJAABAAElEQVR4AVz92Y5k25be+Vl4uHtE7PackyeTZBWpLEACBFFCSU+gN9OL6HUEXdSFVNCNLlUCKRIgMk+3u2g83EP/3zfN9k5ymZvbsrnmHP0Yc8xmLXv1f/2//J+/vLrcndfd3eXly8vlrpLn55fLy8vT5YvX88fLy4dfuna5fLmrdvUe3351ef3wePny5fny5fOny6ePH2vzujavLvdvX1/u70G9v7x+HczafHn1urqXy+VVf32+flUZgH3fZ5cu1Xvu1Ukwny8PXXy5e6ldNGisvX+vw3uF8+r5c9Xvu46HYKoRTZdXn8P+5vL8BQ8vfXf1oavq9HqBxzl+nD5F/+fLh49fLn/608fLf/z/vr/8+f3ry+fqwf38/Hx5ifBXve5fx1f43zzeXf713393+df/9n9z+f2//sPlzduHy+v715dXz9VLjmhE79PT58svye/9D/98+fnHv10+fnh/eXkKf7L68nJ3eYrXn356uvzY+2/vf4nmL5fPwUAfWY335PUKoV27C/abh6QbO3d3X5Lx68tj3+/uPl++fvvm8vW7x8s333x9+fqb7y5v3767PD6+uXz7zVeXh/voulO383T3EK2X4N4l91fkM3qjKZwkA/lLovviXxfjKLo+j56b7kL/66Gd49AbruB9iUcHHLfr7Od2rG5fDv7KAdRkRAAAaJ8r62svcnjJdu4gQHs83V3roRG9Fa8JPC+jP5uqzqvafOnt88X3XU+GO2Fvtau+a4CkzdVf22v7l+wLvTmD1kMEpzaHzyuewSdJNKH74AUL7eof2z+CO5wee0f34YBeqouHa5HvgfQXT5+vfIKHb4x3zl5HDxpBUq6BNnD4RGc20KGtOonShWi9X/ld/nd393i57/treouHh+z/4f5+dPGtuxd+8uXy6fnp8vHjj5enPn/55adiws+XH3/86fL+w9Pl/afny19++rHvP19+/vn95edfPl8+/Xy5/JJvfC5uPH9+CvddsOlpLIw//x4e7i/fffX68q//+PXlj//wu8vv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'... 1664578 more characters,
-      caption_text: "It's just average; not very tasty."
-    }
-  }
-}
-[Orchestrator] Node "vision_describe" completed in 3155ms
-[Orchestrator] Executing node: tes_builder (skill: tes_builder)
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3djai_hxww6y',
-  timeoutMs: 7000,
-  input: {
-    vision_features: [
-      'grilled scallops',
-      'octopus',
-      'octopus with potatoes',
-      'paella',
-      'prawn paella',
-      'restaurant setting',
-      'scallops',
-      'seafood',
-      'seafood dishes',
-      'spanish cuisine'
-    ],
-    tags: [
-      'beachfront',
-      'coastal landmark',
-      'modern architecture',
-      'skyline',
-      'urban design'
-    ],
-    normalize: true
-  }
-}
-[Orchestrator] Node "tes_builder" completed in 26ms
-[Orchestrator] Executing node: fetch_recommendation (skill: fetch_recommendation)
-[toolClient] -> /tool/recommendation.score {
-  traceId: 't_mpu3djb8_qwe98a',
-  timeoutMs: 3000,
-  input: {
-    data: {
-      user_id: 'ui_demo_user',
-      city: 'barcelona',
-      tags: [Array],
-      intent: 'balanced',
-      memory_confidence: 0.210078,
-      memory_pool: 'all',
-      anchor_tags: [Array]
-    }
-  }
-}
-[Orchestrator] Node "fetch_recommendation" completed in 483ms
-[Orchestrator] Executing node: rerank (skill: rerank)
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3djon_i58bhx',
-  timeoutMs: 7000,
-  input: {
-    tags: [ 'beach', 'daytime', 'leisure', 'social', 'urban_coast' ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3djov_o6p8ug',
-  timeoutMs: 7000,
-  input: {
-    tags: [ 'architecture', 'heritage', 'modernisme', 'museum', 'rooftop' ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3djp3_tt25ps',
-  timeoutMs: 7000,
-  input: {
-    tags: [ 'breeze', 'daytime', 'leisure', 'seaside', 'walk' ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3djpb_knkj2x',
-  timeoutMs: 7000,
-  input: {
-    tags: [ 'architecture', 'gaudi', 'iconic', 'modernisme', 'museum' ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3djpi_iwd42a',
-  timeoutMs: 7000,
-  input: {
-    tags: [ 'architecture', 'heritage', 'landmark', 'modernisme', 'unesco' ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3djpq_hoeujl',
-  timeoutMs: 7000,
-  input: {
-    tags: [ 'architecture', 'daytime', 'luxury', 'urban', 'walk' ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3djpy_nchsnb',
-  timeoutMs: 7000,
-  input: {
-    tags: [
-      'architecture',
-      'concert_hall',
-      'heritage',
-      'modernisme',
-      'music'
-    ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3djq6_xkl5o2',
-  timeoutMs: 7000,
-  input: {
-    tags: [ 'cultural', 'heritage', 'medieval', 'old_town', 'streets' ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3djqe_mcehl2',
-  timeoutMs: 7000,
-  input: {
-    tags: [ 'architecture', 'basilica', 'gaudi', 'iconic', 'landmark' ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpu3djqm_67rryr',
-  timeoutMs: 7000,
-  input: {
-    tags: [ 'gaudi', 'heritage', 'mosaic', 'park', 'viewpoint' ],
-    normalize: true
-  }
-}
-[Orchestrator] Node "rerank" completed in 79ms
-[Orchestrator] Executing node: mix_policy (skill: mix_policy)
-[Orchestrator] Node "mix_policy" completed in 0ms
-[Orchestrator] Executing node: build_cards (skill: build_cards)
-[toolClient] -> /tool/planner.compose {
-  traceId: 't_mpu3djqu_nqqxtv',
-  timeoutMs: 3000,
-  input: {
-    data: {
-      city: 'barcelona',
-      cz: [Array],
-      ez: [Array],
-      tags: [],
-      user_id: 'ui_demo_user',
-      intent: {},
-      cz_ranked: [Array],
-      ez_ranked: [],
-      mix_policy: [Object],
-      decision_trace: [Object],
-      meta: [Object]
-    }
-  }
-}
-[Orchestrator] Node "build_cards" completed in 40ms
-[Orchestrator] Executing node: explain_from_trace (skill: explain_from_trace)
-[Orchestrator] Node "explain_from_trace" completed in 2334ms
+[explain] memory_anchors: [{"memory_id":"56f3e9e7-ac1e-41ef-9e6a-c0632ae28333","tags":["octopus","paella","scallops"],"city":"barcelona","vision_type":"food","w_time":0.9816,"w_sent":1.08,"final_weight":0.9973,"sentiment":0.4,"timestamp":"2026-05-31T18:06:58.660Z"},{"memory_id":"922bb748-77fc-4018-bdeb-47ecb0281d12","tags":["beachfront","coastal landmark","modern architecture"],"city":"barcelona","vision_type":"scenery","w_time":0.9809,"w_sent":1.2,"final_weight":0.822,"sentiment":1,"timestamp":"2026-05-31T17:56:34.087Z"}]
+[explain] recommended_items: [{"name":"Tokyo Skytree","type":"other","tags":["skyscraper","skyline","modern","observation","landmark"]},{"name":"Sushi Omakase Spot","type":"food","tags":["omakase","sushi","premium","chef’s_choice","elegant"]},{"name":"Tsukiji Sushi Counter","type":"food","tags":["sushi","seafood","breakfast","local","traditional"]},{"name":"French-Japanese Fusion","type":"other","tags":["fusion","fine_dining","modern","dinner","creative"]},{"name":"Shibuya Crossing Viewpoint","type":"other","tags":["intersection","city_life","iconic","modern","photo"]}]
+[Orchestrator] Node "explain_from_trace" completed in 1808ms

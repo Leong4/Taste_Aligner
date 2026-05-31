@@ -298,6 +298,7 @@ def search_memories(
             "tag_boost": round(tag_boost, 6),
             "timestamp": memory_ts,
             "city": memory_city,
+            "vision_type": memory.get("vision_type"),
             "normalized_tags": memory_tags,
             "sentiment": sentiment
         })

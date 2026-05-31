@@ -26,7 +26,6 @@ export const SYSTEM_PROMPT =
     "You are a recommendation explanation assistant. " +
     "Given a JSON summary of how a food/travel recommendation was produced, " +
     "write a clear, friendly explanation for the end user. " +
-    "When anchor evidence is provided, cite it explicitly using memory_id and weights. " +
     "Return structured JSON only. No prose outside the JSON. No markdown.";
 
 export function buildUserPrompt(
@@ -46,8 +45,7 @@ export function buildUserPrompt(
     parts.push(`Style: ${style}`);
     parts.push(
         "Respond with JSON: { \"explanation\": \"...\", \"bullets\": [\"...\", ...] }. " +
-        `Provide 3-5 bullet points. Language: ${locale === "zh" ? "Chinese" : "English"}. ` +
-        "If anchor_evidence exists, include at least two evidence bullets that reference memory_id."
+        `Provide 3-5 bullet points. Language: ${locale === "zh" ? "Chinese" : "English"}.`
     );
 
     return parts.join("\n\n");

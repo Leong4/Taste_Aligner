@@ -260,7 +260,7 @@ function createTesBuilderSkill(toolClient) {
         inputSchema: {
             description: "Build TES vector from memory_signal anchor tags and optional vision features",
             required: [],
-            optional: ["anchor_tags", "normalized_tags", "vision_features", "vision_tags", "request_ts", "user_city", "decision_trace"],
+            optional: ["anchor_tags", "normalized_tags", "vision_features", "vision_tags", "sentiment", "request_ts", "user_city", "decision_trace"],
         },
         outputSchema: {
             description: "Validated TES vector and trace",

@@ -12,6 +12,9 @@
  *   2. Calls the LLM adapter for structured JSON output
  *   3. Returns explanation + bullets + full call trace for auditing
  *   4. On adapter failure, returns a graceful fallback (never throws)
+ *
+ * The adapter factory defaults to mock. Start with
+ * `./scripts/dev_restart.sh --all --with-llm` to use the real openai_compat adapter.
  */
 
 import {
@@ -54,7 +57,7 @@ const MAX_COMPACT_JSON_BYTES = 8 * 1024; // 8 KB
  * Configurable via EXPLAIN_MAX_TOTAL_TOKENS env var (default from LIMITS).
  */
 const EXPLAIN_MAX_TOTAL_TOKENS = parseInt(
-    process.env.EXPLAIN_MAX_TOTAL_TOKENS ?? String(LIMITS.max_total_tokens),
+    process.env.EXPLAIN_MAX_TOTAL_TOKENS ?? "2000",
     10
 );
 
@@ -70,12 +73,20 @@ interface ExplainLLMOutput {
 
 interface AnchorEvidence {
     memory_id: string;
+    city?: string;
+    vision_type?: string;
     tags: string[];
     w_time?: number;
     w_sent?: number;
     final_weight?: number;
     sentiment?: number;
     timestamp?: string;
+}
+
+interface RecommendedItemEvidence {
+    name: string;
+    type: string;
+    tags: string[];
 }
 
 function isValidOutput(data: unknown): data is ExplainLLMOutput {
@@ -140,10 +151,13 @@ function toNumber4(value: unknown): number | undefined {
     return Number(n.toFixed(4));
 }
 
-function extractWeightedResultIndex(trace: Record<string, unknown>): Map<string, Record<string, unknown>> {
+function extractWeightedResultIndex(
+    trace: Record<string, unknown>,
+    weightedResults?: unknown
+): Map<string, Record<string, unknown>> {
     const index = new Map<string, Record<string, unknown>>();
     const mwa = asObject(trace.memory_weight_adjust);
-    const weighted = mwa?.weighted_results;
+    const weighted = Array.isArray(weightedResults) ? weightedResults : mwa?.weighted_results;
     if (!Array.isArray(weighted)) return index;
     for (const row of weighted) {
         const obj = asObject(row);
@@ -155,10 +169,10 @@ function extractWeightedResultIndex(trace: Record<string, unknown>): Map<string,
     return index;
 }
 
-function extractAnchorEvidence(trace: Record<string, unknown>): AnchorEvidence[] {
+function extractAnchorEvidence(trace: Record<string, unknown>, weightedResults?: unknown): AnchorEvidence[] {
     const pvn = asObject(trace.profile_vector_node);
     if (!pvn || !Array.isArray(pvn.anchors)) return [];
-    const weightedIndex = extractWeightedResultIndex(trace);
+    const weightedIndex = extractWeightedResultIndex(trace, weightedResults);
     const evidence: AnchorEvidence[] = [];
 
     for (const anchorRaw of pvn.anchors) {
@@ -178,6 +192,12 @@ function extractAnchorEvidence(trace: Record<string, unknown>): AnchorEvidence[]
             memory_id: memoryId,
             tags,
         };
+        if (typeof weighted?.city === "string" && weighted.city.trim()) {
+            row.city = weighted.city.trim();
+        }
+        if (typeof weighted?.vision_type === "string" && weighted.vision_type.trim()) {
+            row.vision_type = weighted.vision_type.trim();
+        }
         const wTime = toNumber4(anchor.w_time ?? weighted?.w_time);
         if (wTime !== undefined) row.w_time = wTime;
         const wSent = toNumber4(anchor.w_sent ?? weighted?.w_sent);
@@ -205,50 +225,15 @@ function hasProfileVectorNode(trace: Record<string, unknown>): boolean {
     return asObject(trace.profile_vector_node) !== null;
 }
 
-function formatEvidenceLine(e: AnchorEvidence): string {
-    const tags = e.tags.length > 0 ? e.tags.join("|") : "none";
-    const wTime = e.w_time !== undefined ? String(e.w_time) : "n/a";
-    const wSent = e.w_sent !== undefined ? String(e.w_sent) : "n/a";
-    const finalWeight = e.final_weight !== undefined ? String(e.final_weight) : "n/a";
-    return `memory_id=${e.memory_id}, tags=${tags}, w_time=${wTime}, w_sent=${wSent}, final_weight=${finalWeight}`;
-}
-
-function buildEvidenceBullets(evidence: AnchorEvidence[]): string[] {
-    return evidence.slice(0, 2).map((e, i) => `Evidence ${i + 1}: ${formatEvidenceLine(e)}`);
-}
-
-function mergeBulletsWithEvidence(baseBullets: string[], evidenceBullets: string[]): string[] {
-    const out: string[] = [];
-    const seen = new Set<string>();
-    for (const b of [...evidenceBullets, ...baseBullets]) {
-        const trimmed = b.trim();
-        if (!trimmed || seen.has(trimmed)) continue;
-        seen.add(trimmed);
-        out.push(trimmed);
-        if (out.length >= 5) break;
-    }
-    while (out.length < 3) {
-        out.push("Evidence-based ranking with deterministic weighting.");
-    }
-    return out.slice(0, 5);
-}
-
-function appendEvidenceToExplanation(explanation: string, evidenceBullets: string[]): string {
-    const trimmed = explanation.trim();
-    const evidenceBlock = evidenceBullets.map((b, i) => `${i + 1}) ${b}`).join("\n");
-    return `${trimmed}\n\nAnchor evidence:\n${evidenceBlock}`;
-}
-
-function buildAnchoredFallback(evidence: AnchorEvidence[]): { explanation: string; bullets: string[] } {
-    const evidenceBullets = buildEvidenceBullets(evidence);
+function buildAnchoredFallback(): { explanation: string; bullets: string[] } {
     return {
         explanation:
-            "Recommendations are grounded in your recent uploaded memories. " +
-            "The following anchor evidence was used deterministically.",
-        bullets: mergeBulletsWithEvidence(
-            ["Profile vector and recall weights were applied consistently."],
-            evidenceBullets
-        ),
+            "Recommendations are grounded in your recent uploaded memories.",
+        bullets: [
+            "Your uploaded memories helped shape these recommendations.",
+            "Recent preferences were used to find relevant options.",
+            "The final list balances familiar choices with variety.",
+        ],
     };
 }
 
@@ -263,9 +248,71 @@ function buildInsufficientEvidenceFallback(anchorCount: number): { explanation: 
     };
 }
 
-function compactTrace(trace: Record<string, unknown>): Record<string, unknown> {
+function extractRecommendedItems(cards: unknown): RecommendedItemEvidence[] {
+    if (!Array.isArray(cards)) return [];
+    const items: RecommendedItemEvidence[] = [];
+    for (const cardRaw of cards) {
+        const card = asObject(cardRaw);
+        if (!card || !Array.isArray(card.items)) continue;
+        for (const itemRaw of card.items) {
+            const item = asObject(itemRaw);
+            if (!item) continue;
+            const name =
+                typeof item.name === "string" && item.name.trim()
+                    ? item.name.trim()
+                    : (typeof item.item_id === "string" ? item.item_id : "");
+            if (!name) continue;
+            const type =
+                typeof item.type === "string" && item.type.trim()
+                    ? item.type.trim()
+                    : "unknown";
+            const tags = Array.isArray(item.tags)
+                ? item.tags
+                    .filter((tag): tag is string => typeof tag === "string" && tag.trim().length > 0)
+                    .map((tag) => tag.trim().toLowerCase())
+                    .slice(0, MAX_TAGS_PER_ITEM)
+                : [];
+            items.push({ name, type, tags });
+        }
+    }
+    return items.slice(0, MAX_CARDS * MAX_ITEMS_PER_CARD);
+}
+
+function buildPersonalizedExplanationPrompt(compact: Record<string, unknown>): string {
+    const memoryAnchors = Array.isArray(compact.memory_anchors)
+        ? (compact.memory_anchors as AnchorEvidence[])
+        : [];
+    const recommendedItems = Array.isArray(compact.recommended_items)
+        ? (compact.recommended_items as RecommendedItemEvidence[])
+        : [];
+    const memorySummary = memoryAnchors
+        .map((anchor) => {
+            const tags = anchor.tags.length > 0 ? anchor.tags.join(", ") : anchor.vision_type ?? "memory";
+            const city = anchor.city ? ` in ${anchor.city}` : "";
+            const sentiment = anchor.sentiment !== undefined ? ` (sentiment: ${anchor.sentiment})` : "";
+            return `${tags}${city}${sentiment}`;
+        })
+        .join("; ");
+    const recommendationSummary = recommendedItems
+        .map((item) => `${item.name} (${item.type})`)
+        .join(", ");
+    return [
+        `Past memories: ${memorySummary || "none"}`,
+        `Recommended: ${recommendationSummary || "none"}`,
+        "Generate a short 2-3 sentence friendly explanation connecting the user's past memories to the recommendations. " +
+            "Be conversational. Do NOT mention memory_id, w_time, w_sent, final_weight, sentiment scores, or any technical fields. " +
+            "Just describe the connection naturally. Example: \"Since you enjoyed seafood in Barcelona, we picked Tsukiji Sushi Counter for a similar experience in Tokyo. " +
+            "We also noticed you love coastal scenery, so Odaiba Bay Promenade might be a great fit.\"",
+    ].join("\n");
+}
+
+function compactTrace(
+    trace: Record<string, unknown>,
+    cards?: unknown,
+    weightedResults?: unknown
+): Record<string, unknown> {
     const compact: Record<string, unknown> = {};
-    const anchorEvidence = extractAnchorEvidence(trace);
+    const anchorEvidence = extractAnchorEvidence(trace, weightedResults);
 
     // extract_intent summary
     const intent = trace.extract_intent;
@@ -340,6 +387,9 @@ function compactTrace(trace: Record<string, unknown>): Record<string, unknown> {
             total_memories_considered: p.total_memories_considered,
         };
     }
+    if (anchorEvidence.length > 0) {
+        compact.memory_anchors = anchorEvidence;
+    }
 
     // planner / build_cards summary — cap cards and items per card
     for (const key of ["planner", "build_cards"]) {
@@ -387,6 +437,10 @@ function compactTrace(trace: Record<string, unknown>): Record<string, unknown> {
             break;
         }
     }
+    const recommendedItems = extractRecommendedItems(cards);
+    if (recommendedItems.length > 0) {
+        compact.recommended_items = recommendedItems;
+    }
 
     // 8 KB hard cap — deterministically remove largest fields first
     const enforceByteLimit = (obj: Record<string, unknown>): Record<string, unknown> => {
@@ -428,7 +482,7 @@ export function createExplainFromTraceSkill(
         inputSchema: {
             description: "Decision trace + optional user text for explanation generation",
             required: ["decision_trace"],
-            optional: ["user_text", "locale", "style"],
+            optional: ["user_text", "locale", "style", "cards"],
         },
 
         outputSchema: {
@@ -443,18 +497,25 @@ export function createExplainFromTraceSkill(
             const locale = input.locale ?? (process.env.EXPLAIN_LOCALE as "en" | "zh" | undefined) ?? "en";
             const style = input.style ?? (process.env.EXPLAIN_STYLE as "concise" | "detailed" | undefined) ?? "concise";
 
-            // Use graph-provided decision_trace, fall back to context
+            // Use the context's fully aggregated trace, falling back to the graph-provided trace.
             const traceSource =
-                input.decision_trace &&
-                typeof input.decision_trace === "object" &&
-                Object.keys(input.decision_trace).length > 0
-                    ? input.decision_trace
-                    : _context.decision_trace;
+                Object.keys(_context.decision_trace).length > 0
+                    ? _context.decision_trace
+                    : input.decision_trace;
+            const memoryWeightAdjustOutput = asObject(
+                _context.intermediate_results.memory_weight_adjust
+            );
+            const weightedResults = memoryWeightAdjustOutput?.weighted_results;
 
             const profileNodePresent = hasProfileVectorNode(traceSource);
-            const anchorEvidence = extractAnchorEvidence(traceSource);
-            const compact = compactTrace(traceSource);
-            const userPrompt = buildExplainUserPrompt(compact, locale, style, input.user_text);
+            const anchorEvidence = extractAnchorEvidence(traceSource, weightedResults);
+            const compact = compactTrace(traceSource, input.cards, weightedResults);
+            console.log("[explain] memory_anchors:", JSON.stringify(compact.memory_anchors ?? "MISSING"));
+            console.log("[explain] recommended_items:", JSON.stringify(compact.recommended_items ?? "MISSING"));
+            const userPrompt = [
+                buildExplainUserPrompt(compact, locale, style, input.user_text),
+                buildPersonalizedExplanationPrompt(compact),
+            ].join("\n\n");
 
             let explanation: string;
             let bullets: string[];
@@ -499,10 +560,6 @@ export function createExplainFromTraceSkill(
                             const local = buildInsufficientEvidenceFallback(anchorEvidence.length);
                             explanation = local.explanation;
                             bullets = local.bullets;
-                        } else {
-                            const evidenceBullets = buildEvidenceBullets(anchorEvidence);
-                            explanation = appendEvidenceToExplanation(explanation, evidenceBullets);
-                            bullets = mergeBulletsWithEvidence(bullets, evidenceBullets);
                         }
                     }
                 }
@@ -512,7 +569,7 @@ export function createExplainFromTraceSkill(
                 fallbackReason = "adapter_error";
                 if (profileNodePresent) {
                     if (anchorEvidence.length >= 2) {
-                        const local = buildAnchoredFallback(anchorEvidence);
+                        const local = buildAnchoredFallback();
                         explanation = local.explanation;
                         bullets = local.bullets;
                     } else {
