@@ -1,35 +1,165 @@
 /Volumes/leong4/University_doc/RAG/Taste-Aligner/Taste_Aligner/services/memory/main.py:398: FastAPIDeprecationWarning: `regex` has been deprecated, please use `pattern` instead
   variant: str = Query("thumb", regex="^(thumb|preview|original|vision_input)$"),
-INFO:     Started server process [39914]
+INFO:     Started server process [7583]
 INFO:     Waiting for application startup.
-2026-05-31 23:34:32,656 - services.memory.db - INFO - Database initialized at /Volumes/leong4/University_doc/RAG/Taste-Aligner/Taste_Aligner/services/memory/memory.db
-2026-05-31 23:34:32,656 - services.memory.main - INFO - Memory Service started on port 5001
+2026-06-02 18:46:52,153 - services.memory.db - INFO - Database initialized at /Volumes/leong4/University_doc/RAG/Taste-Aligner/Taste_Aligner/services/memory/memory.db
+2026-06-02 18:46:52,154 - services.memory.main - INFO - Memory Service started on port 5001
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:5001 (Press CTRL+C to quit)
-INFO:     127.0.0.1:54796 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54820 - "GET /health HTTP/1.1" 200 OK
-2026-05-31 23:34:55,504 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 50, has_embedding: False, memory_pool: all
-2026-05-31 23:34:55,506 - services.memory.db - INFO - Loaded 2 memories for user ui_demo_user
-2026-05-31 23:34:55,506 - services.memory.main - INFO - Search returned 2 results
-INFO:     127.0.0.1:54841 - "POST /search HTTP/1.1" 200 OK
-2026-05-31 23:34:55,532 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 10, has_embedding: True, memory_pool: all
-2026-05-31 23:34:55,533 - services.memory.db - INFO - Loaded 2 memories for user ui_demo_user
-2026-05-31 23:34:55,533 - services.memory.main - INFO - Search returned 2 results
-INFO:     127.0.0.1:54841 - "POST /search HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54944 - "GET /health HTTP/1.1" 200 OK
-2026-05-31 23:34:56,146 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 1, has_embedding: True, memory_pool: all
-2026-05-31 23:34:56,148 - services.memory.db - INFO - Loaded 2 memories for user ui_demo_user
-2026-05-31 23:34:56,148 - services.memory.main - INFO - Search returned 1 results
-INFO:     127.0.0.1:54948 - "POST /search HTTP/1.1" 200 OK
-2026-05-31 23:34:56,158 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 1, has_embedding: True, memory_pool: all
-2026-05-31 23:34:56,159 - services.memory.db - INFO - Loaded 2 memories for user ui_demo_user
-2026-05-31 23:34:56,159 - services.memory.main - INFO - Search returned 1 results
-INFO:     127.0.0.1:54952 - "POST /search HTTP/1.1" 200 OK
-2026-05-31 23:34:56,168 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 1, has_embedding: True, memory_pool: all
-2026-05-31 23:34:56,169 - services.memory.db - INFO - Loaded 2 memories for user ui_demo_user
-2026-05-31 23:34:56,169 - services.memory.main - INFO - Search returned 1 results
-INFO:     127.0.0.1:54956 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61156 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61180 - "GET /health HTTP/1.1" 200 OK
+2026-06-02 18:47:29,988 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 50, has_embedding: False, memory_pool: all
+2026-06-02 18:47:29,989 - services.memory.db - INFO - Loaded 4 memories for user ui_demo_user
+2026-06-02 18:47:29,989 - services.memory.main - INFO - Search returned 4 results
+INFO:     127.0.0.1:61199 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 18:47:29,990 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 50, has_embedding: False, memory_pool: all
+2026-06-02 18:47:29,991 - services.memory.db - INFO - Loaded 4 memories for user ui_demo_user
+2026-06-02 18:47:29,991 - services.memory.main - INFO - Search returned 4 results
+INFO:     127.0.0.1:61201 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 18:47:30,715 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 50, has_embedding: False, memory_pool: all
+2026-06-02 18:47:30,716 - services.memory.db - INFO - Loaded 4 memories for user ui_demo_user
+2026-06-02 18:47:30,717 - services.memory.main - INFO - Search returned 4 results
+INFO:     127.0.0.1:61209 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 18:47:30,718 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 50, has_embedding: False, memory_pool: all
+2026-06-02 18:47:30,719 - services.memory.db - INFO - Loaded 4 memories for user ui_demo_user
+2026-06-02 18:47:30,720 - services.memory.main - INFO - Search returned 4 results
+INFO:     127.0.0.1:61210 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 18:49:07,453 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 10, has_embedding: True, memory_pool: scenery
+2026-06-02 18:49:07,456 - services.memory.db - INFO - Loaded 4 memories for user ui_demo_user
+2026-06-02 18:49:07,456 - services.memory.main - INFO - Search returned 3 results
+INFO:     127.0.0.1:61220 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 18:49:12,271 - services.memory.main - INFO - POST /write - user_id: ui_demo_user
+2026-06-02 18:49:12,769 - services.memory.db - INFO - Memory written: 4edfde8e-bca6-4c0f-a9b1-cf563d363d4e
+2026-06-02 18:49:12,769 - services.memory.main - INFO - Memory written: 4edfde8e-bca6-4c0f-a9b1-cf563d363d4e
+INFO:     127.0.0.1:61226 - "POST /write HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61232 - "GET /health HTTP/1.1" 200 OK
+2026-06-02 18:49:15,642 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 10, has_embedding: False, memory_pool: all
+2026-06-02 18:49:15,645 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 18:49:15,645 - services.memory.main - INFO - Search returned 5 results
+INFO:     127.0.0.1:61236 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 18:49:15,650 - services.memory.main - INFO - GET /read/4edfde8e-bca6-4c0f-a9b1-cf563d363d4e
+INFO:     127.0.0.1:61239 - "GET /read/4edfde8e-bca6-4c0f-a9b1-cf563d363d4e HTTP/1.1" 200 OK
+2026-06-02 18:49:28,695 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 50, has_embedding: False, memory_pool: all
+2026-06-02 18:49:28,697 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 18:49:28,698 - services.memory.main - INFO - Search returned 5 results
+INFO:     127.0.0.1:61243 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 18:49:28,699 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 50, has_embedding: False, memory_pool: all
+2026-06-02 18:49:28,700 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 18:49:28,700 - services.memory.main - INFO - Search returned 5 results
+INFO:     127.0.0.1:61245 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 18:49:46,859 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 50, has_embedding: False, memory_pool: all
+2026-06-02 18:49:46,864 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 18:49:46,864 - services.memory.main - INFO - Search returned 5 results
+INFO:     127.0.0.1:61258 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 18:49:46,865 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 50, has_embedding: False, memory_pool: all
+2026-06-02 18:49:46,866 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 18:49:46,866 - services.memory.main - INFO - Search returned 5 results
+INFO:     127.0.0.1:61259 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 18:51:20,945 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 50, has_embedding: False, memory_pool: all
+2026-06-02 18:51:20,951 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 18:51:20,951 - services.memory.main - INFO - Search returned 5 results
+INFO:     127.0.0.1:61269 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 18:51:20,953 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 50, has_embedding: False, memory_pool: all
+2026-06-02 18:51:20,954 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 18:51:20,954 - services.memory.main - INFO - Search returned 5 results
+INFO:     127.0.0.1:61271 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 18:51:20,958 - services.memory.main - INFO - GET /files/4edfde8e-bca6-4c0f-a9b1-cf563d363d4e?variant=thumb
+2026-06-02 18:51:20,965 - services.memory.main - INFO - GET /files/6c31e867-51cb-400a-acec-12c7591d7b15?variant=thumb
+2026-06-02 18:51:20,967 - services.memory.main - INFO - GET /files/a52d4a45-e868-4e4c-904f-4cd9936bc859?variant=thumb
+INFO:     127.0.0.1:61274 - "GET /files/4edfde8e-bca6-4c0f-a9b1-cf563d363d4e?variant=thumb HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61279 - "GET /files/6c31e867-51cb-400a-acec-12c7591d7b15?variant=thumb HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61280 - "GET /files/a52d4a45-e868-4e4c-904f-4cd9936bc859?variant=thumb HTTP/1.1" 200 OK
+2026-06-02 18:51:26,847 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 50, has_embedding: False, memory_pool: all
+2026-06-02 18:51:26,849 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 18:51:26,849 - services.memory.main - INFO - Search returned 5 results
+INFO:     127.0.0.1:61285 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 18:51:26,850 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 50, has_embedding: False, memory_pool: all
+2026-06-02 18:51:26,851 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 18:51:26,851 - services.memory.main - INFO - Search returned 5 results
+INFO:     127.0.0.1:61286 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 18:54:32,038 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 50, has_embedding: False, memory_pool: all
+2026-06-02 18:54:32,045 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 18:54:32,045 - services.memory.main - INFO - Search returned 5 results
+INFO:     127.0.0.1:61300 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 18:54:32,064 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 10, has_embedding: True, memory_pool: all
+2026-06-02 18:54:32,066 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 18:54:32,066 - services.memory.main - INFO - Search returned 5 results
+INFO:     127.0.0.1:61300 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61405 - "GET /health HTTP/1.1" 200 OK
+2026-06-02 18:54:32,670 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 1, has_embedding: True, memory_pool: all
+2026-06-02 18:54:32,672 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 18:54:32,672 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:61409 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 18:54:32,681 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 1, has_embedding: True, memory_pool: all
+2026-06-02 18:54:32,682 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 18:54:32,683 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:61413 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 18:54:32,692 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 1, has_embedding: True, memory_pool: all
+2026-06-02 18:54:32,693 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 18:54:32,693 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:61417 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 18:54:49,886 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 50, has_embedding: False, memory_pool: all
+2026-06-02 18:54:49,893 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 18:54:49,893 - services.memory.main - INFO - Search returned 5 results
+INFO:     127.0.0.1:61421 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 18:54:49,895 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 50, has_embedding: False, memory_pool: all
+2026-06-02 18:54:49,896 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 18:54:49,897 - services.memory.main - INFO - Search returned 5 results
+INFO:     127.0.0.1:61423 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 18:56:38,151 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 50, has_embedding: False, memory_pool: all
+2026-06-02 18:56:38,156 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 18:56:38,156 - services.memory.main - INFO - Search returned 5 results
+INFO:     127.0.0.1:61429 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 18:56:38,157 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 50, has_embedding: False, memory_pool: all
+2026-06-02 18:56:38,158 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 18:56:38,158 - services.memory.main - INFO - Search returned 5 results
+INFO:     127.0.0.1:61430 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 19:05:42,187 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 50, has_embedding: False, memory_pool: all
+2026-06-02 19:05:42,193 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 19:05:42,193 - services.memory.main - INFO - Search returned 5 results
+INFO:     127.0.0.1:61450 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 19:05:42,194 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 50, has_embedding: False, memory_pool: all
+2026-06-02 19:05:42,195 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 19:05:42,195 - services.memory.main - INFO - Search returned 5 results
+INFO:     127.0.0.1:61451 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 19:10:00,165 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 50, has_embedding: False, memory_pool: all
+2026-06-02 19:10:00,169 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 19:10:00,170 - services.memory.main - INFO - Search returned 5 results
+INFO:     127.0.0.1:61461 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 19:10:00,172 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 50, has_embedding: False, memory_pool: all
+2026-06-02 19:10:00,173 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 19:10:00,173 - services.memory.main - INFO - Search returned 5 results
+INFO:     127.0.0.1:61463 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 19:10:40,220 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 50, has_embedding: False, memory_pool: all
+2026-06-02 19:10:40,226 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 19:10:40,226 - services.memory.main - INFO - Search returned 5 results
+INFO:     127.0.0.1:61472 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 19:10:40,247 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 10, has_embedding: True, memory_pool: all
+2026-06-02 19:10:40,248 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 19:10:40,248 - services.memory.main - INFO - Search returned 5 results
+INFO:     127.0.0.1:61472 - "POST /search HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61575 - "GET /health HTTP/1.1" 200 OK
+2026-06-02 19:10:40,850 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 1, has_embedding: True, memory_pool: all
+2026-06-02 19:10:40,852 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 19:10:40,852 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:61579 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 19:10:40,862 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 1, has_embedding: True, memory_pool: all
+2026-06-02 19:10:40,863 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 19:10:40,863 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:61583 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 19:10:40,873 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 1, has_embedding: True, memory_pool: all
+2026-06-02 19:10:40,874 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 19:10:40,874 - services.memory.main - INFO - Search returned 1 results
+INFO:     127.0.0.1:61587 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 19:10:57,046 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 50, has_embedding: False, memory_pool: all
+2026-06-02 19:10:57,052 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 19:10:57,052 - services.memory.main - INFO - Search returned 5 results
+INFO:     127.0.0.1:61591 - "POST /search HTTP/1.1" 200 OK
+2026-06-02 19:10:57,054 - services.memory.main - INFO - POST /search - user_id: ui_demo_user, top_k: 50, has_embedding: False, memory_pool: all
+2026-06-02 19:10:57,055 - services.memory.db - INFO - Loaded 5 memories for user ui_demo_user
+2026-06-02 19:10:57,055 - services.memory.main - INFO - Search returned 5 results
+INFO:     127.0.0.1:61593 - "POST /search HTTP/1.1" 200 OK
 INFO:     Shutting down
 INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
-INFO:     Finished server process [39914]
+INFO:     Finished server process [7583]

@@ -1,26 +1,28 @@
-INFO:     Started server process [40154]
+INFO:     Started server process [7805]
 INFO:     Waiting for application startup.
-2026-05-31 23:34:39,370 - services.vision.backends - INFO - [vision] Backend selected: hybrid  model=ViT-B-32/openai  device=cpu
-2026-05-31 23:34:39,370 - services.vision.main - INFO - [vision] Backend ready: hybrid  model_id=ViT-B-32/openai  device=cpu
-2026-05-31 23:34:39,370 - services.vision.backends - INFO - [clip_v1] Loading CLIP model: ViT-B-32/openai on cpu
-2026-05-31 23:34:39,370 - root - INFO - Parsing model identifier. Schema: None, Identifier: ViT-B-32
-2026-05-31 23:34:39,370 - root - INFO - Loaded built-in ViT-B-32 model config.
+2026-06-02 18:46:58,746 - services.vision.backends - INFO - [vision] Backend selected: hybrid  model=ViT-B-32/openai  device=cpu
+2026-06-02 18:46:58,746 - services.vision.main - INFO - [vision] Backend ready: hybrid  model_id=ViT-B-32/openai  device=cpu
+2026-06-02 18:46:58,746 - services.vision.backends - INFO - [clip_v1] Loading CLIP model: ViT-B-32/openai on cpu
+2026-06-02 18:46:58,746 - root - INFO - Parsing model identifier. Schema: None, Identifier: ViT-B-32
+2026-06-02 18:46:58,746 - root - INFO - Loaded built-in ViT-B-32 model config.
 /Volumes/leong4/University_doc/RAG/Taste-Aligner/Taste_Aligner/.venv/lib/python3.13/site-packages/open_clip/factory.py:450: UserWarning: QuickGELU mismatch between final model config (quick_gelu=False) and pretrained tag 'openai' (quick_gelu=True).
   warnings.warn(
-2026-05-31 23:34:39,531 - root - INFO - Instantiating model architecture: CLIP
-2026-05-31 23:34:40,333 - root - INFO - Loading full pretrained weights from: /Users/leongjyuhang/.cache/huggingface/hub/models--timm--vit_base_patch32_clip_224.openai/snapshots/a6f597a30f7b82c51704746581f9a4e41421e878/open_clip_model.safetensors
-2026-05-31 23:34:40,680 - root - INFO - Final image preprocessing configuration set: {'size': (224, 224), 'mode': 'RGB', 'mean': (0.48145466, 0.4578275, 0.40821073), 'std': (0.26862954, 0.26130258, 0.27577711), 'interpolation': 'bicubic', 'resize_mode': 'shortest', 'fill_color': 0}
-2026-05-31 23:34:40,680 - root - INFO - Model ViT-B-32 creation process complete.
-2026-05-31 23:34:40,680 - root - INFO - Parsing tokenizer identifier. Schema: None, Identifier: ViT-B-32
-2026-05-31 23:34:40,680 - root - INFO - Attempting to load config from built-in: ViT-B-32
-2026-05-31 23:34:40,680 - root - INFO - Using default SimpleTokenizer.
-2026-05-31 23:34:40,871 - services.vision.backends - INFO - [clip_v1] Model loaded and warm
+2026-06-02 18:46:58,921 - root - INFO - Instantiating model architecture: CLIP
+2026-06-02 18:46:59,721 - root - INFO - Loading full pretrained weights from: /Users/leongjyuhang/.cache/huggingface/hub/models--timm--vit_base_patch32_clip_224.openai/snapshots/a6f597a30f7b82c51704746581f9a4e41421e878/open_clip_model.safetensors
+2026-06-02 18:47:00,038 - root - INFO - Final image preprocessing configuration set: {'size': (224, 224), 'mode': 'RGB', 'mean': (0.48145466, 0.4578275, 0.40821073), 'std': (0.26862954, 0.26130258, 0.27577711), 'interpolation': 'bicubic', 'resize_mode': 'shortest', 'fill_color': 0}
+2026-06-02 18:47:00,038 - root - INFO - Model ViT-B-32 creation process complete.
+2026-06-02 18:47:00,038 - root - INFO - Parsing tokenizer identifier. Schema: None, Identifier: ViT-B-32
+2026-06-02 18:47:00,038 - root - INFO - Attempting to load config from built-in: ViT-B-32
+2026-06-02 18:47:00,038 - root - INFO - Using default SimpleTokenizer.
+2026-06-02 18:47:00,234 - services.vision.backends - INFO - [clip_v1] Model loaded and warm
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:5002 (Press CTRL+C to quit)
-INFO:     127.0.0.1:54814 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54816 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54829 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61174 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61176 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61189 - "GET /health HTTP/1.1" 200 OK
+2026-06-02 18:49:12,204 - services.vision.main - INFO - [vision] describe OK: backend=hybrid type=scenery cues=4 tags=5 latency=4456.4ms
+INFO:     127.0.0.1:61221 - "POST /describe HTTP/1.1" 200 OK
 INFO:     Shutting down
 INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
-INFO:     Finished server process [40154]
+INFO:     Finished server process [7805]

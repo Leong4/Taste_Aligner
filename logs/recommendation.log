@@ -1,30 +1,71 @@
-INFO:     Started server process [39934]
+INFO:     Started server process [7603]
 INFO:     Waiting for application startup.
-2026-05-31 23:34:32,711 - services.recommendation.main - INFO - Recommendation Service v1.3 started on port 5005
-2026-05-31 23:34:32,716 - services.recommendation.db - INFO - Title sanitization: changed=0 (db_update)
-2026-05-31 23:34:32,717 - services.recommendation.db - INFO - Title sanitization verification: PASS, remaining_modena_titles=0
-2026-05-31 23:34:32,718 - services.recommendation.main - INFO - Database: 1300 items across 26 cities
-2026-05-31 23:34:32,718 - services.recommendation.main - INFO - City distribution: {'athens': 48, 'bangkok': 51, 'barcelona': 50, 'berlin': 49, 'budapest': 50, 'chengdu': 51, 'edinburgh': 50, 'guangzhou': 50, 'ho chi minh city': 50, 'hokkaido': 50, 'istanbul': 50, 'london': 49, 'milan': 50, 'munich': 50, 'naples': 50, 'new_york': 50, 'osaka': 50, 'paris': 50, 'prague': 51, 'reykjavik': 51, 'rome': 50, 'seoul': 50, 'shanghai': 47, 'singapore': 53, 'tokyo': 49, 'vienna': 51}
+2026-06-02 18:46:52,206 - services.recommendation.main - INFO - Recommendation Service v1.3 started on port 5005
+2026-06-02 18:46:52,211 - services.recommendation.db - INFO - Title sanitization: changed=0 (db_update)
+2026-06-02 18:46:52,211 - services.recommendation.db - INFO - Title sanitization verification: PASS, remaining_modena_titles=0
+2026-06-02 18:46:52,213 - services.recommendation.main - INFO - Database: 1300 items across 26 cities
+2026-06-02 18:46:52,213 - services.recommendation.main - INFO - City distribution: {'athens': 48, 'bangkok': 51, 'barcelona': 50, 'berlin': 49, 'budapest': 50, 'chengdu': 51, 'edinburgh': 50, 'guangzhou': 50, 'ho chi minh city': 50, 'hokkaido': 50, 'istanbul': 50, 'london': 49, 'milan': 50, 'munich': 50, 'naples': 50, 'new_york': 50, 'osaka': 50, 'paris': 50, 'prague': 51, 'reykjavik': 51, 'rome': 50, 'seoul': 50, 'shanghai': 47, 'singapore': 53, 'tokyo': 49, 'vienna': 51}
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:5005 (Press CTRL+C to quit)
-INFO:     127.0.0.1:54798 - "GET /health HTTP/1.1" 200 OK
-INFO:     127.0.0.1:54824 - "GET /health HTTP/1.1" 200 OK
-2026-05-31 23:34:55,550 - services.recommendation.main - INFO - [t_7b397f54] POST /score - user_id=ui_demo_user, city=tokyo, tags=['cultural experiences', 'general', 'local events', 'nightlife spots', 'shopping districts', 'tokyo attractions', 'tokyo food', 'transport tips'], intent=balanced, memory_confidence=1.0, memory_pool=all
-2026-05-31 23:34:55,550 - services.recommendation.main - INFO - [t_7b397f54] Stage 1: Recall (CZ city-only, EZ global)
-2026-05-31 23:34:55,554 - services.recommendation.db - INFO - Loaded 49 items for city=tokyo table=reco_items
-2026-05-31 23:34:55,554 - services.recommendation.db - INFO - Title sanitization: changed=0 (city=tokyo)
-2026-05-31 23:34:55,554 - services.recommendation.recall - INFO - Recall: CZ=49 (city-only), EZ=45 (city-only, excellence >= 0.8)
-2026-05-31 23:34:55,554 - services.recommendation.main - INFO - [t_7b397f54] Recall: CZ=49 (city-only), EZ=45 (global)
-2026-05-31 23:34:55,554 - services.recommendation.main - INFO - [t_7b397f54] Stage 2: Rerank (v1.3)
-2026-05-31 23:34:56,026 - services.recommendation.rerank - INFO - Rerank: 10 CZ items (filtered 49 → 49), 0 EZ items
-2026-05-31 23:34:56,026 - services.recommendation.rerank - INFO - Top 5 CZ memory_influence: [1.2325, 1.2295, 1.2229, 1.2213, 1.2201]
-2026-05-31 23:34:56,026 - services.recommendation.main - INFO - [t_7b397f54] Rerank: 10 CZ, 0 EZ
-2026-05-31 23:34:56,026 - services.recommendation.mix_policy - INFO - Mix policy: 3 CZ + 0 EZ (ratio=3:0, rule=only_cz_available, delta=inf, intent=balanced, mem_conf=1.00)
-2026-05-31 23:34:56,026 - services.recommendation.main - INFO - [t_7b397f54] Mix policy: only_cz_available (ratio=3:0, conf=1.00)
-2026-05-31 23:34:56,027 - services.recommendation.main - INFO - [t_7b397f54] Non-finite response fields sanitized count=3 sample=['mix_policy.inputs_used.delta', 'mix_policy.delta', 'decision_trace.mix_policy.components.delta']
-2026-05-31 23:34:56,027 - services.recommendation.main - INFO - [t_7b397f54] Response ready
-INFO:     127.0.0.1:54843 - "POST /score HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61158 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61184 - "GET /health HTTP/1.1" 200 OK
+2026-06-02 18:49:12,263 - services.recommendation.main - INFO - [t_0ab02d77] POST /score - user_id=ui_demo_user, city=nottingham, tags=['park', 'photography', 'relaxation', 'scenic_view'], intent=balanced, memory_confidence=0.551543, memory_pool=scenery
+2026-06-02 18:49:12,263 - services.recommendation.main - INFO - [t_0ab02d77] Stage 1: Recall (CZ city-only, EZ global)
+2026-06-02 18:49:12,272 - services.recommendation.db - INFO - Loaded 0 items for city=nottingham table=reco_items
+2026-06-02 18:49:12,272 - services.recommendation.db - INFO - Title sanitization: changed=0 (city=nottingham)
+2026-06-02 18:49:12,272 - services.recommendation.recall - INFO - Recall: CZ=0 (city-only), EZ=0 (city-only, excellence >= 0.8)
+2026-06-02 18:49:12,272 - services.recommendation.main - INFO - [t_0ab02d77] Recall: CZ=0 (city-only), EZ=0 (global)
+2026-06-02 18:49:12,272 - services.recommendation.main - INFO - [t_0ab02d77] Stage 2: Rerank (v1.3)
+2026-06-02 18:49:12,272 - services.recommendation.rerank - INFO - Rerank: 0 CZ items (filtered 0 → 0), 0 EZ items
+2026-06-02 18:49:12,272 - services.recommendation.main - INFO - [t_0ab02d77] Rerank: 0 CZ, 0 EZ
+2026-06-02 18:49:12,272 - services.recommendation.mix_policy - INFO - Mix policy: 0 CZ + 0 EZ (ratio=1:1, rule=no_candidates, delta=0.0000, intent=balanced, mem_conf=0.55)
+2026-06-02 18:49:12,272 - services.recommendation.main - INFO - [t_0ab02d77] Mix policy: no_candidates (ratio=1:1, conf=0.00)
+2026-06-02 18:49:12,273 - services.recommendation.main - INFO - [t_0ab02d77] Response ready
+INFO:     127.0.0.1:61227 - "POST /score HTTP/1.1" 200 OK
+2026-06-02 18:49:12,289 - services.recommendation.main - INFO - [t_64defe82] POST /score - user_id=ui_demo_user, city=nottingham, tags=['park'], intent=None, memory_confidence=None, memory_pool=None
+2026-06-02 18:49:12,289 - services.recommendation.main - INFO - [t_64defe82] Stage 1: Recall (CZ city-only, EZ global)
+2026-06-02 18:49:12,290 - services.recommendation.db - INFO - Loaded 0 items for city=nottingham table=reco_items
+2026-06-02 18:49:12,290 - services.recommendation.db - INFO - Title sanitization: changed=0 (city=nottingham)
+2026-06-02 18:49:12,290 - services.recommendation.recall - INFO - Recall: CZ=0 (city-only), EZ=0 (city-only, excellence >= 0.8)
+2026-06-02 18:49:12,290 - services.recommendation.main - INFO - [t_64defe82] Recall: CZ=0 (city-only), EZ=0 (global)
+2026-06-02 18:49:12,290 - services.recommendation.main - INFO - [t_64defe82] Stage 2: Rerank (v1.3)
+2026-06-02 18:49:12,290 - services.recommendation.rerank - INFO - Rerank: 0 CZ items (filtered 0 → 0), 0 EZ items
+2026-06-02 18:49:12,290 - services.recommendation.main - INFO - [t_64defe82] Rerank: 0 CZ, 0 EZ
+2026-06-02 18:49:12,290 - services.recommendation.mix_policy - INFO - Mix policy: 0 CZ + 0 EZ (ratio=1:1, rule=no_candidates, delta=0.0000, intent=balanced, mem_conf=0.50)
+2026-06-02 18:49:12,290 - services.recommendation.main - INFO - [t_64defe82] Mix policy: no_candidates (ratio=1:1, conf=0.00)
+2026-06-02 18:49:12,290 - services.recommendation.main - INFO - [t_64defe82] Response ready
+INFO:     127.0.0.1:61230 - "POST /score HTTP/1.1" 200 OK
+2026-06-02 18:54:32,080 - services.recommendation.main - INFO - [t_f51a38da] POST /score - user_id=ui_demo_user, city=tokyo, tags=['nightlife'], intent=balanced, memory_confidence=1.0, memory_pool=all
+2026-06-02 18:54:32,080 - services.recommendation.main - INFO - [t_f51a38da] Stage 1: Recall (CZ city-only, EZ global)
+2026-06-02 18:54:32,088 - services.recommendation.db - INFO - Loaded 49 items for city=tokyo table=reco_items
+2026-06-02 18:54:32,088 - services.recommendation.db - INFO - Title sanitization: changed=0 (city=tokyo)
+2026-06-02 18:54:32,088 - services.recommendation.recall - INFO - Recall: CZ=49 (city-only), EZ=45 (city-only, excellence >= 0.8)
+2026-06-02 18:54:32,088 - services.recommendation.main - INFO - [t_f51a38da] Recall: CZ=49 (city-only), EZ=45 (global)
+2026-06-02 18:54:32,088 - services.recommendation.main - INFO - [t_f51a38da] Stage 2: Rerank (v1.3)
+2026-06-02 18:54:32,562 - services.recommendation.rerank - INFO - Rerank: 10 CZ items (filtered 49 → 49), 0 EZ items
+2026-06-02 18:54:32,562 - services.recommendation.rerank - INFO - Top 5 CZ memory_influence: [1.2301, 1.2265, 1.2251, 1.2242, 1.2231]
+2026-06-02 18:54:32,562 - services.recommendation.main - INFO - [t_f51a38da] Rerank: 10 CZ, 0 EZ
+2026-06-02 18:54:32,562 - services.recommendation.mix_policy - INFO - Mix policy: 3 CZ + 0 EZ (ratio=3:0, rule=only_cz_available, delta=inf, intent=balanced, mem_conf=1.00)
+2026-06-02 18:54:32,562 - services.recommendation.main - INFO - [t_f51a38da] Mix policy: only_cz_available (ratio=3:0, conf=1.00)
+2026-06-02 18:54:32,564 - services.recommendation.main - INFO - [t_f51a38da] Non-finite response fields sanitized count=3 sample=['mix_policy.inputs_used.delta', 'mix_policy.delta', 'decision_trace.mix_policy.components.delta']
+2026-06-02 18:54:32,564 - services.recommendation.main - INFO - [t_f51a38da] Response ready
+INFO:     127.0.0.1:61302 - "POST /score HTTP/1.1" 200 OK
+2026-06-02 19:10:40,262 - services.recommendation.main - INFO - [t_8389e4e0] POST /score - user_id=ui_demo_user, city=tokyo, tags=['cultural experiences', 'general', 'local events', 'nightlife spots', 'shopping districts', 'tokyo attractions', 'tokyo food', 'transport tips'], intent=balanced, memory_confidence=1.0, memory_pool=all
+2026-06-02 19:10:40,262 - services.recommendation.main - INFO - [t_8389e4e0] Stage 1: Recall (CZ city-only, EZ global)
+2026-06-02 19:10:40,270 - services.recommendation.db - INFO - Loaded 49 items for city=tokyo table=reco_items
+2026-06-02 19:10:40,270 - services.recommendation.db - INFO - Title sanitization: changed=0 (city=tokyo)
+2026-06-02 19:10:40,271 - services.recommendation.recall - INFO - Recall: CZ=49 (city-only), EZ=45 (city-only, excellence >= 0.8)
+2026-06-02 19:10:40,271 - services.recommendation.main - INFO - [t_8389e4e0] Recall: CZ=49 (city-only), EZ=45 (global)
+2026-06-02 19:10:40,271 - services.recommendation.main - INFO - [t_8389e4e0] Stage 2: Rerank (v1.3)
+2026-06-02 19:10:40,746 - services.recommendation.rerank - INFO - Rerank: 10 CZ items (filtered 49 → 49), 0 EZ items
+2026-06-02 19:10:40,746 - services.recommendation.rerank - INFO - Top 5 CZ memory_influence: [1.2301, 1.2265, 1.2251, 1.2242, 1.2231]
+2026-06-02 19:10:40,746 - services.recommendation.main - INFO - [t_8389e4e0] Rerank: 10 CZ, 0 EZ
+2026-06-02 19:10:40,746 - services.recommendation.mix_policy - INFO - Mix policy: 3 CZ + 0 EZ (ratio=3:0, rule=only_cz_available, delta=inf, intent=balanced, mem_conf=1.00)
+2026-06-02 19:10:40,746 - services.recommendation.main - INFO - [t_8389e4e0] Mix policy: only_cz_available (ratio=3:0, conf=1.00)
+2026-06-02 19:10:40,747 - services.recommendation.main - INFO - [t_8389e4e0] Non-finite response fields sanitized count=3 sample=['mix_policy.inputs_used.delta', 'mix_policy.delta', 'decision_trace.mix_policy.components.delta']
+2026-06-02 19:10:40,747 - services.recommendation.main - INFO - [t_8389e4e0] Response ready
+INFO:     127.0.0.1:61474 - "POST /score HTTP/1.1" 200 OK
 INFO:     Shutting down
 INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
-INFO:     Finished server process [39934]
+INFO:     Finished server process [7603]

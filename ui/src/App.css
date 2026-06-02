@@ -43,6 +43,7 @@ body {
 
 /* ─── Main layout ────────────────────────────────────────────────────────────── */
 .main { max-width: 900px; margin: 2rem auto; padding: 0 1.5rem; }
+.main.main-map { max-width: none; width: 100%; }
 
 /* ─── Page titles ────────────────────────────────────────────────────────────── */
 h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 1.25rem; color: #111827; }

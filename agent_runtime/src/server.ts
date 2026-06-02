@@ -10,6 +10,7 @@
 
 import http from "node:http";
 import { createOrchestrator } from "./core/bootstrap";
+import { OpenAICompatAdapter } from "./llm";
 
 const PORT = Number(process.env.PORT ?? process.env.AGENT_SERVER_PORT ?? 8787);
 
@@ -23,6 +24,20 @@ const orchestrator = createOrchestrator({
     timeoutMs,
     logPayload: true,
 });
+
+const geocodeApiKey = process.env.LLM_API_KEY;
+const geocodeAdapterOptions = geocodeApiKey
+    ? {
+        apiKey: geocodeApiKey,
+        model: process.env.LLM_GEOCODE_MODEL ?? "gpt-4o",
+    }
+    : null;
+if (geocodeAdapterOptions && process.env.LLM_BASE_URL) {
+    Object.assign(geocodeAdapterOptions, { baseUrl: process.env.LLM_BASE_URL });
+}
+const geocodeAdapter = geocodeAdapterOptions
+    ? new OpenAICompatAdapter(geocodeAdapterOptions)
+    : null;
 
 function sendJson(res: http.ServerResponse, status: number, body: unknown) {
     const payload = JSON.stringify(body);
@@ -64,6 +79,62 @@ const server = http.createServer(async (req, res) => {
             "Access-Control-Allow-Headers": "Content-Type",
         });
         res.end();
+        return;
+    }
+
+    if (req.method === "POST" && req.url === "/geocode/uk-location") {
+        try {
+            const body = await readJson(req);
+            const city = typeof body.city === "string" ? body.city.trim() : "";
+            const validLocations = Array.isArray(body.valid_locations)
+                ? body.valid_locations.filter((value: unknown): value is string => typeof value === "string")
+                : [];
+
+            if (!city) {
+                sendJson(res, 400, { error: "city_required" });
+                return;
+            }
+            if (!geocodeAdapter) {
+                sendJson(res, 503, { error: "llm_not_configured" });
+                return;
+            }
+
+            const result = await geocodeAdapter.generateStructuredJSON<{ location: string | null }>({
+                systemPrompt:
+                    "You resolve UK city names to exact local-authority names. " +
+                    "Return JSON with exactly one key named location. " +
+                    "The value must be one exact case-sensitive string from the supplied valid locations, or null.",
+                userPrompt:
+                    `Given the city name '${city}', return the exact UK county or unitary authority name ` +
+                    "as it appears in the ONS GeoJSON data. Return only the matching name string in the " +
+                    "location field, nothing else. If the city is not in the UK, return null.\n\n" +
+                    `Valid locations:\n${validLocations.join("\n")}`,
+                schema: {
+                    type: "object",
+                    properties: {
+                        location: { type: ["string", "null"] },
+                    },
+                    required: ["location"],
+                    additionalProperties: false,
+                },
+                temperature: 0,
+                promptVersion: "uk_location_geocode_v1",
+                traceContext: { city },
+            });
+
+            const location = typeof result.data?.location === "string"
+                ? result.data.location
+                : null;
+            if (location !== null && !validLocations.includes(location)) {
+                console.warn(`[geocode] No exact UK LAD match for city="${city}": "${location}"`);
+                sendJson(res, 200, { location: null });
+                return;
+            }
+
+            sendJson(res, 200, { location });
+        } catch (err: any) {
+            sendJson(res, 500, { error: "geocode_failed", message: err?.message ?? "unknown" });
+        }
         return;
     }
 

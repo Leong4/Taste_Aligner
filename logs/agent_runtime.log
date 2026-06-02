@@ -2,28 +2,165 @@
 > agent_runtime@1.0.0 dev
 > ts-node-dev --respawn --transpile-only src/server.ts
 
-[INFO] 23:34:32 ts-node-dev ver. 2.0.0 (using ts-node ver. 10.9.2, typescript ver. 5.9.3)
+[INFO] 18:46:52 ts-node-dev ver. 2.0.0 (using ts-node ver. 10.9.2, typescript ver. 5.9.3)
 [bootstrap] LLM adapter: openai_compat/gpt-4o-mini
 [bootstrap] Registered 14 skills: [extract_intent, decide_tag_budget, tag_expand, tag_normalize, memory_signal, memory_weight_adjust, build_profile_vector, vision_describe, tes_builder, fetch_recommendation, rerank, mix_policy, build_cards, explain_from_trace]
 [bootstrap] Orchestrator ready with graph "recommendation_pipeline" v13.0.0
 [agent_runtime] server listening on http://localhost:8787
 [Orchestrator] Starting pipeline "recommendation_pipeline" v13.0.0 with 13 nodes
 [Orchestrator] Executing node: extract_intent (skill: extract_intent)
-[Orchestrator] Node "extract_intent" completed in 1ms
+[Orchestrator] Node "extract_intent" completed in 0ms
 [Orchestrator] Executing node: decide_tag_budget (skill: decide_tag_budget)
 [Orchestrator] Node "decide_tag_budget" completed in 0ms
 [Orchestrator] Executing node: tag_expand (skill: tag_expand)
-[Orchestrator] Node "tag_expand" completed in 1349ms
+[Orchestrator] Node "tag_expand" completed in 3773ms
 [Orchestrator] Executing node: tag_normalize (skill: tag_normalize)
 [toolClient] -> /tool/ontology.normalize {
-  traceId: 't_mpucxzzn_6hbdwd',
+  traceId: 't_mpwxm5s4_kotw5v',
   timeoutMs: 3000,
   input: { data: { tags: [Array], lang: 'auto', strict: true } }
 }
-[Orchestrator] Node "tag_normalize" completed in 26ms
+[Orchestrator] Node "tag_normalize" completed in 34ms
+[Orchestrator] Executing node: memory_weight_adjust (skill: memory_weight_adjust)
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mpwxm5t2_9owu6d',
+  timeoutMs: 7000,
+  input: {
+    tags: [ 'park', 'photography', 'relaxation', 'scenic_view' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/memory.search {
+  traceId: 't_mpwxm5tg_sor2tp',
+  timeoutMs: 3000,
+  input: {
+    data: {
+      user_id: 'ui_demo_user',
+      query_tags: [Array],
+      top_k: 10,
+      memory_pool: 'scenery',
+      query_embedding: [Array],
+      city: 'nottingham',
+      now_ts: '2026-06-02T17:49:03.622Z'
+    }
+  }
+}
+[Orchestrator] Node "memory_weight_adjust" completed in 28ms
+[Orchestrator] Executing node: build_profile_vector (skill: build_profile_vector)
+[Orchestrator] Node "build_profile_vector" completed in 0ms
+[Orchestrator] Executing node: vision_describe (skill: vision_describe)
+[toolClient] -> /tool/vision.describe {
+  traceId: 't_mpwxm5tu_pz8hhx',
+  timeoutMs: 15000,
+  input: {
+    data: {
+      top_k: 10,
+      image_base64: 'data:image/png;base64,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'... 1706142 more characters,
+      caption_text: 'The sunset in a park in Nottingham is beautiful'
+    }
+  }
+}
+[Orchestrator] Node "vision_describe" completed in 4753ms
+[Orchestrator] Executing node: tes_builder (skill: tes_builder)
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mpwxm9hw_yvrvie',
+  timeoutMs: 7000,
+  input: {
+    vision_features: [
+      'nottingham',
+      'park',
+      'pink and orange sky',
+      'river',
+      'silhouetted trees',
+      'skyline',
+      'sunset',
+      'urban skyline',
+      'water reflections'
+    ],
+    tags: [
+      'bath',
+      'beachfront',
+      'bridge',
+      'cityscape',
+      'coastal landmark',
+      'gothic_architecture',
+      'hilltop',
+      'landmark',
+      'landscape',
+      'modern architecture',
+      'panoramic view',
+      'river',
+      'skyline',
+      'urban',
+      'urban design'
+    ],
+    normalize: true
+  }
+}
+[Orchestrator] Node "tes_builder" completed in 45ms
+[Orchestrator] Executing node: fetch_recommendation (skill: fetch_recommendation)
+[toolClient] -> /tool/recommendation.score {
+  traceId: 't_mpwxm9j4_k2fod5',
+  timeoutMs: 3000,
+  input: {
+    data: {
+      user_id: 'ui_demo_user',
+      city: 'nottingham',
+      tags: [Array],
+      intent: 'balanced',
+      memory_confidence: 0.551543,
+      memory_pool: 'scenery',
+      anchor_tags: [Array]
+    }
+  }
+}
+[Orchestrator] Node "fetch_recommendation" completed in 19ms
+[Orchestrator] Executing node: rerank (skill: rerank)
+[Orchestrator] Node "rerank" completed in 0ms
+[Orchestrator] Executing node: mix_policy (skill: mix_policy)
+[Orchestrator] Node "mix_policy" completed in 1ms
+[Orchestrator] Executing node: build_cards (skill: build_cards)
+[toolClient] -> /tool/planner.compose {
+  traceId: 't_mpwxm9jo_nzj20m',
+  timeoutMs: 3000,
+  input: {
+    data: {
+      city: 'nottingham',
+      cz: [],
+      ez: [Array],
+      tags: [Array],
+      user_id: 'ui_demo_user',
+      intent: {},
+      cz_ranked: [],
+      ez_ranked: [],
+      mix_policy: {},
+      decision_trace: [Object],
+      meta: [Object]
+    }
+  }
+}
+[Orchestrator] Node "build_cards" completed in 497ms
+[Orchestrator] Executing node: explain_from_trace (skill: explain_from_trace)
+[explain] memory_anchors: [{"memory_id":"a52d4a45-e868-4e4c-904f-4cd9936bc859","tags":["bath","cityscape","hilltop"],"city":"bath","vision_type":"scenery","w_time":0.999,"w_sent":1.2,"final_weight":0.3231,"sentiment":1,"timestamp":"2026-06-02T17:34:35.019Z"},{"memory_id":"6c31e867-51cb-400a-acec-12c7591d7b15","tags":["bridge","gothic_architecture","landmark"],"city":"london","vision_type":"scenery","w_time":0.9988,"w_sent":1.1,"final_weight":0.2707,"sentiment":0.5,"timestamp":"2026-06-02T17:31:29.308Z"},{"memory_id":"922bb748-77fc-4018-bdeb-47ecb0281d12","tags":["beachfront","coastal landmark","modern architecture"],"city":"barcelona","vision_type":"scenery","w_time":0.8192,"w_sent":1.2,"final_weight":0.2547,"sentiment":1,"timestamp":"2026-05-31T17:56:34.087Z"}]
+[explain] recommended_items: "MISSING"
+[Orchestrator] Node "explain_from_trace" completed in 2553ms
+[Orchestrator] Starting pipeline "recommendation_pipeline" v13.0.0 with 13 nodes
+[Orchestrator] Executing node: extract_intent (skill: extract_intent)
+[Orchestrator] Node "extract_intent" completed in 0ms
+[Orchestrator] Executing node: decide_tag_budget (skill: decide_tag_budget)
+[Orchestrator] Node "decide_tag_budget" completed in 0ms
+[Orchestrator] Executing node: tag_expand (skill: tag_expand)
+[Orchestrator] Node "tag_expand" completed in 1625ms
+[Orchestrator] Executing node: tag_normalize (skill: tag_normalize)
+[toolClient] -> /tool/ontology.normalize {
+  traceId: 't_mpwxt49h_4vfjfs',
+  timeoutMs: 3000,
+  input: { data: { tags: [Array], lang: 'auto', strict: true } }
+}
+[Orchestrator] Node "tag_normalize" completed in 13ms
 [Orchestrator] Executing node: memory_weight_adjust (skill: memory_weight_adjust)
 [toolClient] -> /tool/memory.search {
-  traceId: 't_mpucy00d_6j30vw',
+  traceId: 't_mpwxt49v_ysx0bn',
   timeoutMs: 3000,
   input: {
     data: {
@@ -32,31 +169,33 @@
       top_k: 50,
       memory_pool: 'all',
       city: 'tokyo',
-      now_ts: '2026-05-31T22:34:54.123Z'
+      now_ts: '2026-06-02T17:54:30.396Z'
     }
   }
 }
 [toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpucy00k_dj6bld',
+  traceId: 't_mpwxt4a7_0rh4q4',
   timeoutMs: 7000,
   input: {
     tags: [
-      'beachfront',
-      'coastal landmark',
-      'modern architecture',
-      'octopus',
-      'paella',
-      'scallops',
-      'seafood',
-      'skyline',
-      'spanish cuisine',
+      'bath',             'beachfront',
+      'bridge',           'cityscape',
+      'coastal landmark', 'gothic_architecture',
+      'hilltop',          'landmark',
+      'landscape',        'modern architecture',
+      'nottingham',       'octopus',
+      'paella',           'panoramic view',
+      'park',             'river',
+      'scallops',         'seafood',
+      'skyline',          'spanish cuisine',
+      'sunset',           'urban',
       'urban design'
     ],
     normalize: true
   }
 }
 [toolClient] -> /tool/memory.search {
-  traceId: 't_mpucy010_65qqt2',
+  traceId: 't_mpwxt4al_8oohey',
   timeoutMs: 3000,
   input: {
     data: {
@@ -66,40 +205,44 @@
       memory_pool: 'all',
       query_embedding: [Array],
       city: 'tokyo',
-      now_ts: '2026-05-31T22:34:54.123Z'
+      now_ts: '2026-06-02T17:54:30.396Z'
     }
   }
 }
-[Orchestrator] Node "memory_weight_adjust" completed in 35ms
+[Orchestrator] Node "memory_weight_adjust" completed in 32ms
 [Orchestrator] Executing node: build_profile_vector (skill: build_profile_vector)
-[Orchestrator] Node "build_profile_vector" completed in 0ms
+[Orchestrator] Node "build_profile_vector" completed in 1ms
 [Orchestrator] Executing node: vision_describe (skill: vision_describe)
 [Orchestrator] Node "vision_describe" completed in 0ms
 [Orchestrator] Executing node: tes_builder (skill: tes_builder)
 [toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpucy01c_gfkpyz',
+  traceId: 't_mpwxt4as_szmcol',
   timeoutMs: 7000,
   input: {
     vision_features: [],
     tags: [
-      'beachfront',
-      'coastal landmark',
-      'modern architecture',
-      'octopus',
-      'paella',
-      'scallops',
-      'seafood',
+      'bath',
+      'bridge',
+      'cityscape',
+      'gothic_architecture',
+      'hilltop',
+      'landmark',
+      'landscape',
+      'nottingham',
+      'panoramic view',
+      'park',
+      'river',
       'skyline',
-      'spanish cuisine',
-      'urban design'
+      'sunset',
+      'urban'
     ],
     normalize: true
   }
 }
-[Orchestrator] Node "tes_builder" completed in 12ms
+[Orchestrator] Node "tes_builder" completed in 11ms
 [Orchestrator] Executing node: fetch_recommendation (skill: fetch_recommendation)
 [toolClient] -> /tool/recommendation.score {
-  traceId: 't_mpucy01n_fg57rt',
+  traceId: 't_mpwxt4b3_7tebvp',
   timeoutMs: 3000,
   input: {
     data: {
@@ -113,74 +256,10 @@
     }
   }
 }
-[Orchestrator] Node "fetch_recommendation" completed in 483ms
+[Orchestrator] Node "fetch_recommendation" completed in 487ms
 [Orchestrator] Executing node: rerank (skill: rerank)
 [toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpucy0f2_g643z6',
-  timeoutMs: 7000,
-  input: {
-    tags: [ 'landmark', 'modern', 'observation', 'skyline', 'skyscraper' ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpucy0fc_1h5xbu',
-  timeoutMs: 7000,
-  input: {
-    tags: [ 'family', 'modern', 'park', 'seaside', 'view' ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpucy0fl_h0ttsf',
-  timeoutMs: 7000,
-  input: {
-    tags: [ 'creative', 'dinner', 'fine_dining', 'fusion', 'modern' ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpucy0fw_21yttg',
-  timeoutMs: 7000,
-  input: {
-    tags: [ 'breakfast', 'local', 'seafood', 'sushi', 'traditional' ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpucy0g4_har2ax',
-  timeoutMs: 7000,
-  input: {
-    tags: [ 'leisure', 'modern', 'seaside', 'sunset', 'walk' ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpucy0gd_7ee28p',
-  timeoutMs: 7000,
-  input: {
-    tags: [ 'chef’s_choice', 'elegant', 'omakase', 'premium', 'sushi' ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpucy0gn_8pn7yb',
-  timeoutMs: 7000,
-  input: {
-    tags: [ 'casual', 'italian', 'lunch', 'pasta', 'western' ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpucy0gw_klf52r',
-  timeoutMs: 7000,
-  input: {
-    tags: [ 'cruise', 'evening', 'experience', 'river', 'scenery' ],
-    normalize: true
-  }
-}
-[toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpucy0h4_0fggq9',
+  traceId: 't_mpwxt4om_56h7yb',
   timeoutMs: 7000,
   input: {
     tags: [ 'city_life', 'iconic', 'intersection', 'modern', 'photo' ],
@@ -188,19 +267,83 @@
   }
 }
 [toolClient] -> /tool/embedding.tes_build {
-  traceId: 't_mpucy0hd_jrosx3',
+  traceId: 't_mpwxt4ox_7yg85b',
   timeoutMs: 7000,
   input: {
-    tags: [ 'casual', 'noodles', 'quick', 'street_food', 'yakisoba' ],
+    tags: [ 'daytime', 'shopping', 'upscale', 'urban', 'walk' ],
     normalize: true
   }
 }
-[Orchestrator] Node "rerank" completed in 93ms
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mpwxt4p6_m5thp2',
+  timeoutMs: 7000,
+  input: {
+    tags: [ 'landmark', 'modern', 'observation', 'skyline', 'skyscraper' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mpwxt4pe_tbjf7c',
+  timeoutMs: 7000,
+  input: {
+    tags: [ 'alleys', 'charming', 'local_life', 'retro', 'walk' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mpwxt4pn_p0e54k',
+  timeoutMs: 7000,
+  input: {
+    tags: [ 'cruise', 'evening', 'experience', 'river', 'scenery' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mpwxt4pw_lx4bh3',
+  timeoutMs: 7000,
+  input: {
+    tags: [ 'lights', 'night', 'photo', 'skyline', 'walk' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mpwxt4q4_0oiko7',
+  timeoutMs: 7000,
+  input: {
+    tags: [ 'colorful', 'daytime', 'shopping', 'walk', 'youth_culture' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mpwxt4qc_sodpxd',
+  timeoutMs: 7000,
+  input: {
+    tags: [ 'calm', 'river', 'scenic', 'sunset', 'walk' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mpwxt4ql_ex0kas',
+  timeoutMs: 7000,
+  input: {
+    tags: [ 'heritage', 'local', 'market', 'shopping', 'traditional' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mpwxt4qt_p8t8nf',
+  timeoutMs: 7000,
+  input: {
+    tags: [ 'art', 'garden', 'heritage', 'museum', 'tranquil' ],
+    normalize: true
+  }
+}
+[Orchestrator] Node "rerank" completed in 88ms
 [Orchestrator] Executing node: mix_policy (skill: mix_policy)
 [Orchestrator] Node "mix_policy" completed in 0ms
 [Orchestrator] Executing node: build_cards (skill: build_cards)
 [toolClient] -> /tool/planner.compose {
-  traceId: 't_mpucy0hn_9a536n',
+  traceId: 't_mpwxt4r2_4dcxyz',
   timeoutMs: 3000,
   input: {
     data: {
@@ -218,8 +361,230 @@
     }
   }
 }
-[Orchestrator] Node "build_cards" completed in 48ms
+[Orchestrator] Node "build_cards" completed in 41ms
 [Orchestrator] Executing node: explain_from_trace (skill: explain_from_trace)
-[explain] memory_anchors: [{"memory_id":"56f3e9e7-ac1e-41ef-9e6a-c0632ae28333","tags":["octopus","paella","scallops"],"city":"barcelona","vision_type":"food","w_time":0.9816,"w_sent":1.08,"final_weight":0.9973,"sentiment":0.4,"timestamp":"2026-05-31T18:06:58.660Z"},{"memory_id":"922bb748-77fc-4018-bdeb-47ecb0281d12","tags":["beachfront","coastal landmark","modern architecture"],"city":"barcelona","vision_type":"scenery","w_time":0.9809,"w_sent":1.2,"final_weight":0.822,"sentiment":1,"timestamp":"2026-05-31T17:56:34.087Z"}]
-[explain] recommended_items: [{"name":"Tokyo Skytree","type":"other","tags":["skyscraper","skyline","modern","observation","landmark"]},{"name":"Sushi Omakase Spot","type":"food","tags":["omakase","sushi","premium","chef’s_choice","elegant"]},{"name":"Tsukiji Sushi Counter","type":"food","tags":["sushi","seafood","breakfast","local","traditional"]},{"name":"French-Japanese Fusion","type":"other","tags":["fusion","fine_dining","modern","dinner","creative"]},{"name":"Shibuya Crossing Viewpoint","type":"other","tags":["intersection","city_life","iconic","modern","photo"]}]
-[Orchestrator] Node "explain_from_trace" completed in 1808ms
+[explain] memory_anchors: [{"memory_id":"a52d4a45-e868-4e4c-904f-4cd9936bc859","tags":["bath","cityscape","hilltop"],"city":"bath","vision_type":"scenery","w_time":0.9986,"w_sent":1.2,"final_weight":1.1019,"sentiment":1,"timestamp":"2026-06-02T17:34:35.019Z"},{"memory_id":"4edfde8e-bca6-4c0f-a9b1-cf563d363d4e","tags":["nottingham","park","river"],"city":"nottingham","vision_type":"scenery","w_time":0.9996,"w_sent":1.16,"final_weight":1.0412,"sentiment":0.8,"timestamp":"2026-06-02T17:49:03.622Z"},{"memory_id":"6c31e867-51cb-400a-acec-12c7591d7b15","tags":["bridge","gothic_architecture","landmark"],"city":"london","vision_type":"scenery","w_time":0.9984,"w_sent":1.1,"final_weight":0.9448,"sentiment":0.5,"timestamp":"2026-06-02T17:31:29.308Z"}]
+[explain] recommended_items: [{"name":"Tokyo Skytree","type":"other","tags":["skyscraper","skyline","modern","observation","landmark"]},{"name":"Night Lights Tokyo Tower Loop","type":"walk","tags":["walk","night","lights","skyline","photo"]},{"name":"Shibuya Crossing Viewpoint","type":"other","tags":["intersection","city_life","iconic","modern","photo"]},{"name":"Ginza Luxury Lane","type":"walk","tags":["walk","shopping","urban","upscale","daytime"]},{"name":"Asakusa Culture Streets","type":"walk","tags":["market","heritage","shopping","local","traditional"]}]
+[Orchestrator] Node "explain_from_trace" completed in 5598ms
+[Orchestrator] Starting pipeline "recommendation_pipeline" v13.0.0 with 13 nodes
+[Orchestrator] Executing node: extract_intent (skill: extract_intent)
+[Orchestrator] Node "extract_intent" completed in 0ms
+[Orchestrator] Executing node: decide_tag_budget (skill: decide_tag_budget)
+[Orchestrator] Node "decide_tag_budget" completed in 0ms
+[Orchestrator] Executing node: tag_expand (skill: tag_expand)
+[Orchestrator] Node "tag_expand" completed in 1439ms
+[Orchestrator] Executing node: tag_normalize (skill: tag_normalize)
+[toolClient] -> /tool/ontology.normalize {
+  traceId: 't_mpwydvbe_esihy0',
+  timeoutMs: 3000,
+  input: { data: { tags: [Array], lang: 'auto', strict: true } }
+}
+[Orchestrator] Node "tag_normalize" completed in 15ms
+[Orchestrator] Executing node: memory_weight_adjust (skill: memory_weight_adjust)
+[toolClient] -> /tool/memory.search {
+  traceId: 't_mpwydvbt_o3wwml',
+  timeoutMs: 3000,
+  input: {
+    data: {
+      user_id: 'ui_demo_user',
+      query_tags: [Array],
+      top_k: 50,
+      memory_pool: 'all',
+      city: 'tokyo',
+      now_ts: '2026-06-02T18:10:38.761Z'
+    }
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mpwydvc4_4m78pu',
+  timeoutMs: 7000,
+  input: {
+    tags: [
+      'bath',             'beachfront',
+      'bridge',           'cityscape',
+      'coastal landmark', 'gothic_architecture',
+      'hilltop',          'landmark',
+      'landscape',        'modern architecture',
+      'nottingham',       'octopus',
+      'paella',           'panoramic view',
+      'park',             'river',
+      'scallops',         'seafood',
+      'skyline',          'spanish cuisine',
+      'sunset',           'urban',
+      'urban design'
+    ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/memory.search {
+  traceId: 't_mpwydvck_v2q7ce',
+  timeoutMs: 3000,
+  input: {
+    data: {
+      user_id: 'ui_demo_user',
+      query_tags: [Array],
+      top_k: 10,
+      memory_pool: 'all',
+      query_embedding: [Array],
+      city: 'tokyo',
+      now_ts: '2026-06-02T18:10:38.761Z'
+    }
+  }
+}
+[Orchestrator] Node "memory_weight_adjust" completed in 32ms
+[Orchestrator] Executing node: build_profile_vector (skill: build_profile_vector)
+[Orchestrator] Node "build_profile_vector" completed in 0ms
+[Orchestrator] Executing node: vision_describe (skill: vision_describe)
+[Orchestrator] Node "vision_describe" completed in 0ms
+[Orchestrator] Executing node: tes_builder (skill: tes_builder)
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mpwydvcq_a2ufq7',
+  timeoutMs: 7000,
+  input: {
+    vision_features: [],
+    tags: [
+      'bath',
+      'bridge',
+      'cityscape',
+      'gothic_architecture',
+      'hilltop',
+      'landmark',
+      'landscape',
+      'nottingham',
+      'panoramic view',
+      'park',
+      'river',
+      'skyline',
+      'sunset',
+      'urban'
+    ],
+    normalize: true
+  }
+}
+[Orchestrator] Node "tes_builder" completed in 11ms
+[Orchestrator] Executing node: fetch_recommendation (skill: fetch_recommendation)
+[toolClient] -> /tool/recommendation.score {
+  traceId: 't_mpwydvd0_347sc9',
+  timeoutMs: 3000,
+  input: {
+    data: {
+      user_id: 'ui_demo_user',
+      city: 'tokyo',
+      tags: [Array],
+      intent: 'balanced',
+      memory_confidence: 1,
+      memory_pool: 'all',
+      anchor_tags: [Array]
+    }
+  }
+}
+[Orchestrator] Node "fetch_recommendation" completed in 489ms
+[Orchestrator] Executing node: rerank (skill: rerank)
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mpwydvql_gon5lv',
+  timeoutMs: 7000,
+  input: {
+    tags: [ 'city_life', 'iconic', 'intersection', 'modern', 'photo' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mpwydvqu_otflpx',
+  timeoutMs: 7000,
+  input: {
+    tags: [ 'daytime', 'shopping', 'upscale', 'urban', 'walk' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mpwydvr2_zb32tv',
+  timeoutMs: 7000,
+  input: {
+    tags: [ 'landmark', 'modern', 'observation', 'skyline', 'skyscraper' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mpwydvrb_8twgs0',
+  timeoutMs: 7000,
+  input: {
+    tags: [ 'alleys', 'charming', 'local_life', 'retro', 'walk' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mpwydvrk_ua472h',
+  timeoutMs: 7000,
+  input: {
+    tags: [ 'cruise', 'evening', 'experience', 'river', 'scenery' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mpwydvrs_isx1cr',
+  timeoutMs: 7000,
+  input: {
+    tags: [ 'lights', 'night', 'photo', 'skyline', 'walk' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mpwydvs1_lhyf2k',
+  timeoutMs: 7000,
+  input: {
+    tags: [ 'colorful', 'daytime', 'shopping', 'walk', 'youth_culture' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mpwydvs9_y3yy5a',
+  timeoutMs: 7000,
+  input: {
+    tags: [ 'calm', 'river', 'scenic', 'sunset', 'walk' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mpwydvsi_olaz88',
+  timeoutMs: 7000,
+  input: {
+    tags: [ 'heritage', 'local', 'market', 'shopping', 'traditional' ],
+    normalize: true
+  }
+}
+[toolClient] -> /tool/embedding.tes_build {
+  traceId: 't_mpwydvsq_gc86uz',
+  timeoutMs: 7000,
+  input: {
+    tags: [ 'art', 'garden', 'heritage', 'museum', 'tranquil' ],
+    normalize: true
+  }
+}
+[Orchestrator] Node "rerank" completed in 86ms
+[Orchestrator] Executing node: mix_policy (skill: mix_policy)
+[Orchestrator] Node "mix_policy" completed in 0ms
+[Orchestrator] Executing node: build_cards (skill: build_cards)
+[toolClient] -> /tool/planner.compose {
+  traceId: 't_mpwydvsz_it8o7s',
+  timeoutMs: 3000,
+  input: {
+    data: {
+      city: 'tokyo',
+      cz: [Array],
+      ez: [Array],
+      tags: [Array],
+      user_id: 'ui_demo_user',
+      intent: {},
+      cz_ranked: [Array],
+      ez_ranked: [],
+      mix_policy: [Object],
+      decision_trace: [Object],
+      meta: [Object]
+    }
+  }
+}
+[Orchestrator] Node "build_cards" completed in 41ms
+[Orchestrator] Executing node: explain_from_trace (skill: explain_from_trace)
+[explain] memory_anchors: [{"memory_id":"a52d4a45-e868-4e4c-904f-4cd9936bc859","tags":["bath","cityscape","hilltop"],"city":"bath","vision_type":"scenery","w_time":0.9975,"w_sent":1.2,"final_weight":1.1007,"sentiment":1,"timestamp":"2026-06-02T17:34:35.019Z"},{"memory_id":"4edfde8e-bca6-4c0f-a9b1-cf563d363d4e","tags":["nottingham","park","river"],"city":"nottingham","vision_type":"scenery","w_time":0.9985,"w_sent":1.16,"final_weight":1.04,"sentiment":0.8,"timestamp":"2026-06-02T17:49:03.622Z"},{"memory_id":"6c31e867-51cb-400a-acec-12c7591d7b15","tags":["bridge","gothic_architecture","landmark"],"city":"london","vision_type":"scenery","w_time":0.9973,"w_sent":1.1,"final_weight":0.9437,"sentiment":0.5,"timestamp":"2026-06-02T17:31:29.308Z"}]
+[explain] recommended_items: [{"name":"Tokyo Skytree","type":"other","tags":["skyscraper","skyline","modern","observation","landmark"]},{"name":"Night Lights Tokyo Tower Loop","type":"walk","tags":["walk","night","lights","skyline","photo"]},{"name":"Shibuya Crossing Viewpoint","type":"other","tags":["intersection","city_life","iconic","modern","photo"]},{"name":"Ginza Luxury Lane","type":"walk","tags":["walk","shopping","urban","upscale","daytime"]},{"name":"Asakusa Culture Streets","type":"walk","tags":["market","heritage","shopping","local","traditional"]}]
+[Orchestrator] Node "explain_from_trace" completed in 2826ms

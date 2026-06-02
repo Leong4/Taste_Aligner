@@ -56,6 +56,14 @@ export async function searchMemory(opts: {
   return resp.results ?? [];
 }
 
+export async function resolveUkLocation(city: string, validLocations: string[]): Promise<string | null> {
+  const resp = await postJson<{ location?: string | null }>(`${AGENT}/geocode/uk-location`, {
+    city,
+    valid_locations: validLocations,
+  });
+  return typeof resp.location === "string" ? resp.location : null;
+}
+
 // GET /read/{memory_id}  — read single memory
 export async function readMemory(memoryId: string): Promise<MemoryDetail | null> {
   const res = await fetch(`${MEMORY}/read/${encodeURIComponent(memoryId)}`);
