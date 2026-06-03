@@ -261,6 +261,10 @@ def search_memories(
         memory_ts = memory.get("timestamp", "")
         sentiment = memory.get("sentiment", 0.0)
 
+        if query_city:
+            if memory_city.lower().strip() != query_city.lower().strip():
+                continue
+
         # Compute base similarity (cosine or tag overlap fallback)
         if use_embedding and len(memory_embedding) == 512:
             # Primary: Cosine similarity
@@ -300,7 +304,9 @@ def search_memories(
             "city": memory_city,
             "vision_type": memory.get("vision_type"),
             "normalized_tags": memory_tags,
-            "sentiment": sentiment
+            "sentiment": sentiment,
+            "image_url": f"/files/{memory_id}?variant=thumb",
+            "preview_url": f"/files/{memory_id}?variant=preview"
         })
 
     # Sort by final_score DESC

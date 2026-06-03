@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type TouchEvent as ReactTouchEvent } from "react";
 import * as d3 from "d3";
 import { feature } from "topojson-client";
 import type { Feature, FeatureCollection, Geometry } from "geojson";
@@ -184,14 +184,17 @@ const UK_LOCATION_TO_LADS: Record<string, string[]> = {
 };
 
 const COMING_SOON = [
-  "🇨🇳 China provinces",
-  "🇯🇵 Japan prefectures",
-  "🇫🇷 France regions",
-  "🇮🇹 Italy regions",
-  "🇩🇪 Germany states",
-  "🇺🇸 US states",
-  "🇪🇸 Spain regions",
+  "China Provinces",
+  "Japan Prefectures",
+  "US States",
+  "Memory Globe",
 ];
+
+const CORAL = "#FF6B5C";
+const CORAL_HOVER = "#e05545";
+const UNVISITED_FILL = "#2d2d3f";
+const MOBILE_QUERY = "(max-width: 767px)";
+const MEMORY_SERVICE_BASE_URL = "/api/memory";
 
 type MapView = "world" | "uk";
 
@@ -218,6 +221,25 @@ interface TooltipState {
   tags: string[];
 }
 
+interface MemoryPopupState {
+  x: number;
+  y: number;
+  city: string;
+  memoryCount: number;
+  memories: Array<SearchResult & { image_url?: string; preview_url?: string }>;
+  loading: boolean;
+}
+
+interface AtlasPhotoViewerState {
+  memoryId: string;
+  city: string;
+}
+
+interface MapSize {
+  width: number;
+  height: number;
+}
+
 export default function MapPage() {
   const svgRef = useRef<SVGSVGElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
@@ -228,9 +250,19 @@ export default function MapPage() {
   const [resolvedUkLocations, setResolvedUkLocations] = useState<Record<string, string | null>>({});
   const [resolvingUkLocations, setResolvingUkLocations] = useState(false);
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
+  const [memoryPopup, setMemoryPopup] = useState<MemoryPopupState | null>(null);
+  const [photoViewer, setPhotoViewer] = useState<AtlasPhotoViewerState | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [mapTransitioning, setMapTransitioning] = useState(false);
+  const [drawerExpanded, setDrawerExpanded] = useState(false);
+  const [mapSize, setMapSize] = useState<MapSize>({ width: 0, height: 0 });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const resolvedUkLocationCache = useRef(new Map<string, string | null>());
+  const drawerDragStart = useRef<number | null>(null);
+  const zoomBehaviorRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
+  const homeTransformRef = useRef<d3.ZoomTransform>(d3.zoomIdentity);
+  const fullWorldTransformRef = useRef<d3.ZoomTransform>(d3.zoomIdentity);
 
   const ukLocationToLads = useMemo(() => {
     const locations = { ...UK_LOCATION_TO_LADS };
@@ -260,6 +292,35 @@ export default function MapPage() {
     return summaries;
   }, [memories]);
 
+  const uniqueCityCount = useMemo(
+    () => new Set(memories.map((memory) => normalizeCity(memory.city)).filter(Boolean)).size,
+    [memories],
+  );
+
+  const tasteProfile = useMemo(() => {
+    const order = ["scenery", "food", "architecture", "other"] as const;
+    const labels: Record<(typeof order)[number], string> = {
+      scenery: "Scenery",
+      food: "Food",
+      architecture: "Architecture",
+      other: "Other",
+    };
+    const counts = new Map<(typeof order)[number], number>(order.map((type) => [type, 0]));
+    for (const memory of memories) {
+      const type = normalizeVisionType(memory.vision_type);
+      counts.set(type, (counts.get(type) ?? 0) + 1);
+    }
+    return order.map((type) => {
+      const count = counts.get(type) ?? 0;
+      return {
+        type,
+        label: labels[type],
+        count,
+        percent: memories.length > 0 ? Math.round((count / memories.length) * 100) : 0,
+      };
+    });
+  }, [memories]);
+
   const ukSummaries = useMemo(() => {
     const summaries = new Map<string, LocationSummary>();
     for (const memory of memories) {
@@ -269,6 +330,36 @@ export default function MapPage() {
     }
     return summaries;
   }, [memories, resolvedUkLocations]);
+
+  useEffect(() => {
+    const media = window.matchMedia(MOBILE_QUERY);
+    const update = () => setIsMobile(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    const svgElement = svgRef.current;
+    if (!svgElement) return;
+
+    const updateMapSize = () => {
+      const rect = svgElement.getBoundingClientRect();
+      const width = Math.max(1, Math.round(rect.width));
+      const height = Math.max(1, Math.round(rect.height));
+      setMapSize((current) => (current.width === width && current.height === height ? current : { width, height }));
+    };
+
+    updateMapSize();
+    const observer = new ResizeObserver(updateMapSize);
+    observer.observe(svgElement);
+    window.addEventListener("resize", updateMapSize);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", updateMapSize);
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -373,12 +464,57 @@ export default function MapPage() {
     };
   }, [memories, ukTopology]);
 
+  function transitionToView(nextView: MapView) {
+    if (nextView === view) return;
+    setMapTransitioning(true);
+    window.setTimeout(() => {
+      setView(nextView);
+      setMemoryPopup(null);
+      setTooltip(null);
+      if (nextView === "world") window.setTimeout(resetZoomHome, 80);
+      window.setTimeout(() => setMapTransitioning(false), 150);
+    }, 150);
+  }
+
+  function resetZoomHome() {
+    zoomToTransform(homeTransformRef.current);
+  }
+
+  function resetZoomWorld() {
+    zoomToTransform(fullWorldTransformRef.current);
+  }
+
+  function zoomToTransform(targetTransform: d3.ZoomTransform) {
+    const svgElement = svgRef.current;
+    const zoomBehavior = zoomBehaviorRef.current;
+    if (!svgElement || !zoomBehavior) return;
+    d3.select(svgElement)
+      .transition()
+      .duration(500)
+      .call(zoomBehavior.transform, targetTransform);
+  }
+
+  function handleDrawerTouchStart(event: ReactTouchEvent) {
+    drawerDragStart.current = event.touches[0]?.clientY ?? null;
+  }
+
+  function handleDrawerTouchMove(event: ReactTouchEvent) {
+    if (drawerDragStart.current !== null) event.preventDefault();
+  }
+
+  function handleDrawerTouchEnd(event: ReactTouchEvent) {
+    if (drawerDragStart.current === null || !isMobile) return;
+    const deltaY = event.changedTouches[0].clientY - drawerDragStart.current;
+    drawerDragStart.current = null;
+    if (deltaY < -60) setDrawerExpanded(true);
+    if (deltaY > 60) setDrawerExpanded(false);
+  }
+
   useEffect(() => {
     const svgElement = svgRef.current;
-    if (!svgElement) return;
+    if (!svgElement || mapSize.width === 0 || mapSize.height === 0) return;
 
-    const width = 1200;
-    const height = 620;
+    const { width, height } = mapSize;
     const svg = d3.select(svgElement);
     svg.selectAll("*").remove();
     svg.attr("viewBox", `0 0 ${width} ${height}`);
@@ -386,15 +522,21 @@ export default function MapPage() {
     if (view === "world" && worldTopology) {
       const countries = toFeatureCollection(worldTopology, "countries");
       const projection = d3.geoNaturalEarth1().fitExtent(
-        [
-          [18, 18],
-          [width - 18, height - 18],
-        ],
+        paddedExtent(width, height, 18),
         countries,
       );
+      const ukFeature = countries.features.find((datum) => numericCountryIdToIso(datum.id) === "GBR");
+      const locateTransform = ukFeature
+        ? transformForFit({
+            projectionFactory: () => d3.geoNaturalEarth1(),
+            baseProjection: projection,
+            target: ukFeature,
+            extent: paddedExtent(width, height, 40),
+          })
+        : d3.zoomIdentity;
       const path = d3.geoPath(projection);
 
-      svg
+      const paths = svg
         .append("g")
         .selectAll<SVGPathElement, Feature<Geometry, MapProperties>>("path")
         .data(countries.features)
@@ -404,11 +546,20 @@ export default function MapPage() {
         .attr("data-country-code", (datum) => numericCountryIdToIso(datum.id))
         .attr("fill", (datum) => {
           const summary = countrySummaries.get(numericCountryIdToIso(datum.id));
-          return summary ? visitedColor(summary.cities.size) : "#2d2d3f";
+          return summary ? visitedColor() : UNVISITED_FILL;
         })
         .attr("stroke", "#4b4b63")
         .attr("stroke-width", 0.65)
-        .style("cursor", (datum) => (numericCountryIdToIso(datum.id) === "GBR" ? "pointer" : "default"))
+        .classed("map-region-highlighted", (datum) => countrySummaries.has(numericCountryIdToIso(datum.id)))
+        .style("cursor", (datum) => (countrySummaries.has(numericCountryIdToIso(datum.id)) ? "pointer" : "default"))
+        .on("mouseover", function (_event, datum) {
+          const summary = countrySummaries.get(numericCountryIdToIso(datum.id));
+          if (summary) d3.select(this).attr("fill", CORAL_HOVER);
+        })
+        .on("mouseout", function (_event, datum) {
+          const summary = countrySummaries.get(numericCountryIdToIso(datum.id));
+          if (summary) d3.select(this).attr("fill", visitedColor());
+        })
         .on("mouseenter", (event, datum) => {
           const summary = countrySummaries.get(numericCountryIdToIso(datum.id));
           if (summary) showTooltip(event, datum.properties.name ?? "Unknown country", summary);
@@ -418,26 +569,33 @@ export default function MapPage() {
           if (summary) showTooltip(event, datum.properties.name ?? "Unknown country", summary);
         })
         .on("mouseleave", () => setTooltip(null))
-        .on("click", (_event, datum) => {
-          if (numericCountryIdToIso(datum.id) === "GBR") {
-            setTooltip(null);
-            setView("uk");
+        .on("click", (event, datum) => {
+          const iso = numericCountryIdToIso(datum.id);
+          const summary = countrySummaries.get(iso);
+          if (!summary) return;
+          showMemoryPopup(event, summary);
+          if (iso === "GBR") {
+            window.setTimeout(() => transitionToView("uk"), 220);
           }
         });
+
+      installZoom(projection, path, paths, {
+        initialTransform: locateTransform,
+        homeTransform: locateTransform,
+        fullTransform: d3.zoomIdentity,
+      });
     }
 
     if (view === "uk" && ukTopology && !resolvingUkLocations) {
+      svg.property("__zoom", d3.zoomIdentity);
       const lads = toFeatureCollection(ukTopology, "lad");
       const projection = d3.geoMercator().fitExtent(
-        [
-          [90, 18],
-          [width - 90, height - 18],
-        ],
+        paddedExtent(width, height, 24),
         lads,
       );
       const path = d3.geoPath(projection);
 
-      svg
+      const paths = svg
         .append("g")
         .selectAll<SVGPathElement, Feature<Geometry, MapProperties>>("path")
         .data(lads.features)
@@ -447,10 +605,28 @@ export default function MapPage() {
         .attr("data-location", (datum) => ukLadToLocation.get(datum.properties.LAD13NM ?? "") ?? "")
         .attr("fill", (datum) => {
           const location = ukLadToLocation.get(datum.properties.LAD13NM ?? "");
-          return location && ukSummaries.has(location) ? "#f59e0b" : "#2d2d3f";
+          return location && ukSummaries.has(location) ? visitedColor() : UNVISITED_FILL;
         })
         .attr("stroke", "#4b4b63")
         .attr("stroke-width", 0.55)
+        .classed("map-region-highlighted", (datum) => {
+          const location = ukLadToLocation.get(datum.properties.LAD13NM ?? "");
+          return Boolean(location && ukSummaries.has(location));
+        })
+        .style("cursor", (datum) => {
+          const location = ukLadToLocation.get(datum.properties.LAD13NM ?? "");
+          return location && ukSummaries.has(location) ? "pointer" : "default";
+        })
+        .on("mouseover", function (_event, datum) {
+          const location = ukLadToLocation.get(datum.properties.LAD13NM ?? "");
+          const summary = location ? ukSummaries.get(location) : undefined;
+          if (summary) d3.select(this).attr("fill", CORAL_HOVER);
+        })
+        .on("mouseout", function (_event, datum) {
+          const location = ukLadToLocation.get(datum.properties.LAD13NM ?? "");
+          const summary = location ? ukSummaries.get(location) : undefined;
+          if (summary) d3.select(this).attr("fill", visitedColor());
+        })
         .on("mouseenter", (event, datum) => {
           const location = ukLadToLocation.get(datum.properties.LAD13NM ?? "");
           const summary = location ? ukSummaries.get(location) : undefined;
@@ -461,7 +637,18 @@ export default function MapPage() {
           const summary = location ? ukSummaries.get(location) : undefined;
           if (location && summary) showTooltip(event, location, summary);
         })
-        .on("mouseleave", () => setTooltip(null));
+        .on("mouseleave", () => setTooltip(null))
+        .on("click", (event, datum) => {
+          const location = ukLadToLocation.get(datum.properties.LAD13NM ?? "");
+          const summary = location ? ukSummaries.get(location) : undefined;
+          if (summary) showMemoryPopup(event, summary);
+        });
+
+      installZoom(projection, path, paths, {
+        initialTransform: d3.zoomIdentity,
+        homeTransform: d3.zoomIdentity,
+        fullTransform: d3.zoomIdentity,
+      });
     }
 
     function showTooltip(event: PointerEvent, name: string, summary: LocationSummary) {
@@ -474,100 +661,294 @@ export default function MapPage() {
         tags: topTags(summary),
       });
     }
-  }, [countrySummaries, resolvingUkLocations, ukLadToLocation, ukSummaries, ukTopology, view, worldTopology]);
+
+    function showMemoryPopup(event: PointerEvent, summary: LocationSummary) {
+      const city = [...summary.cities][0];
+      setTooltip(null);
+      setMemoryPopup({
+        x: event.clientX + 14,
+        y: event.clientY + 14,
+        city,
+        memoryCount: summary.memoryCount,
+        memories: [],
+        loading: true,
+      });
+      searchMemory({ query_tags: MAP_SEARCH_TAGS, city, top_k: 2 })
+        .then((results) => {
+          const returnedCity = normalizeCity(results.find((result) => result.city)?.city) ?? city;
+          setMemoryPopup((current) =>
+            current && current.city === city
+              ? { ...current, city: returnedCity, memories: results, loading: false }
+              : current,
+          );
+        })
+        .catch((err: unknown) => {
+          console.warn(`[map] Failed to load memories for city="${city}": ${errorMessage(err)}`);
+          setMemoryPopup((current) =>
+            current && current.city === city ? { ...current, memories: [], loading: false } : current,
+          );
+        });
+    }
+
+    function installZoom(
+      projection: d3.GeoProjection,
+      path: d3.GeoPath<unknown, Feature<Geometry, MapProperties>>,
+      paths: d3.Selection<SVGPathElement, Feature<Geometry, MapProperties>, SVGGElement, unknown>,
+      options: {
+        initialTransform?: d3.ZoomTransform;
+        homeTransform?: d3.ZoomTransform;
+        fullTransform?: d3.ZoomTransform;
+      } = {},
+    ) {
+      const baseScale = projection.scale();
+      const baseTranslate = projection.translate();
+      let lastTap = 0;
+      const zoomBehavior = d3
+        .zoom<SVGSVGElement, unknown>()
+        .scaleExtent([1, 8])
+        .on("start", () => {
+          svg.style("cursor", "grabbing");
+        })
+        .on("zoom", (event) => {
+          const transform = event.transform;
+          projection
+            .scale(baseScale * transform.k)
+            .translate([
+              baseTranslate[0] * transform.k + transform.x,
+              baseTranslate[1] * transform.k + transform.y,
+            ]);
+          paths.attr("d", (datum) => path(datum) ?? "");
+        })
+        .on("end", () => {
+          svg.style("cursor", "grab");
+        });
+
+      zoomBehaviorRef.current = zoomBehavior;
+      homeTransformRef.current = options.homeTransform ?? d3.zoomIdentity;
+      fullWorldTransformRef.current = options.fullTransform ?? d3.zoomIdentity;
+      svg
+        .style("cursor", "grab")
+        .call(zoomBehavior)
+        .on("dblclick.zoom", null)
+        .on("dblclick.reset", (event) => {
+          event.preventDefault();
+          resetZoomHome();
+        })
+        .on("touchend.reset", (event) => {
+          const now = Date.now();
+          if (now - lastTap < 300) {
+            event.preventDefault();
+            resetZoomHome();
+          }
+          lastTap = now;
+        });
+      svg.call(zoomBehavior.transform, options.initialTransform ?? homeTransformRef.current);
+    }
+  }, [
+    countrySummaries,
+    isMobile,
+    mapSize,
+    resolvingUkLocations,
+    ukLadToLocation,
+    ukSummaries,
+    ukTopology,
+    view,
+    worldTopology,
+  ]);
 
   return (
-    <div>
-      <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1rem" }}>
-        {view === "uk" && (
-          <button className="btn btn-ghost" type="button" onClick={() => setView("world")}>
-            ← Back to world
-          </button>
-        )}
-        <div>
-          <h2 style={{ margin: 0 }}>{view === "world" ? "Your Taste Map" : "United Kingdom"}</h2>
-          <p style={{ color: "#6b7280", marginTop: "0.4rem", fontSize: "0.9rem" }}>
-            {view === "world"
-              ? "Countries light up as your travel memories grow. Select the UK to explore its local map."
-              : "Visited UK locations are highlighted from your saved memories."}
-          </p>
-        </div>
-      </div>
-
+    <div className={`atlas-page ${drawerExpanded ? "drawer-expanded" : ""}`}>
       {error && <div className="error-banner">{error}</div>}
 
       <div
         ref={mapRef}
-        style={{
-          position: "relative",
-          width: "100%",
-          overflow: "hidden",
-          borderRadius: "16px",
-          background: "#1a1a2e",
-          boxShadow: "0 12px 32px rgba(17, 24, 39, 0.18)",
-        }}
+        className={`atlas-map-card ${mapTransitioning ? "transitioning" : ""}`}
       >
+        <div className="atlas-title-pill">
+          {view === "uk" && (
+            <button type="button" onClick={() => transitionToView("world")} aria-label="Back to world map">
+              ←
+            </button>
+          )}
+          <div>
+            <h1>Your Atlas</h1>
+            <p>Mapping your taste across the world.</p>
+          </div>
+        </div>
         <svg
           ref={svgRef}
           aria-label={view === "world" ? "World taste map" : "United Kingdom taste map"}
           role="img"
-          style={{ display: "block", width: "100%", height: "auto", minHeight: "360px" }}
+          className="atlas-map-svg"
         />
         {(loading || (view === "uk" && (!ukTopology || resolvingUkLocations))) && (
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#f59e0b",
-              background: "rgba(26, 26, 46, 0.72)",
-            }}
-          >
+          <div className="atlas-map-loading">
             Loading map...
           </div>
         )}
+        {view === "world" && (
+          <div className="atlas-map-actions">
+            <button type="button" onClick={resetZoomHome}>
+              📍 Locate
+            </button>
+            <button type="button" onClick={resetZoomWorld}>
+              🌍 World View
+            </button>
+          </div>
+        )}
         {tooltip && (
-          <div
-            style={{
-              position: "absolute",
-              left: tooltip.x,
-              top: tooltip.y,
-              pointerEvents: "none",
-              maxWidth: "240px",
-              padding: "0.75rem 0.85rem",
-              border: "1px solid rgba(245, 158, 11, 0.45)",
-              borderRadius: "10px",
-              background: "rgba(17, 24, 39, 0.96)",
-              color: "#f9fafb",
-              boxShadow: "0 8px 20px rgba(0, 0, 0, 0.28)",
-              fontSize: "0.82rem",
-            }}
-          >
-            <div style={{ color: "#f59e0b", fontWeight: 700, marginBottom: "0.25rem" }}>
-              {tooltip.name}
-            </div>
+          <div className="atlas-tooltip" style={{ left: tooltip.x, top: tooltip.y }}>
+            <div className="atlas-tooltip-title">{tooltip.name}</div>
             <div>{tooltip.memoryCount} {tooltip.memoryCount === 1 ? "memory" : "memories"}</div>
-            <div style={{ color: "#d1d5db", marginTop: "0.2rem" }}>
+            <div className="atlas-tooltip-muted">
               Top tags: {tooltip.tags.length > 0 ? tooltip.tags.join(", ") : "—"}
             </div>
           </div>
         )}
       </div>
 
-      <div style={{ margin: "1rem 0 2rem", color: "#4b5563", fontSize: "0.95rem", fontWeight: 600 }}>
-        {countrySummaries.size} countries explored · {memories.length} memories
-      </div>
+      {memoryPopup && (
+        <>
+          <div className="atlas-popup-backdrop" onClick={() => setMemoryPopup(null)} />
+          <div
+            className="atlas-memory-popup"
+            style={{ left: memoryPopup.x, top: memoryPopup.y }}
+            onClick={(event) => event.stopPropagation()}
+          >
+            {memoryPopup.loading ? (
+              <div className="atlas-popup-empty">Loading memories...</div>
+            ) : memoryPopup.memories.length > 0 ? (
+              <>
+                <div className="atlas-popup-thumbs">
+                  {memoryPopup.memories.slice(0, 2).map((memory) => (
+                    <MemoryPopupImage
+                      key={memory.memory_id}
+                      memoryId={memory.memory_id}
+                      onOpen={() => {
+                        setMemoryPopup(null);
+                        setPhotoViewer({
+                          memoryId: memory.memory_id,
+                          city: normalizeCity(memory.city) ?? memoryPopup.city,
+                        });
+                      }}
+                    />
+                  ))}
+                </div>
+                <div className="atlas-popup-city">{formatCityName(memoryPopup.city)}</div>
+                <div className="atlas-popup-count">
+                  {memoryPopup.memoryCount} {memoryPopup.memoryCount === 1 ? "memory" : "memories"}
+                </div>
+              </>
+            ) : (
+              <div className="atlas-popup-empty">No memories here yet</div>
+            )}
+          </div>
+        </>
+      )}
 
-      <section className="card">
-        <h3>Coming soon</h3>
-        <div className="tags">
-          {COMING_SOON.map((item) => (
-            <span key={item} className="tag tag-gray">{item}</span>
-          ))}
+      {photoViewer && (
+        <AtlasPhotoViewer
+          memoryId={photoViewer.memoryId}
+          city={photoViewer.city}
+          onClose={() => setPhotoViewer(null)}
+        />
+      )}
+
+      <section
+        className="atlas-drawer"
+      >
+        <button
+          className="atlas-drawer-handle"
+          type="button"
+          aria-label={drawerExpanded ? "Collapse Atlas drawer" : "Expand Atlas drawer"}
+          onTouchStart={handleDrawerTouchStart}
+          onTouchMove={handleDrawerTouchMove}
+          onTouchEnd={handleDrawerTouchEnd}
+        />
+        <section className="atlas-stats">
+          <StatCard icon="⌖" value={countrySummaries.size} label="Countries" />
+          <StatCard icon="◇" value={uniqueCityCount} label="Cities" />
+          <StatCard icon="◉" value={memories.length} label="Memories" />
+        </section>
+
+        <div className="atlas-drawer-expanded-content">
+          <section className="atlas-profile-card">
+            <h3>Taste Profile</h3>
+            <div className="atlas-profile-bar" aria-label="Taste profile by memory type">
+              {tasteProfile.map((segment) => (
+                <span
+                  key={segment.type}
+                  className={`profile-segment profile-${segment.type}`}
+                  style={{ width: `${segment.percent}%` }}
+                />
+              ))}
+            </div>
+            <div className="atlas-profile-legend">
+              {tasteProfile.map((segment) => (
+                <span key={segment.type} className="tag-chip profile-chip">
+                  <span className={`profile-dot profile-${segment.type}`} />
+                  {segment.label} {segment.percent}%
+                </span>
+              ))}
+            </div>
+          </section>
+
+          <section className="atlas-coming-soon">
+            <div className="atlas-coming-label">Expanding Horizons</div>
+            <div className="atlas-coming-chips">
+              {COMING_SOON.map((item) => (
+                <span key={item} className="tag-chip">🔒 {item}</span>
+              ))}
+            </div>
+          </section>
         </div>
       </section>
+    </div>
+  );
+}
+
+function StatCard({ icon, value, label }: { icon: string; value: number; label: string }) {
+  return (
+    <div className="atlas-stat-card">
+      <div className="atlas-stat-icon">{icon}</div>
+      <div className="atlas-stat-value">{value}</div>
+      <div className="atlas-stat-label">{label}</div>
+    </div>
+  );
+}
+
+function MemoryPopupImage({ memoryId, onOpen }: { memoryId: string; onOpen: () => void }) {
+  const [failed, setFailed] = useState(false);
+  const imageUrl = `${MEMORY_SERVICE_BASE_URL}/files/${encodeURIComponent(memoryId)}?variant=thumb`;
+
+  if (failed) {
+    return (
+      <button className="atlas-popup-thumb-button" type="button" onClick={onOpen}>
+        <div className="atlas-popup-placeholder" aria-label="Memory image unavailable">📷</div>
+      </button>
+    );
+  }
+
+  return (
+    <button className="atlas-popup-thumb-button" type="button" onClick={onOpen}>
+      <img
+        src={imageUrl}
+        alt={`memory-${memoryId}`}
+        onError={() => setFailed(true)}
+      />
+    </button>
+  );
+}
+
+function AtlasPhotoViewer({ memoryId, city, onClose }: { memoryId: string; city: string; onClose: () => void }) {
+  const imageUrl = `${MEMORY_SERVICE_BASE_URL}/files/${encodeURIComponent(memoryId)}?variant=preview`;
+
+  return (
+    <div className="atlas-photo-viewer">
+      <button className="atlas-photo-back" type="button" onClick={onClose}>
+        ← {formatCityName(city)}
+      </button>
+      <img src={imageUrl} alt={`memory-${memoryId}`} />
     </div>
   );
 }
@@ -583,6 +964,34 @@ function toFeatureCollection(topology: TopologyPayload, objectName: string) {
     Geometry,
     MapProperties
   >;
+}
+
+function transformForFit({
+  projectionFactory,
+  baseProjection,
+  target,
+  extent,
+}: {
+  projectionFactory: () => d3.GeoProjection;
+  baseProjection: d3.GeoProjection;
+  target: Feature<Geometry, MapProperties> | FeatureCollection<Geometry, MapProperties>;
+  extent: [[number, number], [number, number]];
+}) {
+  const fittedProjection = projectionFactory().fitExtent(extent, target);
+  const baseScale = baseProjection.scale();
+  const [baseX, baseY] = baseProjection.translate();
+  const fittedScale = fittedProjection.scale();
+  const [fittedX, fittedY] = fittedProjection.translate();
+  const scale = fittedScale / baseScale;
+  return d3.zoomIdentity.translate(fittedX - baseX * scale, fittedY - baseY * scale).scale(scale);
+}
+
+function paddedExtent(width: number, height: number, padding: number): [[number, number], [number, number]] {
+  const safePadding = Math.min(padding, Math.max(0, (width - 1) / 2), Math.max(0, (height - 1) / 2));
+  return [
+    [safePadding, safePadding],
+    [width - safePadding, height - safePadding],
+  ];
 }
 
 function normalizeCity(city: string | undefined): string | null {
@@ -611,10 +1020,22 @@ function topTags(summary: LocationSummary): string[] {
     .map(([tag]) => tag);
 }
 
-function visitedColor(cityCount: number): string {
-  if (cityCount >= 3) return "#b45309";
-  if (cityCount === 2) return "#d97706";
-  return "#f59e0b";
+function visitedColor(): string {
+  return CORAL;
+}
+
+function normalizeVisionType(visionType: string | undefined): "scenery" | "food" | "architecture" | "other" {
+  const type = (visionType ?? "").trim().toLowerCase();
+  if (type === "scenery" || type === "food" || type === "architecture") return type;
+  return "other";
+}
+
+function formatCityName(city: string): string {
+  return city
+    .split("_")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
 }
 
 function numericCountryIdToIso(id: string | number | undefined): string {
