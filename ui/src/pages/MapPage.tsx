@@ -517,6 +517,14 @@ export default function MapPage() {
     const { width, height } = mapSize;
     const svg = d3.select(svgElement);
     svg.selectAll("*").remove();
+    const defs = svg.append("defs");
+    defs.append("filter").attr("id", "country-glow").html(`
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    `);
     svg.attr("viewBox", `0 0 ${width} ${height}`);
 
     if (view === "world" && worldTopology) {
@@ -525,15 +533,22 @@ export default function MapPage() {
         paddedExtent(width, height, 18),
         countries,
       );
-      const ukFeature = countries.features.find((datum) => numericCountryIdToIso(datum.id) === "GBR");
-      const locateTransform = ukFeature
-        ? transformForFit({
-            projectionFactory: () => d3.geoNaturalEarth1(),
-            baseProjection: projection,
-            target: ukFeature,
-            extent: paddedExtent(width, height, 40),
-          })
-        : d3.zoomIdentity;
+      const visitedFeatures = countries.features.filter((datum) =>
+        countrySummaries.has(numericCountryIdToIso(datum.id)),
+      );
+      const visitedCollection = {
+        type: "FeatureCollection" as const,
+        features: visitedFeatures,
+      };
+      const center =
+        visitedFeatures.length > 0
+          ? d3.geoCentroid(visitedCollection)
+          : ([-2, 48] as [number, number]);
+      const locateMultiplier = 8;
+      const targetXY = projection(center as [number, number])!;
+      const locateTransform = d3.zoomIdentity
+        .translate(width / 2 - targetXY[0] * locateMultiplier, height / 2 - targetXY[1] * locateMultiplier)
+        .scale(locateMultiplier);
       const path = d3.geoPath(projection);
 
       const paths = svg
@@ -548,8 +563,17 @@ export default function MapPage() {
           const summary = countrySummaries.get(numericCountryIdToIso(datum.id));
           return summary ? visitedColor() : UNVISITED_FILL;
         })
-        .attr("stroke", "#4b4b63")
-        .attr("stroke-width", 0.65)
+        .attr("stroke", (datum) =>
+          countrySummaries.has(numericCountryIdToIso(datum.id)) ? "#FFB4A8" : "rgba(255,255,255,0.15)",
+        )
+        .attr("stroke-width", (datum) =>
+          countrySummaries.has(numericCountryIdToIso(datum.id)) ? "1.5" : "0.5",
+        )
+        .attr("filter", (datum) =>
+          countrySummaries.has(numericCountryIdToIso(datum.id)) ? "url(#country-glow)" : null,
+        )
+        .attr("vector-effect", "non-scaling-stroke")
+        .attr("paint-order", "stroke")
         .classed("map-region-highlighted", (datum) => countrySummaries.has(numericCountryIdToIso(datum.id)))
         .style("cursor", (datum) => (countrySummaries.has(numericCountryIdToIso(datum.id)) ? "pointer" : "default"))
         .on("mouseover", function (_event, datum) {
@@ -607,8 +631,20 @@ export default function MapPage() {
           const location = ukLadToLocation.get(datum.properties.LAD13NM ?? "");
           return location && ukSummaries.has(location) ? visitedColor() : UNVISITED_FILL;
         })
-        .attr("stroke", "#4b4b63")
-        .attr("stroke-width", 0.55)
+        .attr("stroke", (datum) => {
+          const location = ukLadToLocation.get(datum.properties.LAD13NM ?? "");
+          return location && ukSummaries.has(location) ? "#FFB4A8" : "rgba(255,255,255,0.15)";
+        })
+        .attr("stroke-width", (datum) => {
+          const location = ukLadToLocation.get(datum.properties.LAD13NM ?? "");
+          return location && ukSummaries.has(location) ? "1.5" : "0.4";
+        })
+        .attr("filter", (datum) => {
+          const location = ukLadToLocation.get(datum.properties.LAD13NM ?? "");
+          return location && ukSummaries.has(location) ? "url(#country-glow)" : null;
+        })
+        .attr("vector-effect", "non-scaling-stroke")
+        .attr("paint-order", "stroke")
         .classed("map-region-highlighted", (datum) => {
           const location = ukLadToLocation.get(datum.properties.LAD13NM ?? "");
           return Boolean(location && ukSummaries.has(location));
@@ -789,10 +825,18 @@ export default function MapPage() {
         {view === "world" && (
           <div className="atlas-map-actions">
             <button type="button" onClick={resetZoomHome}>
-              📍 Locate
+              <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+                <path d="M12 21s7-6.1 7-12A7 7 0 0 0 5 9c0 5.9 7 12 7 12Z" />
+                <circle cx="12" cy="9" r="2.4" />
+              </svg>
+              <span>Locate</span>
             </button>
             <button type="button" onClick={resetZoomWorld}>
-              🌍 World View
+              <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M3 12h18M12 3c2.4 2.5 3.6 5.5 3.6 9S14.4 18.5 12 21c-2.4-2.5-3.6-5.5-3.6-9S9.6 5.5 12 3Z" />
+              </svg>
+              <span>World View</span>
             </button>
           </div>
         )}
