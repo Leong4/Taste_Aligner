@@ -19,7 +19,7 @@
  *  11.  Pass-through: tags, cz_seed, ez_seed unchanged
  *  12.  Trace: rule_id, schema_version, all contract fields
  *  13.  Empty input: no seeds, no text → base budget
- *  14.  Wired into RECOMMENDATION_GRAPH v8.0 as node 2
+ *  14.  Wired into RECOMMENDATION_GRAPH v14.0 as node 2
  *  15.  Orchestrator integration: decide_tag_budget in decision_trace
  *  16.  Contract: output has thresholds, features, reasons
  *  17.  Thresholds: min_confidence_soft varies with budget
@@ -388,7 +388,9 @@ async function runAll() {
         const nodeIds = RECOMMENDATION_GRAPH.nodes.map((n) => n.id);
         const requiredNodeIds = [
             "vision_describe",
+            "caption_sentiment",
             "tes_builder",
+            "persist_memory",
             "memory_weight_adjust",
             "build_profile_vector",
             "explain_from_trace",
@@ -425,12 +427,12 @@ async function runAll() {
         assert.ok(profileIdx !== -1 && explainIdx !== -1 && profileIdx < explainIdx,
             "build_profile_vector must execute before explain_from_trace");
 
-        const tesBuilderNode = RECOMMENDATION_GRAPH.nodes.find((n) => n.id === "tes_builder");
-        assert.ok(tesBuilderNode, "tes_builder node must exist");
+        const persistMemoryNode = RECOMMENDATION_GRAPH.nodes.find((n) => n.id === "persist_memory");
+        assert.ok(persistMemoryNode, "persist_memory node must exist");
         assert.strictEqual(
-            tesBuilderNode.inputFrom.vision_type,
+            persistMemoryNode.inputFrom.vision_type,
             "vision_describe.vision_type",
-            "tes_builder must read canonical vision_type field from vision_describe output"
+            "persist_memory must read canonical vision_type field from vision_describe output"
         );
 
         const memoryWeightNode = RECOMMENDATION_GRAPH.nodes.find((n) => n.id === "memory_weight_adjust");
@@ -528,7 +530,7 @@ async function runAll() {
             }),
         });
 
-        // Stub memory_weight_adjust (new node between tag_normalize and memory_signal)
+        // Stub memory_weight_adjust (the default graph's memory aggregation node)
         reg.register({
             name: "memory_weight_adjust",
             inputSchema: { description: "", required: [] },
@@ -552,7 +554,7 @@ async function runAll() {
             }),
         });
 
-        // Stub memory_signal (legacy node retained for compat)
+        // Stub memory_signal (legacy registry compatibility only; not in the default graph)
         reg.register({
             name: "memory_signal",
             inputSchema: { description: "", required: [] },
@@ -574,7 +576,7 @@ async function runAll() {
             }),
         });
 
-        // Stub tes_builder (new node between memory_signal and fetch_recommendation)
+        // Stub vision_describe
         reg.register({
             name: "vision_describe",
             inputSchema: { description: "", required: [] },
@@ -600,6 +602,24 @@ async function runAll() {
                     },
                 },
                 trace: { rule_id: "vision_describe_v1", schema_version: "1.0" },
+            }),
+        });
+
+        reg.register({
+            name: "caption_sentiment",
+            inputSchema: { description: "", required: [] },
+            outputSchema: { description: "", required: [] },
+            execute: async () => ({
+                output: {
+                    sentiment: 0,
+                    sentiment_scale: "signed_v1",
+                    sentiment_confidence: 0,
+                    sentiment_available: false,
+                    sentiment_source: "missing_caption",
+                    matched_terms: [],
+                    decision_trace: {},
+                },
+                trace: { rule_id: "caption_sentiment_v1", schema_version: "1.0" },
             }),
         });
 
@@ -649,12 +669,7 @@ async function runAll() {
             name: "tes_builder",
             inputSchema: { description: "", required: [] },
             outputSchema: { description: "", required: [] },
-            execute: async (input) => {
-                assert.strictEqual(
-                    input.vision_type,
-                    "scenery",
-                    "graph mapping should pass vision_describe.vision_type into tes_builder"
-                );
+            execute: async () => {
                 return {
                     output: {
                         tes_vector: Array.from({ length: 512 }, (_, i) => (i === 0 ? 1 : 0)),
@@ -673,6 +688,29 @@ async function runAll() {
                         },
                     },
                     trace: { rule_id: "tes_builder_v1", schema_version: "1.0" },
+                };
+            },
+        });
+
+        reg.register({
+            name: "persist_memory",
+            inputSchema: { description: "", required: [] },
+            outputSchema: { description: "", required: [] },
+            execute: async (input) => {
+                assert.strictEqual(
+                    input.vision_type,
+                    "scenery",
+                    "graph mapping should pass vision_describe.vision_type into persist_memory"
+                );
+                assert.strictEqual(input.sentiment_source, "missing_caption");
+                return {
+                    output: {
+                        memory_write_status: "skipped",
+                        memory_persisted: false,
+                        attempts: 0,
+                        decision_trace: {},
+                    },
+                    trace: { rule_id: "persist_memory_v1", schema_version: "1.0" },
                 };
             },
         });

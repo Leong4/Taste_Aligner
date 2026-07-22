@@ -93,8 +93,8 @@
   - Prevents malformed raw base64 payloads from triggering `invalid_data_url` in memory service.
 
 ### memory.write response behavior
-- Memory service already returns `memory_id` on successful write in [services/memory/db.py](/Volumes/leong4/University_doc/RAG/Taste-Aligner/Taste_Aligner/services/memory/db.py).
-- `tes_builder` remains fire-and-forget (`memory_write_status="queued"`) by design; write result is not awaited.
+- Memory service returns `memory_id` on successful write and treats a same-user repeat as an idempotent replay.
+- Graph v14 moved the write into `persist_memory`, which waits for acknowledgement and reports `persisted` or `failed`; `tes_builder` no longer has a persistence side effect.
 
 ## 7 Startup Commands
 

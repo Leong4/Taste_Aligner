@@ -1,4 +1,4 @@
-import type { RunResponse, SearchResult, MemoryDetail } from "./types";
+import type { RunResponse, SearchResult, MemoryDetail, AtlasSummaryResponse } from "./types";
 
 // All requests go through Vite proxy:
 //   /api/agent  ->  http://localhost:8787
@@ -30,6 +30,7 @@ export async function runPipeline(payload: {
   image_url?: string;
   caption?: string;
   city?: string;
+  memory_id?: string;
 }): Promise<RunResponse> {
   return postJson<RunResponse>(`${AGENT}/run`, {
     user_id: USER_ID,
@@ -56,6 +57,12 @@ export async function searchMemory(opts: {
   return resp.results ?? [];
 }
 
+export async function getAtlasSummary(userId: string = USER_ID): Promise<AtlasSummaryResponse> {
+  const res = await fetch(`${MEMORY}/atlas/summary?user_id=${encodeURIComponent(userId)}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status} loading Atlas summary`);
+  return res.json() as Promise<AtlasSummaryResponse>;
+}
+
 export async function resolveUkLocation(city: string, validLocations: string[]): Promise<string | null> {
   const resp = await postJson<{ location?: string | null }>(`${AGENT}/geocode/uk-location`, {
     city,
@@ -80,30 +87,4 @@ export async function deleteMemory(memoryId: string): Promise<void> {
     const text = await res.text().catch(() => "(no body)");
     throw new Error(`HTTP ${res.status} deleting memory ${memoryId}: ${text.slice(0, 200)}`);
   }
-}
-
-// Poll /search until a newly-written memory is visible (max 5 s)
-export async function pollForNewMemory(
-  uploadStartMs: number,
-  queryTags: string[],
-  city?: string,
-): Promise<string | null> {
-  const deadline = Date.now() + 6000;
-  while (Date.now() < deadline) {
-    await delay(300);
-    const results = await searchMemory({ query_tags: queryTags, city, top_k: 10 });
-    for (const row of results) {
-      const mem = await readMemory(row.memory_id);
-      if (!mem) continue;
-      if (mem.user_id !== USER_ID) continue;
-      if (mem.source !== "upload") continue;
-      const ts = mem.timestamp ? Date.parse(mem.timestamp) : 0;
-      if (ts >= uploadStartMs - 5000) return mem.memory_id;
-    }
-  }
-  return null;
-}
-
-function delay(ms: number) {
-  return new Promise<void>((r) => setTimeout(r, ms));
 }

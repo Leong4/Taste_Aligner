@@ -382,7 +382,7 @@ public class GatewayServer {
                         return invalidToolInput(
                                 toolName,
                                 missing,
-                                "Provide TES build fields: tags/vision_features/sentiment/recency_days/location (or legacy data.normalized_tags/data.vision_tags)"
+                                "Provide TES semantic fields: tags/vision_features (or legacy data.normalized_tags/data.vision_tags)"
                         );
                     }
                     break;
@@ -391,7 +391,7 @@ public class GatewayServer {
                         return invalidToolInput(
                                 toolName,
                                 missing,
-                                "Provide data.image_url or data.image_base64 (allowed data fields: image_url, image_base64, top_k)"
+                                "Provide data.image_url or data.image_base64 (allowed data fields: image_url, image_base64, caption_text, top_k)"
                         );
                     }
                     break;
@@ -607,25 +607,25 @@ public class GatewayServer {
 
         private boolean validateTesBuildPayload(Map<String, Object> payload, List<String> missing) {
             List<String> allowedRoot = List.of(
-                    "vision_features", "tags", "sentiment", "recency_days", "location", "normalize", "data"
+                    "vision_features", "tags", "normalize", "data"
             );
             missing.addAll(findUnknownKeys(payload, allowedRoot, "root"));
 
             boolean hasRootCandidate = hasAnyPath(payload, List.of(
-                    "vision_features", "tags", "sentiment", "recency_days", "location"
+                    "vision_features", "tags"
             ));
             boolean hasLegacyCandidate = hasAnyPath(payload, List.of(
-                    "data.vision_tags", "data.normalized_tags", "data.emotion", "data.recency_days"
+                    "data.vision_tags", "data.normalized_tags"
             ));
             if (!hasRootCandidate && !hasLegacyCandidate) {
-                missing.add("tags|vision_features|sentiment|recency_days|location");
+                missing.add("tags|vision_features");
             }
 
             Object dataObj = payload.get("data");
             if (dataObj instanceof Map<?, ?>) {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> data = (Map<String, Object>) dataObj;
-                List<String> allowedData = List.of("vision_tags", "normalized_tags", "emotion", "recency_days");
+                List<String> allowedData = List.of("vision_tags", "normalized_tags");
                 missing.addAll(findUnknownKeys(data, allowedData, "data"));
             }
             return missing.isEmpty();
@@ -663,9 +663,6 @@ public class GatewayServer {
             if (payload != null) {
                 copyIfPresent(payload, outgoing, "vision_features");
                 copyIfPresent(payload, outgoing, "tags");
-                copyIfPresent(payload, outgoing, "sentiment");
-                copyIfPresent(payload, outgoing, "recency_days");
-                copyIfPresent(payload, outgoing, "location");
                 copyIfPresent(payload, outgoing, "normalize");
 
                 Object dataObj = payload.get("data");
@@ -677,9 +674,6 @@ public class GatewayServer {
                     }
                     if (!outgoing.containsKey("tags") && data.get("normalized_tags") != null) {
                         outgoing.put("tags", data.get("normalized_tags"));
-                    }
-                    if (!outgoing.containsKey("recency_days") && data.get("recency_days") != null) {
-                        outgoing.put("recency_days", data.get("recency_days"));
                     }
                 }
             }

@@ -2,480 +2,204 @@
 
 ## Overview
 
-The Taste Aligner agent runtime uses a **SkillRegistry + Graph + Orchestrator** architecture to execute a deterministic recommendation pipeline. This replaces the previous ReAct loop + IntentAgent pattern with a structured, extensible, and fully traceable execution model.
+Taste Aligner executes recommendations through a `SkillRegistry`, a versioned
+linear graph, and an `Orchestrator`. The production graph is
+`recommendation_pipeline` v14.0.0. Every node has explicit `inputFrom`
+dependencies, and each skill contributes structured evidence to the final
+decision trace.
 
-**Key principles:**
-- No multi-agent reasoning — deterministic skill execution + optional LLM post-processing
-- Graph defines execution order — skills do not know about each other
-- Decision trace is preserved and deep-merged across all skills (incoming wins)
-- LLM integration via pluggable adapter — mock for dev, API adapters for production
-- Existing Python services are unchanged — skills wrap gateway calls
+The default path is deterministic except for the skills that explicitly use an
+LLM adapter (`tag_expand` and `explain_from_trace`) or external services. The
+legacy `memory_signal` skill remains registered for compatibility, but it is not
+part of the v14 graph.
 
----
+## Production graph (v14)
 
-## Architecture Diagram
-
-```
-                         POST /run { text }
-                              │
-                              ▼
-                    ┌──────────────────┐
-                    │   HTTP Server    │  (server.ts)
-                    │   port 8787     │
-                    └────────┬─────────┘
-                             │
-                             ▼
-                    ┌──────────────────┐
-                    │   Orchestrator   │  (core/orchestrator.ts)
-                    │                  │
-                    │  • Loads Graph   │
-                    │  • Creates Ctx   │
-                    │  • Runs nodes    │
-                    │  • Merges trace  │
-                    └────────┬─────────┘
-                             │
-           ┌─────────────────┼──────────────────┐
-           │                 │                   │
-           ▼                 ▼                   ▼
-    ┌─────────────┐  ┌──────────────┐   ┌──────────────┐
-    │ SkillRegistry│  │    Graph     │   │ ExecutionCtx │
-    │              │  │  Definition  │   │              │
-    │ • 6 skills   │  │  • 6 nodes   │   │ • input      │
-    │ • get/list   │  │  • inputFrom │   │ • results    │
-    │              │  │  • linear    │   │ • trace      │
-    └──────────────┘  └──────────────┘   │ • errors     │
-                                         └──────────────┘
-
-    ═══════════════ Execution Graph (v3.0) ═══════════════
-
-    ┌─────────────────┐
-    │  extract_intent  │  (local, no HTTP)
-    │  city/type/tags  │
-    └────────┬─────────┘
-             │
-             ▼
-    ┌────────────────────┐     ┌─────────────────────┐
-    │ fetch_recommendation│────▶│  recommendation.score│
-    │  cz/ez ranked      │     │  (gateway → :5005)   │
-    └────────┬───────────┘     └─────────────────────┘
-             │
-             ▼
-    ┌─────────┐
-    │  rerank  │  (graph input from fetch_recommendation)
-    │  scored  │
-    └────┬────┘
-         │
-         ▼
-    ┌────────────┐
-    │ mix_policy  │  (graph input from fetch_recommendation)
-    │ CZ:EZ ratio│
-    └─────┬──────┘
-          │
-          ▼
-    ┌──────────────┐     ┌─────────────────────┐
-    │  build_cards  │────▶│  planner.compose     │
-    │  final cards  │     │  (gateway → :5006)   │
-    └──────┬───────┘     └─────────────────────┘
-           │
-           ▼
-    ┌────────────────────┐     ┌──────────────────┐
-    │ explain_from_trace  │────▶│  LLMAdapter      │
-    │  explanation + tips │     │  (mock / API)    │
-    └────────────────────┘     └──────────────────┘
+```text
+POST /run
+   |
+   v
+extract_intent
+   |
+   v
+decide_tag_budget -> tag_expand -> tag_normalize
+                                      |
+                                      v
+                              memory_weight_adjust
+                                      |
+                                      v
+                              build_profile_vector
+                                      |
+                                      v
+                               vision_describe
+                                      |
+                                      v
+                             caption_sentiment
+                                      |
+                                      v
+                                 tes_builder
+                                      |
+                                      v
+                                persist_memory
+                                      |
+                                      v
+                           fetch_recommendation
+                                      |
+                                      v
+                                   rerank
+                                      |
+                                      v
+                                 mix_policy
+                                      |
+                                      v
+                                build_cards
+                                      |
+                                      v
+                            explain_from_trace
 ```
 
----
+The exact node definitions and bindings live in
+`agent_runtime/src/core/graph_definition.ts`.
 
-## Module Structure
+## Node responsibilities
 
-```
+| # | Node | Responsibility |
+|---:|---|---|
+| 1 | `extract_intent` | Extract city, type, input tags, and CZ/EZ seeds. |
+| 2 | `decide_tag_budget` | Compute deterministic hard/soft expansion limits. |
+| 3 | `tag_expand` | Expand seed tags within the allocated budget. |
+| 4 | `tag_normalize` | Map expanded tags to the shared ontology. |
+| 5 | `memory_weight_adjust` | Search memory and expose authoritative `score`, `w_time`, `w_sent`, and `w_context` values plus anchors and confidence. |
+| 6 | `build_profile_vector` | Consume upstream weights, select anchors, and construct the profile vector. It does not recompute time or sentiment weights. |
+| 7 | `vision_describe` | Produce optional semantic vision features. |
+| 8 | `caption_sentiment` | Analyse the user's caption independently of the vision backend and return signed sentiment, confidence, availability, and provenance. Missing evidence is unavailable rather than fabricated neutral. |
+| 9 | `tes_builder` | Build a 512-dimensional TES vector from tags and vision features. The `/tes/build` contract is semantic-only: `tags`, `vision_features`, and `normalize`. |
+| 10 | `persist_memory` | For upload requests, synchronously persist the TES vector and metadata with a stable `memory_id`, bounded transient retries, and confirmed success/failure status. |
+| 11 | `fetch_recommendation` | Fetch the service's CZ/EZ candidates and upstream mix trace. |
+| 12 | `rerank` | Fuse each zone's canonical score (`score_CZ` or `score_EZ`) with TES similarity. It records per-item base, TES, and fused scores and has a 20-call hard budget. |
+| 13 | `mix_policy` | Choose the CZ/EZ mixing policy from reranked candidates and upstream evidence. |
+| 14 | `build_cards` | Ask the planner to compose final journey cards. |
+| 15 | `explain_from_trace` | Generate a user-facing explanation from bounded trace evidence. Its serialized trace context is hard-capped at 8 KiB of UTF-8 data. |
+
+## Runtime components
+
+```text
 agent_runtime/src/
-├── core/                          # Orchestration engine
-│   ├── types.ts                   # All TypeScript interfaces
-│   ├── skill_registry.ts          # Skill registration + lookup
-│   ├── execution_context.ts       # Shared context + path resolution
-│   ├── trace_manager.ts           # Decision trace deep merge logic
-│   ├── graph_definition.ts        # Graph DAG + validation
-│   ├── orchestrator.ts            # Main execution engine
-│   ├── bootstrap.ts               # Factory: wires registry + graph + orchestrator
-│   └── index.ts                   # Barrel export
-│
-├── llm/                           # LLM adapter abstraction
-│   ├── llm_adapter.ts             # Interface: LLMAdapter, LLMCallTrace, etc.
-│   ├── mock_adapter.ts            # MockLLMAdapter (deterministic, no network)
-│   └── index.ts                   # Factory: createLLMAdapterFromEnv()
-│
-├── skills/                        # Skill implementations
-│   ├── extract_intent.ts          # Rule-based intent extraction
-│   ├── fetch_recommendation.ts    # Gateway call to recommendation.score
-│   ├── rerank.ts                  # Rerank via graph input (+ fallback)
-│   ├── mix_policy.ts              # Mix policy via graph input (+ fallback)
-│   ├── build_cards.ts             # Gateway call to planner.compose
-│   ├── explain_from_trace.ts      # LLM-backed explanation generation
-│   └── index.ts                   # Barrel export
-│
-├── tools/
-│   └── toolClient.ts              # Gateway HTTP client (shared)
-│
-├── index.ts                       # CLI entry point
-└── server.ts                      # HTTP server entry point
+|- core/
+|  |- graph_definition.ts    # v14 graph and validation
+|  |- orchestrator.ts        # node execution and early termination
+|  |- execution_context.ts   # input and intermediate-result resolution
+|  |- skill_registry.ts      # registered skill lookup
+|  |- trace_manager.ts       # trace merge behavior
+|  |- bootstrap.ts           # production wiring
+|  `- types.ts               # shared contracts
+|- skills/                   # node implementations
+|- llm/                      # mock/provider adapter abstraction
+`- tools/toolClient.ts       # gateway client
 ```
 
----
+`bootstrap.ts` registers the default graph's skills and also registers
+`memory_signal` as a legacy, non-default compatibility entry.
 
-## Skill Lifecycle
+## Skill lifecycle
 
-### 1. Definition
-
-Every skill implements the `Skill` interface:
+Each skill implements the same contract:
 
 ```typescript
 interface Skill<TInput, TOutput> {
     name: string;
     inputSchema: SchemaDescriptor;
     outputSchema: SchemaDescriptor;
-    execute(input: TInput, context: ExecutionContext): Promise<SkillResult<TOutput>>;
-}
-
-interface SkillResult<T> {
-    output: T;       // Skill's output data
-    trace: SkillTrace; // Decision trace fragment
+    execute(
+        input: TInput,
+        context: ExecutionContext,
+    ): Promise<SkillResult<TOutput>>;
 }
 ```
 
-### 2. Registration
+For every node the orchestrator:
 
-Skills are registered at startup in `bootstrap.ts`:
+1. Resolves each `inputFrom` path from the root input or an earlier node.
+2. Calls the registered skill.
+3. Stores the output under the node id.
+4. Merges the skill trace into the accumulated decision trace.
+5. Records timing or terminates with a structured error.
 
-```typescript
-const registry = new SkillRegistry();
-const llmAdapter = createLLMAdapterFromEnv();
+Graph validation rejects duplicate node ids, missing dependencies, and forward
+references.
 
-// Deterministic skills
-registry.register(extractIntentSkill);
-registry.register(createFetchRecommendationSkill(toolClient));
-registry.register(rerankSkill);
-registry.register(mixPolicySkill);
-registry.register(createBuildCardsSkill(toolClient));
+## Important data contracts
 
-// LLM-backed skills
-registry.register(createExplainFromTraceSkill(llmAdapter));
+### Memory weighting
+
+`memory.search` is the authoritative source for the time, signed-sentiment, and
+context factors. `memory_weight_adjust` validates and passes them downstream;
+`build_profile_vector` consumes the resulting `score` as `final_weight`. This
+avoids applying sentiment or recency twice.
+
+Caption sentiment is stored on `[-1, 1]` together with
+`sentiment_available`, `sentiment_confidence`, and `sentiment_source`. Its
+weight is confidence-aware:
+
+```text
+w_sent = clamp(1 + 0.5 * sentiment * confidence, 0.5, 1.5)
 ```
 
-Skills that need HTTP access are created via factory functions that receive the shared `ToolClient`. LLM-backed skills receive an `LLMAdapter` instance.
+Unavailable sentiment always yields `w_sent=1.0`; it is not described as a
+measured neutral opinion.
 
-### 3. Graph Binding
+### Confirmed upload persistence
 
-Each skill is bound to a graph node with explicit input mappings:
+`tes_builder` has no persistence side effect. `persist_memory` owns the write
+and accepts success only after Memory Service returns 2xx with a `memory_id`.
+Network errors, 408, 429, and 5xx responses receive bounded retries with the
+same stable id; other 4xx responses fail immediately. Memory Service treats a
+repeat of the same `memory_id` by the same user as an idempotent replay.
 
-```typescript
-{
-    id: "rerank",
-    skill: "rerank",
-    inputFrom: {
-        recall_results: "recall_candidates.recall_results",
-        user_id: "extract_intent.user_id",
-        user_city: "extract_intent.city",
-        user_tags: "extract_intent.tags",
-    },
-}
-```
+The final state is one of `skipped`, `persisted`, or `failed`. Only
+`persisted` sets `memory_persisted=true` and receives the green UI state.
 
-### 4. Execution
+### TES input and reranking
 
-The Orchestrator iterates graph nodes sequentially:
-
-1. Resolve inputs from `ExecutionContext` using `inputFrom` paths
-2. Call `skill.execute(resolvedInput, context)`
-3. Store `result.output` in `context.intermediate_results[nodeId]`
-4. Merge `result.trace` into `context.decision_trace[skillName]`
-5. Record timing
-
-### 5. Error Handling
-
-- If a skill throws, the Orchestrator records the error and returns immediately
-- Early termination: if `extract_intent` produces no city, the pipeline stops before `recall_candidates`
-- Non-fatal errors are collected in `context.errors`
-
----
-
-## Data Flow
-
-### Input → Output Path
-
-```
-{ text: "I want to travel to London for food." }
-    │
-    ▼
-extract_intent
-    → { city: "london", type: "food", tags: ["food"], cz_seed: [...], ... }
-    │
-    ▼
-recall_candidates (HTTP → recommendation.score)
-    → { recall_results: { cz_candidates: [...], ez_candidates: [...] },
-        full_reco_response: { ... } }
-    │
-    ▼
-rerank (reads cached full_reco_response)
-    → { cz_ranked: [{score_CZ: 1.87, ...}], ez_ranked: [{score_EZ: 1.43, ...}] }
-    │
-    ▼
-mix_policy (reads cached full_reco_response)
-    → { policy: { ratio: "3:1", cz: 3, ez: 1, rule: "..." },
-        upstream_trace: { recall: {...}, rerank: {...}, mix_policy: {...} } }
-    │
-    ▼
-build_cards (HTTP → planner.compose)
-    → { cards: [ { zone: "CZ", items: [...] }, { zone: "EZ", items: [...] } ],
-        decision_trace: { recall: {...}, rerank: {...}, planner: {...} } }
-    │
-    ▼
-explain_from_trace (LLM → MockAdapter / API)
-    → { explanation: "Based on your preferences, we selected...",
-        bullets: ["City matched", "Comfort-zone ranked", "Exploration added"],
-        meta: { locale: "en", style: "concise" } }
-```
-
-### ExecutionContext Resolution
-
-Input paths use dot notation to reference data from prior nodes:
-
-| Path | Resolves To |
-|------|-------------|
-| `input.text` | Original user text |
-| `extract_intent.city` | City from intent extraction |
-| `recall_candidates.recall_results` | Recall output |
-| `rerank.cz_ranked` | Ranked CZ list |
-| `mix_policy.policy` | Mix policy decision |
-
----
-
-## Decision Trace Structure
-
-The final merged `decision_trace` contains one entry per skill:
+`tes_builder` sends only semantic content to `/tes/build`:
 
 ```json
 {
-    "extract_intent": {
-        "rule_id": "intent_v1_keywords",
-        "city_detected": true,
-        "city": "london",
-        "type": "food",
-        "cz_seed": ["ramen_shop", "izakaya"],
-        "ez_seed": [],
-        "tags": ["food"]
-    },
-    "recall_candidates": {
-        "recall": {
-            "rule_id": "recall_v1_city_strict",
-            "rules_used": ["cz_city_match", "ez_city_excellence"],
-            "candidate_counts": { "cz": 11, "ez": 18 },
-            "cross_city_guard": { "rejected": 0 }
-        },
-        "source": "recommendation.score"
-    },
-    "rerank": {
-        "rule_id": "rerank_v1_3",
-        "top_items": [...],
-        "weights": { "alpha": 1.0, "beta": 0.6, "gamma": 0.3 },
-        "thresholds": { ... }
-    },
-    "mix_policy": {
-        "ratio": { "label": "3:1", "cz": 3, "ez": 1 },
-        "rule_id": "comfort_high_confidence",
-        "confidence": 0.9,
-        "components": { ... }
-    },
-    "build_cards": {
-        "rule_id": "planner_compose_v1",
-        "cards_count": 2,
-        "selected_cz_ids": [...],
-        "selected_ez_ids": [...]
-    },
-    "explain_from_trace": {
-        "schema_version": "explain_v1",
-        "inputs_used": ["intent", "recall", "rerank", "mix_policy", "planner"],
-        "locale": "en",
-        "style": "concise",
-        "fallback_used": false,
-        "llm_call": {
-            "provider": "mock",
-            "model_name": "mock-v1",
-            "temperature": 0.3,
-            "prompt_version": "explain_v1",
-            "latency_ms": 1,
-            "fallback_used": false
-        }
-    }
+  "tags": ["seafood", "market"],
+  "vision_features": ["harbour", "grilled fish"],
+  "normalize": true
 }
 ```
 
----
+Sentiment, recency, and location are not TES embedding inputs. The reranker
+uses `score_CZ` for CZ items and `score_EZ` for EZ items, falling back to generic
+score fields only when the canonical zone field is absent. When no item TES
+vector is valid, it preserves the upstream order and reports
+`tes_used=false` with `fallback_reason=no_item_tes`.
 
-## How to Add a New Skill
+### Explanation limits
 
-### Step 1: Implement the Skill
+`explain_from_trace` selects only the trace evidence needed for the prompt. The
+serialized context is measured in UTF-8 bytes and cannot exceed 8 KiB, even for
+large multibyte strings. The default token budget comes from the shared runtime
+limit and can be overridden through the supported environment setting.
 
-Create a new file in `agent_runtime/src/skills/`:
+## Adding a skill
 
-```typescript
-// skills/my_new_skill.ts
-import { Skill, SkillResult, ExecutionContext } from "../core/types";
+1. Implement the `Skill` interface in `agent_runtime/src/skills/`.
+2. Export it from `skills/index.ts`.
+3. Register it in `core/bootstrap.ts`.
+4. Add a node with explicit backward-only `inputFrom` mappings in
+   `core/graph_definition.ts`.
+5. Add contract tests for graph wiring, fallback behavior, and decision trace.
 
-interface MyInput { /* ... */ }
-interface MyOutput { /* ... */ }
+Do not add new production behavior through `memory_signal`; extend
+`memory_weight_adjust` or add a new graph node instead.
 
-export const myNewSkill: Skill<MyInput, MyOutput> = {
-    name: "my_new_skill",
-    inputSchema: {
-        description: "Description of expected input",
-        required: ["field1", "field2"],
-    },
-    outputSchema: {
-        description: "Description of output",
-        required: ["result"],
-    },
-    async execute(input: MyInput, context: ExecutionContext): Promise<SkillResult<MyOutput>> {
-        // Your logic here
-        const output: MyOutput = { /* ... */ };
-        const trace = { rule_id: "my_rule_v1", /* ... */ };
-        return { output, trace };
-    },
-};
-```
+## Compatibility
 
-### Step 2: Register in Bootstrap
-
-```typescript
-// core/bootstrap.ts
-import { myNewSkill } from "../skills/my_new_skill";
-
-registry.register(myNewSkill);
-```
-
-### Step 3: Add to Graph
-
-```typescript
-// core/graph_definition.ts — add a node
-{
-    id: "my_new_skill",
-    skill: "my_new_skill",
-    inputFrom: {
-        field1: "extract_intent.city",
-        field2: "rerank.cz_ranked",
-    },
-}
-```
-
-### Step 4: Export
-
-Add to `skills/index.ts`:
-
-```typescript
-export { myNewSkill } from "./my_new_skill";
-```
-
----
-
-## LLM Adapter Abstraction
-
-### Why an Adapter?
-
-LLM-backed skills (like `explain_from_trace`) need to call language models for structured text generation. The `LLMAdapter` interface decouples skills from specific API providers:
-
-- **Development/testing:** `MockLLMAdapter` returns deterministic canned responses — no API keys, no network, fully reproducible.
-- **Production:** Swap in an `OpenAIAdapter` or `AnthropicAdapter` by setting `LLM_PROVIDER=openai` — zero changes to skill code or graph wiring.
-
-### Interface
-
-```typescript
-interface LLMAdapter {
-    readonly modelInfo: LLMModelInfo;
-    generateStructuredJSON<T>(input: LLMGenerateInput): Promise<LLMGenerateOutput<T>>;
-}
-```
-
-Every call returns:
-- `data: T` — parsed structured response
-- `callTrace: LLMCallTrace` — model, temperature, prompt_version, latency, usage (for decision_trace)
-
-### MockLLMAdapter
-
-The default adapter. Returns canned explanations based on `LLM_MOCK_MODE`:
-
-| Mode | Behavior |
-|------|----------|
-| `short` (default) | Concise explanation, 3 bullets |
-| `long` | Detailed explanation, 6 bullets |
-| `error` | Throws to test fallback handling |
-
-### How to Add an API Adapter
-
-Create `agent_runtime/src/llm/openai_adapter.ts`:
-
-```typescript
-import { LLMAdapter, LLMGenerateInput, LLMGenerateOutput, LLMModelInfo } from "./llm_adapter";
-
-export class OpenAIAdapter implements LLMAdapter {
-    readonly modelInfo: LLMModelInfo = {
-        provider: "openai",
-        model_name: "gpt-4o",
-        version: "2024-08-06",
-    };
-
-    async generateStructuredJSON<T>(input: LLMGenerateInput): Promise<LLMGenerateOutput<T>> {
-        // Call OpenAI API with structured output schema
-        // Return parsed data + callTrace
-    }
-}
-```
-
-Then add a case in `createLLMAdapterFromEnv()`:
-
-```typescript
-case "openai":
-    return new OpenAIAdapter(process.env.OPENAI_API_KEY!);
-```
-
-No changes needed in skills, graph, or orchestrator.
-
-### Environment Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `LLM_PROVIDER` | `mock` | Adapter to use (`mock`, future: `openai`, `anthropic`) |
-| `LLM_MOCK_MODE` | `short` | Mock response mode (`short`, `long`, `error`) |
-| `EXPLAIN_LOCALE` | `en` | Default locale for explanations (`en`, `zh`) |
-| `EXPLAIN_STYLE` | `concise` | Default style (`concise`, `detailed`) |
-
----
-
-## Backward Compatibility
-
-The `/run` endpoint response maintains the same shape as before:
-
-| Field | Old Source | New Source |
-|-------|-----------|-----------|
-| `ok` | `observation.ok` | `orchestrator.result.ok` |
-| `city` | `state.city` | `result.city` |
-| `type` | `state.type` | `result.type` |
-| `tool` | `observation.tool` | `"planner.compose"` (if ok) |
-| `observation` | Raw observation | Synthetic wrapper |
-| `output` | `observation.output` | Cards + trace payload |
-
-New fields added: `decision_trace`, `timing`, `errors`, `explanation`, `bullets`.
-
----
-
-## Comparison: Old vs New Architecture
-
-| Aspect | Old (ReAct + IntentAgent) | New (SkillRegistry + Graph) |
-|--------|--------------------------|----------------------------|
-| Flow control | ReAct loop with maxTurns | Linear graph traversal |
-| Intent extraction | IntentAgent.think() | extract_intent skill |
-| Tool dispatch | IntentAgent.act() → ToolClient | Graph node → skill.execute() |
-| Trace management | Passed through state object | TraceManager merges per-skill |
-| Error handling | ReAct loop retry | Fail-fast with error collection |
-| Extensibility | Add new Agent class | Register skill + add graph node |
-| LLM integration | Agent uses LLM to decide | Skill wraps LLM call |
-| Observability | history array | timing + decision_trace + errors |
+The `/run` endpoint keeps the established response envelope (`ok`, `city`,
+`type`, `tool`, `observation`, and `output`) and adds graph-native fields such as
+`decision_trace`, timing, errors, explanations, and bullets. Old ReAct-related
+code and the registered `memory_signal` skill are compatibility surfaces, not
+the production recommendation path.

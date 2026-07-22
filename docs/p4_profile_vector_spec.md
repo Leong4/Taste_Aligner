@@ -46,6 +46,9 @@ JSON shape:
     {
       "memory_id": "m_001",
       "cosine": 0.82,
+      "score": 0.816865,
+      "w_time": 0.904837,
+      "w_sent": 1.1,
       "w_context": 1.0,
       "timestamp": "2026-02-28T10:00:00Z",
       "sentiment": 0.5,
@@ -100,27 +103,24 @@ JSON shape:
 }
 ```
 
-## Weight Formulas
+## Weight ownership
 
 Defined in [agent_runtime/src/skills/build_profile_vector.ts](/Volumes/leong4/University_doc/RAG/Taste-Aligner/Taste_Aligner/agent_runtime/src/skills/build_profile_vector.ts:9).
 
-Formulas:
+`build_profile_vector` does not recompute memory weights. It consumes the
+authoritative `score`, `w_time`, `w_sent`, and `w_context` emitted by
+`memory.search` and passed through `memory_weight_adjust`:
 
 ```text
-w_time    = exp(-LAMBDA_TIME * delta_days)
-w_sent    = clamp(1 + ALPHA_SENT * sentiment, W_SENT_MIN, W_SENT_MAX)
-w_context = pass-through from memory.search
-final_weight = cosine * w_time * w_sent * w_context
+w_time       = pass-through
+w_sent       = pass-through
+w_context    = pass-through
+final_weight = score
 ```
 
-Current constants:
-
-- `LAMBDA_TIME = 0.1`
-- `ALPHA_SENT = 0.2`
-- `W_SENT_MIN = 0.5`
-- `W_SENT_MAX = 2.0`
-- `TOP_K = 3`
-- `PROFILE_VECTOR_DIM = 512`
+The Memory Service computes confidence-aware sentiment weighting as
+`clamp(1 + 0.5 * sentiment * sentiment_confidence, 0.5, 1.5)` and returns
+neutral weight when `sentiment_available=false`.
 
 ## Determinism Contract
 

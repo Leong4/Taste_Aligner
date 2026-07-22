@@ -32,7 +32,22 @@
  *             │
  *             ▼
  *   ┌─────────────────────┐
+ *   │   vision_describe    │  → semantic image features
+ *   └─────────┬────────────┘
+ *             │
+ *             ▼
+ *   ┌─────────────────────┐
+ *   │ caption_sentiment    │  → signed value + confidence + provenance
+ *   └─────────┬────────────┘
+ *             │
+ *             ▼
+ *   ┌─────────────────────┐
  *   │    tes_builder       │  → tes_vector (512)
+ *   └─────────┬────────────┘
+ *             │
+ *             ▼
+ *   ┌─────────────────────┐
+ *   │   persist_memory     │  → skipped | persisted | failed
  *   └─────────┬────────────┘
  *             │
  *             ▼
@@ -69,13 +84,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RECOMMENDATION_GRAPH = void 0;
 exports.validateGraph = validateGraph;
 /**
- * The default recommendation pipeline graph (v8.0).
+ * The default recommendation pipeline graph (v14.0).
+ *
+ * v14.0 changes from v13.0:
+ *   - Added caption_sentiment as the canonical signed sentiment source.
+ *   - Added persist_memory as a confirmed, idempotent upload write step.
+ *   - Removed memory persistence and sentiment conversion from tes_builder.
+ *   - Graph version bumped to 14.0.0.
  *
  * v13.0 changes from v12.0:
  *   - Added build_profile_vector node (Node 6) between memory_weight_adjust
- *     and vision_describe.  Single authoritative source for P4 dynamic
- *     weighting: computes final_weight = cosine * w_time * w_sent * w_context
- *     per memory and writes decision_trace.profile_vector_node.
+ *     and vision_describe. It consumes the authoritative weights calculated by
+ *     memory.search/memory_weight_adjust and writes
+ *     decision_trace.profile_vector_node.
  *   - explain_from_trace now reads profile_vector_node from the trace.
  *   - Graph version bumped to 13.0.0.
  *
@@ -136,7 +157,7 @@ exports.validateGraph = validateGraph;
  */
 exports.RECOMMENDATION_GRAPH = {
     name: "recommendation_pipeline",
-    version: "13.0.0",
+    version: "14.0.0",
     nodes: [
         // ─────────────────────────────────────────────────────────
         // Node 1: Extract intent from raw user text
@@ -217,10 +238,9 @@ exports.RECOMMENDATION_GRAPH = {
         },
         // ─────────────────────────────────────────────────────────
         // Node 6: Build profile vector — P4 dynamic weighting unification
-        // Single authoritative source for time/sentiment weighting in the
-        // pipeline.  Reads weighted_results from memory_weight_adjust and
-        // computes final_weight = cosine * w_time * w_sent * w_context for
-        // each memory.  Profile vector is a weighted average of embeddings
+        // Reads the authoritative score and weight factors passed through by
+        // memory_weight_adjust; it does not recompute sentiment/time weights.
+        // Profile vector is a weighted average of embeddings
         // (512-dim zero vector when no raw embeddings are available).
         // Writes decision_trace.profile_vector_node for explain_from_trace.
         // Output: profile_vector, anchors, total_memories_considered, weights,
@@ -250,7 +270,18 @@ exports.RECOMMENDATION_GRAPH = {
             },
         },
         // ─────────────────────────────────────────────────────────
-        // Node 8: Build TES vector from anchor_tags + vision_features
+        // Node 8: Analyse caption sentiment independently of vision backend
+        // Output: signed sentiment, confidence, availability, provenance
+        // ─────────────────────────────────────────────────────────
+        {
+            id: "caption_sentiment",
+            skill: "caption_sentiment",
+            inputFrom: {
+                caption: "input.caption",
+            },
+        },
+        // ─────────────────────────────────────────────────────────
+        // Node 9: Build TES vector from anchor_tags + vision_features
         // Now reads from memory_weight_adjust instead of memory_signal.
         // vision_features wired from vision_describe for multimodal enrichment.
         // Output: tes_vector, normalized, backend, tes_version
@@ -262,17 +293,43 @@ exports.RECOMMENDATION_GRAPH = {
                 anchor_tags: "memory_weight_adjust.anchor_tags",
                 normalized_tags: "tag_normalize.normalized_tags",
                 vision_features: "vision_describe.vision_features",
-                vision_tags: "vision_describe.tags",
-                vision_type: "vision_describe.vision_type",
-                sentiment: "vision_describe.sentiment",
-                caption_text: "input.caption",
                 request_ts: "input.request_ts",
-                user_city: "extract_intent.city",
                 decision_trace: "memory_weight_adjust.decision_trace",
             },
         },
         // ─────────────────────────────────────────────────────────
-        // Node 8: Fetch full recommendation (recall+rerank+mix)
+        // Node 10: Confirm upload persistence with bounded retries
+        // Non-upload requests are explicitly skipped. Persistence failure is
+        // non-fatal to recommendation generation but is surfaced in trace/UI.
+        // ─────────────────────────────────────────────────────────
+        {
+            id: "persist_memory",
+            skill: "persist_memory",
+            inputFrom: {
+                user_id: "extract_intent.user_id",
+                memory_id: "input.memory_id",
+                city: "extract_intent.city",
+                caption_text: "input.caption",
+                request_ts: "input.request_ts",
+                image_url: "input.image_url",
+                image_base64: "input.image_base64",
+                image_original_base64: "input.image_original_base64",
+                normalized_tags: "tag_normalize.normalized_tags",
+                vision_tags: "vision_describe.tags",
+                vision_features: "vision_describe.vision_features",
+                vision_type: "vision_describe.vision_type",
+                tes_vector: "tes_builder.tes_vector",
+                tes_dim: "tes_builder.tes_dim",
+                tes_normalized: "tes_builder.normalized",
+                tes_fallback_used: "tes_builder.fallback_used",
+                sentiment: "caption_sentiment.sentiment",
+                sentiment_confidence: "caption_sentiment.sentiment_confidence",
+                sentiment_available: "caption_sentiment.sentiment_available",
+                sentiment_source: "caption_sentiment.sentiment_source",
+            },
+        },
+        // ─────────────────────────────────────────────────────────
+        // Node 11: Fetch full recommendation (recall+rerank+mix)
         // memory_confidence now comes from memory_weight_adjust.
         // Output: cz_ranked, ez_ranked, mix_policy, decision_trace
         // ─────────────────────────────────────────────────────────
@@ -290,7 +347,7 @@ exports.RECOMMENDATION_GRAPH = {
             },
         },
         // ─────────────────────────────────────────────────────────
-        // Node 9: Rerank — TES-driven rerank with fallback
+        // Node 12: Rerank — TES-driven rerank with fallback
         // Receives user TES vector from tes_builder for similarity
         // fusion with per-item TES vectors.
         // Output: cz_ranked, ez_ranked
@@ -312,7 +369,7 @@ exports.RECOMMENDATION_GRAPH = {
             },
         },
         // ─────────────────────────────────────────────────────────
-        // Node 10: Mix policy — consumes from graph input
+        // Node 13: Mix policy — consumes from graph input
         // Primary: uses reco_mix_policy and reco_decision_trace
         // from fetch_recommendation
         // memory_confidence reads from memory_weight_adjust (single source).
@@ -331,7 +388,7 @@ exports.RECOMMENDATION_GRAPH = {
             },
         },
         // ─────────────────────────────────────────────────────────
-        // Node 11: Build final journey cards
+        // Node 14: Build final journey cards
         // Calls planner.compose via gateway.
         // Output: cards + decision_trace
         // ─────────────────────────────────────────────────────────
@@ -352,7 +409,7 @@ exports.RECOMMENDATION_GRAPH = {
             },
         },
         // ─────────────────────────────────────────────────────────
-        // Node 12: Explain from trace (LLM-backed)
+        // Node 15: Explain from trace (LLM-backed)
         // Generates a human-readable explanation of the recommendation
         // decision. Uses the accumulated decision_trace as input.
         // Output: explanation, bullets, meta

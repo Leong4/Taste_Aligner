@@ -112,7 +112,10 @@ class VisionResponse(BaseModel):
     vision_type: Literal["food", "scenery", "other", "unknown"] = "unknown"
     cues: List[str] = []
     confidence: float = 0.0
-    sentiment: float = 0.5
+    # Compatibility-only: clip_v1 returns None rather than fabricating neutral.
+    # Canonical caption sentiment is produced by the Agent caption_sentiment node.
+    sentiment: Optional[float] = None
+    sentiment_source: Optional[str] = None
     model: Optional[VisionModelInfo] = None
     # Legacy fields retained for backward compatibility
     model_id: Optional[str] = None
@@ -226,12 +229,13 @@ async def describe_endpoint(req: DescribeRequest) -> VisionResponse:
         if isinstance(confidence_raw, (int, float)) and math.isfinite(float(confidence_raw))
         else 0.0
     )
-    sentiment_raw = result.get("sentiment", 0.5)
+    sentiment_raw = result.get("sentiment")
     sentiment = (
         float(sentiment_raw)
         if isinstance(sentiment_raw, (int, float)) and math.isfinite(float(sentiment_raw))
-        else 0.5
+        else None
     )
+    sentiment_source = "cloud_caption_v1" if sentiment is not None else None
     raw_model = result.get("model")
     model_info = VisionModelInfo(**raw_model) if isinstance(raw_model, dict) else None
 
@@ -247,7 +251,8 @@ async def describe_endpoint(req: DescribeRequest) -> VisionResponse:
         vision_type=vision_type,
         cues=cues,
         confidence=round(max(0.0, min(1.0, confidence)), 4),
-        sentiment=round(max(0.0, min(1.0, sentiment)), 4),
+        sentiment=(round(max(0.0, min(1.0, sentiment)), 4) if sentiment is not None else None),
+        sentiment_source=sentiment_source,
         model=model_info,
         model_id=response_model_id,
         device=response_device,

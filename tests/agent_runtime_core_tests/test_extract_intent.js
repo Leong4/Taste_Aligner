@@ -70,15 +70,11 @@ async function runAll() {
                     decision_trace: {
                         tes_builder: {
                             rule_id: "tes_builder_v1",
-                            memory_persisted: true,
-                            memory_write_status: "queued",
                         },
                     },
                 },
                 trace: {
                     rule_id: "tes_builder_v1",
-                    memory_persisted: true,
-                    memory_write_status: "queued",
                 },
             }),
         });

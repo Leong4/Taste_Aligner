@@ -160,6 +160,7 @@ const server = http.createServer(async (req, res) => {
             image_original_base64?: string;
             caption?: string;
             city?: string;
+            memory_id?: string;
         } = { text };
         if (typeof body.user_id === "string") {
             orchInput.user_id = body.user_id;
@@ -182,6 +183,9 @@ const server = http.createServer(async (req, res) => {
         }
         if (typeof body.city === "string") {
             orchInput.city = body.city;
+        }
+        if (typeof body.memory_id === "string" && body.memory_id.trim()) {
+            orchInput.memory_id = body.memory_id.trim();
         }
         const result = await orchestrator.runWithTrace(orchInput);
 

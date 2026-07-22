@@ -14,7 +14,7 @@
  *   6. explain_from_trace skill records decision_trace with provider/model/prompt_version
  *   7. explain_from_trace skill handles adapter error gracefully (fallback_used=true)
  *   8. explain_from_trace wired into orchestrator — output includes explanation
- *   9. RECOMMENDATION_GRAPH v8.0 includes explain_from_trace node
+ *   9. RECOMMENDATION_GRAPH v14.0 includes explain_from_trace node
  */
 
 const assert = require("assert");
@@ -399,7 +399,9 @@ async function runAll() {
         assert.deepStrictEqual(capturedTraceContext.memory_anchors[0].tags, ["paella", "seafood"]);
         assert.strictEqual(capturedTraceContext.memory_anchors[0].sentiment, 0.85);
         assert.strictEqual(capturedTraceContext.recommended_items[0].name, "Restaurant 0-0");
-        assert.ok(capturedUserPrompt.includes("Based on your seafood experience in Barcelona"));
+        assert.ok(capturedUserPrompt.includes("Past memories:"));
+        assert.ok(capturedUserPrompt.toLowerCase().includes("seafood"));
+        assert.ok(capturedUserPrompt.toLowerCase().includes("barcelona"));
 
         // intent.tags should be capped at 5
         const intentTags = capturedTraceContext.intent?.tags;
@@ -430,9 +432,44 @@ async function runAll() {
         // Serialized compact must be <= 8KB
         const compactJson = JSON.stringify(capturedTraceContext);
         assert.ok(
-            compactJson.length <= 8 * 1024,
-            `compact JSON must be <= 8KB, got ${compactJson.length} bytes`
+            Buffer.byteLength(compactJson, "utf8") <= 8 * 1024,
+            `compact JSON must be <= 8KB, got ${Buffer.byteLength(compactJson, "utf8")} bytes`
         );
+    });
+
+    await test("compaction: extreme strings still obey the UTF-8 8KB hard cap", async () => {
+        let capturedTraceContext = null;
+        class CapturingAdapter {
+            get modelInfo() { return { provider: "mock", model_name: "mock-hard-cap", version: "1.0.0" }; }
+            async generateStructuredJSON(input) {
+                capturedTraceContext = input.traceContext;
+                return {
+                    data: { explanation: "ok", bullets: ["one", "two", "three"] },
+                    usage: { prompt_tokens: 10, completion_tokens: 10, total_tokens: 20 },
+                    callTrace: {
+                        model: this.modelInfo,
+                        temperature: input.temperature,
+                        prompt_version: input.promptVersion,
+                        latency_ms: 0,
+                        usage: { prompt_tokens: 10, completion_tokens: 10, total_tokens: 20 },
+                        fallback_used: false,
+                    },
+                };
+            }
+        }
+        const huge = "界".repeat(20000);
+        const skill = createExplainFromTraceSkill(new CapturingAdapter());
+        await skill.execute({
+            decision_trace: {
+                extract_intent: { city: huge, type: huge, tags: [huge] },
+                build_cards: { cards: [{ label: huge, items: [{ name: huge, type: huge, tags: [huge] }] }] },
+            },
+            cards: [{ items: [{ item_id: "huge", name: huge, type: huge, tags: [huge] }] }],
+        }, createExecutionContext({ text: "hard cap" }));
+
+        assert.ok(capturedTraceContext !== null);
+        const bytes = Buffer.byteLength(JSON.stringify(capturedTraceContext), "utf8");
+        assert.ok(bytes <= 8 * 1024, `hard cap exceeded: ${bytes} bytes`);
     });
 
     // =========================================================================

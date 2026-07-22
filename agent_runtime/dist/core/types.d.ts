@@ -115,6 +115,8 @@ export interface OrchestratorInput {
     caption?: string;
     /** Optional explicit city from UI upload form. */
     city?: string;
+    /** Stable client-generated ID used to make upload persistence idempotent. */
+    memory_id?: string;
 }
 /** Final output from the orchestrator, returned to the /run endpoint. */
 export interface OrchestratorOutput {
@@ -237,7 +239,9 @@ export interface VisionDescribeDecisionTrace extends Record<string, unknown> {
     tags_count: number;
     cues_count?: number;
     confidence?: number;
+    /** Deprecated compatibility field. Caption sentiment is owned by caption_sentiment. */
     sentiment?: number;
+    sentiment_source?: string;
     latency_ms?: number;
     fallback_used: boolean;
     fallback_reason?: "no_image" | "tool_error" | "invalid_output";
@@ -255,7 +259,9 @@ export interface VisionDescribeOutput {
     cues?: string[];
     tags?: string[];
     confidence?: number;
+    /** Deprecated compatibility field. Caption sentiment is owned by caption_sentiment. */
     sentiment?: number;
+    sentiment_source?: string;
     used: boolean;
     backend?: string;
     model_id?: string | null;
@@ -268,22 +274,44 @@ export interface VisionDescribeOutput {
         vision_describe: VisionDescribeDecisionTrace;
     };
 }
+export type CaptionSentimentSource = "caption_lexicon_v1" | "missing_caption" | "no_sentiment_signal";
+export interface CaptionSentimentInput {
+    caption?: string;
+}
+export interface CaptionSentimentDecisionTrace extends Record<string, unknown> {
+    rule_id: "caption_sentiment_v1";
+    schema_version: "1.0";
+    sentiment: number;
+    confidence: number;
+    available: boolean;
+    source: CaptionSentimentSource;
+    matched_terms: string[];
+    input_summary: {
+        caption_present: boolean;
+        character_count: number;
+        signal_count: number;
+    };
+    fallback_used: boolean;
+    fallback_reason?: "missing_caption" | "no_sentiment_signal";
+}
+export interface CaptionSentimentOutput {
+    sentiment: number;
+    sentiment_scale: "signed_v1";
+    sentiment_confidence: number;
+    sentiment_available: boolean;
+    sentiment_source: CaptionSentimentSource;
+    matched_terms: string[];
+    decision_trace: {
+        caption_sentiment: CaptionSentimentDecisionTrace;
+    };
+}
 /** Input to the tes_builder skill. */
 export interface TesBuilderInput {
     anchor_tags?: string[];
     normalized_tags?: string[];
     /** Vision features from vision_describe for multimodal TES enrichment. */
     vision_features?: string[];
-    /** Raw semantic tags emitted by vision_describe. */
-    vision_tags?: string[];
-    /** Vision type inferred by vision_describe. */
-    vision_type?: "food" | "scenery" | "other" | "unknown" | string;
-    /** Caption sentiment scored by cloud vision, in [0, 1]. */
-    sentiment?: number;
-    /** Optional caption text from UI/upload payload. */
-    caption_text?: string;
     request_ts?: number | string;
-    user_city?: string;
     decision_trace?: Record<string, unknown>;
 }
 /** Decision trace payload for tes_builder. */
@@ -291,9 +319,6 @@ export interface TesBuilderDecisionTrace extends Record<string, unknown> {
     rule_id: "tes_builder_v1";
     schema_version: "1.0";
     request_ts: number;
-    timestamp_source?: "input_timestamp" | "context_request_ts" | "fixed_epoch";
-    sentiment_source?: "vision" | "neutral_default";
-    sentiment_value?: number;
     input_summary: {
         anchor_tag_count: number;
         normalized_tag_count?: number;
@@ -332,6 +357,60 @@ export interface TesBuilderOutput {
     fallback_used: boolean;
     fallback_reason?: "no_tags" | "tool_error" | "invalid_output" | "invalid_vector";
     decision_trace: Record<string, unknown>;
+}
+export type MemoryWriteStatus = "skipped" | "persisted" | "failed";
+export interface PersistMemoryInput {
+    user_id?: string;
+    memory_id?: string;
+    city?: string;
+    caption_text?: string;
+    request_ts?: number | string;
+    image_url?: string;
+    image_base64?: string;
+    image_original_base64?: string;
+    normalized_tags?: string[];
+    vision_tags?: string[];
+    vision_features?: string[];
+    vision_type?: "food" | "scenery" | "other" | "unknown" | string;
+    tes_vector?: number[];
+    tes_dim?: number;
+    tes_normalized?: boolean;
+    tes_fallback_used?: boolean;
+    sentiment?: number;
+    sentiment_confidence?: number;
+    sentiment_available?: boolean;
+    sentiment_source?: CaptionSentimentSource | string;
+}
+export interface PersistMemoryDecisionTrace extends Record<string, unknown> {
+    rule_id: "persist_memory_v1";
+    schema_version: "1.0";
+    status: MemoryWriteStatus;
+    memory_persisted: boolean;
+    memory_id?: string;
+    attempts: number;
+    http_status?: number;
+    latency_ms: number;
+    idempotent_replay?: boolean;
+    sentiment_value: number;
+    sentiment_confidence: number;
+    sentiment_available: boolean;
+    sentiment_source: string;
+    fallback_used: boolean;
+    fallback_reason?: "not_upload_flow" | "invalid_tes" | "write_failed";
+    error_code?: string;
+    error_message?: string;
+}
+export interface PersistMemoryOutput {
+    memory_write_status: MemoryWriteStatus;
+    memory_persisted: boolean;
+    memory_id?: string;
+    attempts: number;
+    http_status?: number;
+    error_code?: string;
+    error_message?: string;
+    decision_trace: {
+        persist_memory: PersistMemoryDecisionTrace;
+    };
 }
 /** Output of the fetch_recommendation skill. */
 export interface FetchRecommendationOutput {
@@ -390,8 +469,16 @@ export interface RerankTesDecisionTrace extends Record<string, unknown> {
         ez_count: number;
     };
     tes_backend?: string;
+    item_scores?: Array<{
+        zone: "cz" | "ez";
+        id: string;
+        base_score: number;
+        tes_sim: number;
+        fused_score: number;
+        tes_applied: boolean;
+    }>;
     fallback_used: boolean;
-    fallback_reason?: "no_user_tes" | "zero_budget" | "no_candidates";
+    fallback_reason?: "no_user_tes" | "zero_budget" | "no_candidates" | "no_item_tes";
     latency_ms?: number;
 }
 /** Output of the rerank skill. */
@@ -595,6 +682,9 @@ export interface MemoryWeightedResult {
     vision_type?: string;
     normalized_tags?: string[];
     sentiment?: number;
+    sentiment_confidence?: number;
+    sentiment_available?: boolean;
+    sentiment_source?: string;
 }
 /** Output of the memory_weight_adjust skill. */
 export interface MemoryWeightAdjustOutput {
@@ -661,13 +751,13 @@ export interface MemoryUnit extends MemoryWeightedResult {
 export interface TopKMemory {
     memory_id: string;
     cosine: number;
-    /** exp(-LAMBDA_TIME * delta_days) — recomputed by build_profile_vector. */
+    /** Time-decay factor passed through from memory.search. */
     w_time: number;
-    /** clamp(1 + ALPHA_SENT * sentiment, 0.5, 2.0) — recomputed by build_profile_vector. */
+    /** Sentiment factor passed through from memory.search (signed sentiment scale). */
     w_sent: number;
     /** Passed through from memory.search. */
     w_context: number;
-    /** cosine * w_time * w_sent * w_context */
+    /** Authoritative weighted score passed through from memory.search. */
     final_weight: number;
 }
 /** Per-memory weight list + aggregate summary. */

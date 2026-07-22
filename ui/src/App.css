@@ -216,6 +216,7 @@ textarea { min-height: 80px; resize: vertical; }
   letter-spacing: 0.04em;
 }
 .badge-green { background: var(--bg-surface-elevated); color: var(--success); }
+.badge-red { background: var(--bg-surface-elevated); color: var(--danger); }
 .badge-yellow { background: var(--bg-surface-elevated); color: var(--accent); }
 .badge-blue { background: var(--bg-surface-elevated); color: var(--accent); }
 .badge-gray { background: var(--bg-surface-elevated); color: var(--text-secondary); }

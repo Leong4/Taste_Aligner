@@ -14,6 +14,14 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+SIGNED_SENTIMENT_SCALE = "signed_v1"
+LEGACY_ZERO_ONE_SENTIMENT_SOURCES = (
+    "upload",
+    "audit",
+    "audit_seed",
+    "audit_embedding_unify",
+)
+
 # Database file path
 DB_PATH = Path(__file__).parent / "memory.db"
 
@@ -35,6 +43,10 @@ def init_database():
             normalized_tags TEXT,
             taxonomy TEXT,
             sentiment REAL,
+            sentiment_scale TEXT NOT NULL DEFAULT 'signed_v1',
+            sentiment_source TEXT NOT NULL DEFAULT 'explicit_api',
+            sentiment_confidence REAL NOT NULL DEFAULT 1.0,
+            sentiment_available INTEGER NOT NULL DEFAULT 1,
             embedding TEXT NOT NULL,
             source TEXT,
             image_path TEXT,
@@ -61,10 +73,55 @@ def init_database():
         ("image_preview_path", "TEXT"),
         ("image_thumbnail_path", "TEXT"),
         ("image_vision_input_path", "TEXT"),
+        ("sentiment_scale", "TEXT"),
+        ("sentiment_source", "TEXT"),
+        ("sentiment_confidence", "REAL"),
+        ("sentiment_available", "INTEGER"),
     ]
     for col_name, col_type in alter_columns:
         if col_name not in existing_cols:
             cursor.execute(f"ALTER TABLE p5_memories ADD COLUMN {col_name} {col_type}")
+
+    # Rows produced by the legacy vision upload chain stored [0, 1] values even
+    # though memory.search has always consumed signed [-1, 1] sentiment. The
+    # per-row scale marker makes this migration safe and idempotent: new signed
+    # writes are never converted again on a later startup.
+    source_placeholders = ", ".join("?" for _ in LEGACY_ZERO_ONE_SENTIMENT_SOURCES)
+    cursor.execute(
+        f"""
+        UPDATE p5_memories
+        SET sentiment = ROUND(2.0 * sentiment - 1.0, 4),
+            sentiment_scale = ?
+        WHERE sentiment_scale IS NULL
+          AND source IN ({source_placeholders})
+          AND sentiment BETWEEN 0.0 AND 1.0
+        """,
+        (SIGNED_SENTIMENT_SCALE, *LEGACY_ZERO_ONE_SENTIMENT_SOURCES),
+    )
+    migrated_sentiment_rows = cursor.rowcount
+
+    # Other legacy rows were written through the documented signed API. Mark
+    # their existing values without transforming the overlapping positive range.
+    cursor.execute(
+        """
+        UPDATE p5_memories
+        SET sentiment_scale = ?
+        WHERE sentiment_scale IS NULL
+        """,
+        (SIGNED_SENTIMENT_SCALE,),
+    )
+
+    # Provenance columns were introduced after the original sentiment field.
+    # Existing rows cannot prove that their value came from caption analysis,
+    # so mark them unavailable instead of mislabelling them as measured neutral.
+    cursor.execute(
+        """
+        UPDATE p5_memories
+        SET sentiment_source = COALESCE(sentiment_source, 'legacy_unknown'),
+            sentiment_confidence = COALESCE(sentiment_confidence, 0.0),
+            sentiment_available = COALESCE(sentiment_available, 0)
+        """
+    )
 
     # Create index for user_id for faster queries
     cursor.execute("""
@@ -75,6 +132,11 @@ def init_database():
     conn.close()
 
     logger.info(f"Database initialized at {DB_PATH}")
+    if migrated_sentiment_rows:
+        logger.info(
+            "Migrated %s legacy [0, 1] sentiment rows to signed [-1, 1]",
+            migrated_sentiment_rows,
+        )
 
 
 def write_memory(memory: Dict[str, Any]) -> Dict[str, Any]:
@@ -105,10 +167,11 @@ def write_memory(memory: Dict[str, Any]) -> Dict[str, Any]:
             INSERT INTO p5_memories (
                 memory_id, user_id, timestamp, city,
                 raw_tags, normalized_tags, taxonomy,
-                sentiment, embedding, source,
+                sentiment, sentiment_scale, sentiment_source,
+                sentiment_confidence, sentiment_available, embedding, source,
                 image_path, thumbnail_path, caption_text, vision_type,
                 image_original_path, image_preview_path, image_thumbnail_path, image_vision_input_path
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             memory["memory_id"],
             memory.get("user_id", ""),
@@ -118,6 +181,10 @@ def write_memory(memory: Dict[str, Any]) -> Dict[str, Any]:
             normalized_tags_json,
             taxonomy_json,
             memory.get("sentiment", 0.0),
+            memory.get("sentiment_scale", SIGNED_SENTIMENT_SCALE) or SIGNED_SENTIMENT_SCALE,
+            memory.get("sentiment_source", "explicit_api") or "explicit_api",
+            memory.get("sentiment_confidence", 1.0),
+            1 if memory.get("sentiment_available", True) else 0,
             embedding_json,
             memory.get("source", "unknown"),
             memory.get("image_path", ""),
@@ -139,8 +206,22 @@ def write_memory(memory: Dict[str, Any]) -> Dict[str, Any]:
             "written": memory
         }
 
-    except sqlite3.IntegrityError as e:
-        logger.error(f"Memory already exists: {memory['memory_id']}")
+    except sqlite3.IntegrityError:
+        conn.rollback()
+        cursor.execute(
+            "SELECT user_id FROM p5_memories WHERE memory_id = ?",
+            (memory["memory_id"],),
+        )
+        existing = cursor.fetchone()
+        if existing and existing[0] == memory.get("user_id", ""):
+            logger.info("Idempotent replay for memory: %s", memory["memory_id"])
+            return {
+                "ok": True,
+                "memory_id": memory["memory_id"],
+                "written": memory,
+                "idempotent_replay": True,
+            }
+        logger.error(f"Memory ID collision: {memory['memory_id']}")
         raise ValueError(f"Memory with id {memory['memory_id']} already exists")
     except Exception as e:
         logger.error(f"Error writing memory: {e}")

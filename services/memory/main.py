@@ -8,7 +8,7 @@ v1: SQLite + cosine similarity + minimal P4 weighting
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field, validator
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Literal
 import uvicorn
 import logging
 import math
@@ -21,6 +21,7 @@ import re
 
 from .db import init_database, write_memory, read_memory, delete_memory, load_user_memories, get_database_stats, delete_all_memories
 from .search import search_memories
+from .atlas import build_atlas_summary
 
 try:
     from PIL import Image  # type: ignore
@@ -222,7 +223,11 @@ class WriteData(BaseModel):
     raw_tags: Optional[List[str]] = None
     normalized_tags: Optional[List[str]] = None
     taxonomy: Optional[Dict[str, Any]] = None
-    sentiment: Optional[float] = 0.0
+    sentiment: float = 0.0
+    sentiment_scale: Literal["signed_v1"] = "signed_v1"
+    sentiment_source: str = "explicit_api"
+    sentiment_confidence: float = 1.0
+    sentiment_available: bool = True
     embedding: List[float]
     source: Optional[str] = "unknown"
     memory_id: Optional[str] = None
@@ -239,6 +244,19 @@ class WriteData(BaseModel):
     image_vision_input_base64: Optional[str] = None
     image_url: Optional[str] = None
 
+    @validator('sentiment', pre=True, always=True)
+    def validate_sentiment(cls, v):
+        if v is None:
+            return 0.0
+        if isinstance(v, bool) or not isinstance(v, (int, float)):
+            raise ValueError("sentiment must be a finite number in [-1, 1]")
+        value = float(v)
+        if not math.isfinite(value):
+            raise ValueError("sentiment must be a finite number in [-1, 1]")
+        if not -1.0 <= value <= 1.0:
+            raise ValueError("sentiment must be in [-1, 1]")
+        return value
+
     @validator('embedding')
     def validate_embedding(cls, v):
         if len(v) != 512:
@@ -250,6 +268,31 @@ class WriteData(BaseModel):
             raise ValueError(f"Embedding must be L2 normalized (norm ≈ 1.0), got {norm:.4f}")
 
         return v
+
+    @validator('sentiment_confidence')
+    def validate_sentiment_confidence(cls, v):
+        if isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(float(v)):
+            raise ValueError("sentiment_confidence must be a finite number in [0, 1]")
+        value = float(v)
+        if not 0.0 <= value <= 1.0:
+            raise ValueError("sentiment_confidence must be in [0, 1]")
+        return value
+
+    @validator('sentiment_source')
+    def validate_sentiment_source(cls, v):
+        value = str(v or "").strip()
+        if not value or len(value) > 64 or not re.fullmatch(r"[a-zA-Z0-9._-]+", value):
+            raise ValueError("sentiment_source must be a non-empty safe identifier")
+        return value
+
+    @validator('memory_id')
+    def validate_memory_id(cls, v):
+        if v is None:
+            return v
+        value = str(v).strip()
+        if not re.fullmatch(r"[a-zA-Z0-9._-]{1,128}", value):
+            raise ValueError("memory_id contains unsupported characters")
+        return value
 
 
 class WritePayload(BaseModel):
@@ -293,6 +336,13 @@ async def health_check():
     }
 
 
+@app.get("/atlas/summary")
+async def atlas_summary_endpoint(user_id: str = Query(..., min_length=1)):
+    """Return a complete, relevance-independent Atlas aggregation for one user."""
+    memories = load_user_memories(user_id)
+    return build_atlas_summary(user_id, memories)
+
+
 @app.post("/write")
 async def write_endpoint(payload: WritePayload):
     """
@@ -308,6 +358,10 @@ async def write_endpoint(payload: WritePayload):
                 "normalized_tags": ["ramen", ...],     // optional
                 "taxonomy": {...},                     // optional
                 "sentiment": 0.8,                      // optional, range [-1, 1]
+                "sentiment_scale": "signed_v1",       // optional, canonical scale marker
+                "sentiment_source": "caption_lexicon_v1",
+                "sentiment_confidence": 0.9,           // optional, range [0, 1]
+                "sentiment_available": true,           // false means not analysed
                 "embedding": [512 floats],             // REQUIRED, L2 normalized
                 "source": "embedding_v1",              // optional
                 "memory_id": "..."                     // optional, auto-generated if missing
@@ -320,12 +374,27 @@ async def write_endpoint(payload: WritePayload):
             "memory_id": "...",
             "written": {...}
         }
+
+    Repeating the same memory_id for the same user is idempotent and returns
+    idempotent_replay=true. A different-user collision returns HTTP 409.
     """
     logger.info(f"POST /write - user_id: {payload.data.user_id}")
 
     try:
         # Convert Pydantic model to dict
         memory_data = payload.data.dict()
+        requested_memory_id = memory_data.get("memory_id")
+        if requested_memory_id:
+            existing = read_memory(str(requested_memory_id))
+            if existing is not None:
+                if existing.get("user_id") != memory_data.get("user_id"):
+                    raise HTTPException(status_code=409, detail="memory_id belongs to another user")
+                return {
+                    "ok": True,
+                    "memory_id": requested_memory_id,
+                    "written": existing,
+                    "idempotent_replay": True,
+                }
         _save_image_assets(memory_data)
         memory_data.pop("image_url", None)
 
@@ -335,6 +404,8 @@ async def write_endpoint(payload: WritePayload):
         logger.info(f"Memory written: {result['memory_id']}")
         return result
 
+    except HTTPException:
+        raise
     except ValueError as e:
         logger.error(f"Validation error: {e}")
         raise HTTPException(status_code=422, detail=str(e))

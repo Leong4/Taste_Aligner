@@ -45,11 +45,15 @@ function createOrchestrator(config = {}) {
     registry.register(skills_1.decideTagBudgetSkill);
     registry.register((0, skills_1.createTagExpandSkill)(llmAdapter));
     registry.register((0, skills_1.createTagNormalizeSkill)(toolClient));
+    // Registered only for callers/tests that still address the legacy skill by
+    // name. RECOMMENDATION_GRAPH v13 does not contain a memory_signal node.
     registry.register((0, skills_1.createMemorySignalSkill)(toolClient));
     registry.register((0, skills_1.createMemoryWeightAdjustSkill)(toolClient));
     registry.register((0, skills_1.createBuildProfileVectorSkill)()); // no tool client needed — pure computation
     registry.register((0, skills_1.createVisionDescribeSkill)(toolClient));
+    registry.register(skills_1.captionSentimentSkill);
     registry.register((0, skills_1.createTesBuilderSkill)(toolClient));
+    registry.register((0, skills_1.createPersistMemorySkill)());
     registry.register((0, skills_1.createFetchRecommendationSkill)(toolClient));
     registry.register((0, skills_1.createRerankSkill)(toolClient));
     registry.register(skills_1.mixPolicySkill);

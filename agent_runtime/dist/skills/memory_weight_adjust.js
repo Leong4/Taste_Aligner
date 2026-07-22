@@ -256,6 +256,18 @@ function mapResult(raw) {
     if (raw.sentiment != null) {
         result.sentiment = round6(Number(raw.sentiment) || 0);
     }
+    if (raw.sentiment_confidence != null) {
+        result.sentiment_confidence = round6(Number(raw.sentiment_confidence) || 0);
+    }
+    if (typeof raw.sentiment_available === "boolean") {
+        result.sentiment_available = raw.sentiment_available;
+    }
+    else if (raw.sentiment_available === 0 || raw.sentiment_available === 1) {
+        result.sentiment_available = raw.sentiment_available === 1;
+    }
+    if (typeof raw.sentiment_source === "string") {
+        result.sentiment_source = raw.sentiment_source;
+    }
     return result;
 }
 // ---------------------------------------------------------------------------
@@ -287,7 +299,7 @@ function createMemoryWeightAdjustSkill(toolClient) {
             // Fallback: no tags
             if (tags.length === 0) {
                 const fallback = buildFallback("no_tags", 0, topK, userId, city, nowTsPresent, memoryPool);
-                applyQueryEmbeddingTraceFields(fallback.trace, false, 0, "tags_only_fallback");
+                applyQueryEmbeddingTraceFields(fallback.output.decision_trace.memory_weight_adjust, false, 0, "tags_only_fallback");
                 return fallback;
             }
             if (generalQuery) {
@@ -361,26 +373,26 @@ function createMemoryWeightAdjustSkill(toolClient) {
             catch (error) {
                 const message = error instanceof Error ? error.message : String(error);
                 const fallback = buildFallback("tool_error", tags.length, topK, userId, city, nowTsPresent, memoryPool, Date.now() - startedAt, message);
-                applyQueryEmbeddingTraceFields(fallback.trace, queryEmbeddingUsed, tags.length, memorySearchMode, queryEmbeddingResult.fallbackReason);
+                applyQueryEmbeddingTraceFields(fallback.output.decision_trace.memory_weight_adjust, queryEmbeddingUsed, tags.length, memorySearchMode, queryEmbeddingResult.fallbackReason);
                 return fallback;
             }
             const latencyMs = observation.latency_ms ?? (Date.now() - startedAt);
             if (!observation.ok) {
                 const fallback = buildFallback("tool_error", tags.length, topK, userId, city, nowTsPresent, memoryPool, latencyMs, observation.error?.message ?? "gateway_call_failed");
-                applyQueryEmbeddingTraceFields(fallback.trace, queryEmbeddingUsed, tags.length, memorySearchMode, queryEmbeddingResult.fallbackReason);
+                applyQueryEmbeddingTraceFields(fallback.output.decision_trace.memory_weight_adjust, queryEmbeddingUsed, tags.length, memorySearchMode, queryEmbeddingResult.fallbackReason);
                 return fallback;
             }
             // Validate output shape
             const outputObj = asObject(observation.output);
             if (!outputObj) {
                 const fallback = buildFallback("invalid_output", tags.length, topK, userId, city, nowTsPresent, memoryPool, latencyMs, "output_not_object");
-                applyQueryEmbeddingTraceFields(fallback.trace, queryEmbeddingUsed, tags.length, memorySearchMode, queryEmbeddingResult.fallbackReason);
+                applyQueryEmbeddingTraceFields(fallback.output.decision_trace.memory_weight_adjust, queryEmbeddingUsed, tags.length, memorySearchMode, queryEmbeddingResult.fallbackReason);
                 return fallback;
             }
             const initialRawResults = outputObj.results;
             if (!Array.isArray(initialRawResults)) {
                 const fallback = buildFallback("invalid_output", tags.length, topK, userId, city, nowTsPresent, memoryPool, latencyMs, "results_not_array");
-                applyQueryEmbeddingTraceFields(fallback.trace, queryEmbeddingUsed, tags.length, memorySearchMode, queryEmbeddingResult.fallbackReason);
+                applyQueryEmbeddingTraceFields(fallback.output.decision_trace.memory_weight_adjust, queryEmbeddingUsed, tags.length, memorySearchMode, queryEmbeddingResult.fallbackReason);
                 return fallback;
             }
             let rawResults = initialRawResults;
@@ -408,7 +420,7 @@ function createMemoryWeightAdjustSkill(toolClient) {
             }
             if (rawResults.length === 0) {
                 const fallback = buildFallback("empty_results", tags.length, topK, userId, city, nowTsPresent, memoryPool, latencyMs);
-                applyQueryEmbeddingTraceFields(fallback.trace, queryEmbeddingUsed, tags.length, memorySearchMode, queryEmbeddingResult.fallbackReason);
+                applyQueryEmbeddingTraceFields(fallback.output.decision_trace.memory_weight_adjust, queryEmbeddingUsed, tags.length, memorySearchMode, queryEmbeddingResult.fallbackReason);
                 return fallback;
             }
             // Sort deterministically: score desc, then memory_id asc

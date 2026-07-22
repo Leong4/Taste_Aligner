@@ -158,8 +158,8 @@ function fail(message, extra) {
     process.exit(1);
 }
 
-function getTesBuilderTrace(resp) {
-    return resp && resp.body && resp.body.decision_trace && resp.body.decision_trace.tes_builder;
+function getPersistMemoryTrace(resp) {
+    return resp && resp.body && resp.body.decision_trace && resp.body.decision_trace.persist_memory;
 }
 
 function getProfileNode(resp) {
@@ -368,62 +368,23 @@ function delay(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function waitForMemoryVisible(uploadStartMs, queryTags, city) {
-    const timeoutMs = 5000;
-    const pollMs = 250;
-    const deadline = Date.now() + timeoutMs;
-    let lastResults = [];
-    while (Date.now() < deadline) {
-        lastResults = await searchMemoryDirect(queryTags, city);
-        const visible = [];
-        for (const row of lastResults) {
-            if (!row || typeof row !== "object" || typeof row.memory_id !== "string") continue;
-            const memory = await readMemoryDirect(row.memory_id);
-            if (!memory || memory.user_id !== STEP5_USER_ID || memory.source !== "upload") continue;
-            const timestampMs = parseIsoMs(memory.timestamp);
-            if (timestampMs === null || timestampMs < uploadStartMs - 5000) continue;
-            visible.push({
-                memory_id: memory.memory_id,
-                timestamp: memory.timestamp,
-                source: memory.source,
-                city: memory.city || null,
-            });
-        }
-        if (visible.length > 0) {
-            visible.sort((a, b) => {
-                const aTs = parseIsoMs(a.timestamp) || 0;
-                const bTs = parseIsoMs(b.timestamp) || 0;
-                if (bTs !== aTs) return bTs - aTs;
-                return String(a.memory_id).localeCompare(String(b.memory_id));
-            });
-            return visible;
-        }
-        await delay(pollMs);
-    }
-    fail("upload queued but memory not visible in memory.search within timeout", {
-        user_id: STEP5_USER_ID,
-        query_tags: queryTags,
-        city,
-        last_results_preview: lastResults.slice(0, 3),
-    });
-}
-
 async function uploadOne(runUrl, filePath, index) {
-    const uploadStartMs = Date.now();
+    const requestedMemoryId = `step5_${Date.now()}_${index + 1}`;
     const caption = readCaptionForImage(filePath, index);
     const resp = await postJson(runUrl, {
         text: `${UPLOAD_TEXT_PREFIX} [${index + 1}] ${path.basename(filePath)}`,
         caption,
         city: STEP5_CITY,
         user_id: STEP5_USER_ID,
+        memory_id: requestedMemoryId,
         image_base64: toDataUrl(filePath),
     });
     if (resp.status !== 200) {
         fail(`upload /run returned ${resp.status}`, { filePath, bodyPreview: String(resp.raw).slice(0, 500) });
     }
-    const tesBuilder = getTesBuilderTrace(resp);
-    if (!tesBuilder || typeof tesBuilder !== "object") {
-        fail("missing decision_trace.tes_builder on upload call", { filePath, bodyPreview: String(resp.raw).slice(0, 500) });
+    const persistMemory = getPersistMemoryTrace(resp);
+    if (!persistMemory || typeof persistMemory !== "object") {
+        fail("missing decision_trace.persist_memory on upload call", { filePath, bodyPreview: String(resp.raw).slice(0, 500) });
     }
     const extractIntent = resp.body && resp.body.decision_trace && resp.body.decision_trace.extract_intent;
     if (!extractIntent || typeof extractIntent !== "object") {
@@ -439,18 +400,27 @@ async function uploadOne(runUrl, filePath, index) {
             : false,
         false
     );
-    if (tesBuilder.memory_persisted === true) {
-        assert.strictEqual(tesBuilder.memory_write_status, "queued");
-        console.log("[step5] upload queued: memory_persisted=true memory_write_status=queued");
-    } else {
-        console.log(
-            `[step5] upload warning: tes_builder reached but memory write not queued ` +
-            `(fallback_reason=${tesBuilder.fallback_reason || "n/a"})`
-        );
+    if (persistMemory.status !== "persisted" || persistMemory.memory_persisted !== true) {
+        fail("upload analysis completed but persistence was not confirmed", {
+            status: persistMemory.status,
+            error_code: persistMemory.error_code,
+            error_message: persistMemory.error_message,
+        });
     }
+    assert.strictEqual(persistMemory.memory_id, requestedMemoryId);
+    console.log(`[step5] upload persisted: memory_id=${persistMemory.memory_id} attempts=${persistMemory.attempts}`);
     const queryTags = extractQueryTagsFromUpload(resp);
     const city = extractCityFromUpload(resp);
-    const visible = await waitForMemoryVisible(uploadStartMs, queryTags, city);
+    const persisted = await readMemoryDirect(persistMemory.memory_id);
+    if (!persisted || persisted.user_id !== STEP5_USER_ID || persisted.source !== "upload") {
+        fail("confirmed memory_id could not be read back", { memory_id: persistMemory.memory_id });
+    }
+    const visible = [{
+        memory_id: persisted.memory_id,
+        timestamp: persisted.timestamp,
+        source: persisted.source,
+        city: persisted.city || null,
+    }];
     console.log("[step5] upload visible:");
     for (const memory of visible.slice(0, 2)) {
         const fileUrl = new URL(`/files/${encodeURIComponent(memory.memory_id)}`, MEMORY_BASE_URL).toString();

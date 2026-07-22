@@ -222,7 +222,7 @@ curl -s http://localhost:5004/health | python3 -m json.tool
 # Build a TES vector (st_v1 path)
 curl -s -X POST http://localhost:5004/tes/build \
   -H 'Content-Type: application/json' \
-  -d '{"tags":["ramen","casual"],"vision_features":["outdoor"],"sentiment":0.5,"recency_days":3,"location":"tokyo","normalize":true}' \
+  -d '{"tags":["ramen","casual"],"vision_features":["outdoor"],"normalize":true}' \
   | python3 -m json.tool
 
 # Score recommendations via gateway

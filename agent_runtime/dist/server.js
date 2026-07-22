@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const node_http_1 = __importDefault(require("node:http"));
 const bootstrap_1 = require("./core/bootstrap");
+const llm_1 = require("./llm");
 const PORT = Number(process.env.PORT ?? process.env.AGENT_SERVER_PORT ?? 8787);
 const gatewayBaseUrl = process.env.GATEWAY_BASE_URL ?? "http://localhost:8080";
 const timeoutMs = process.env.GATEWAY_TIMEOUT_MS
@@ -24,6 +25,19 @@ const orchestrator = (0, bootstrap_1.createOrchestrator)({
     timeoutMs,
     logPayload: true,
 });
+const geocodeApiKey = process.env.LLM_API_KEY;
+const geocodeAdapterOptions = geocodeApiKey
+    ? {
+        apiKey: geocodeApiKey,
+        model: process.env.LLM_GEOCODE_MODEL ?? "gpt-4o",
+    }
+    : null;
+if (geocodeAdapterOptions && process.env.LLM_BASE_URL) {
+    Object.assign(geocodeAdapterOptions, { baseUrl: process.env.LLM_BASE_URL });
+}
+const geocodeAdapter = geocodeAdapterOptions
+    ? new llm_1.OpenAICompatAdapter(geocodeAdapterOptions)
+    : null;
 function sendJson(res, status, body) {
     const payload = JSON.stringify(body);
     res.writeHead(status, {
@@ -64,6 +78,56 @@ const server = node_http_1.default.createServer(async (req, res) => {
         res.end();
         return;
     }
+    if (req.method === "POST" && req.url === "/geocode/uk-location") {
+        try {
+            const body = await readJson(req);
+            const city = typeof body.city === "string" ? body.city.trim() : "";
+            const validLocations = Array.isArray(body.valid_locations)
+                ? body.valid_locations.filter((value) => typeof value === "string")
+                : [];
+            if (!city) {
+                sendJson(res, 400, { error: "city_required" });
+                return;
+            }
+            if (!geocodeAdapter) {
+                sendJson(res, 503, { error: "llm_not_configured" });
+                return;
+            }
+            const result = await geocodeAdapter.generateStructuredJSON({
+                systemPrompt: "You resolve UK city names to exact local-authority names. " +
+                    "Return JSON with exactly one key named location. " +
+                    "The value must be one exact case-sensitive string from the supplied valid locations, or null.",
+                userPrompt: `Given the city name '${city}', return the exact UK county or unitary authority name ` +
+                    "as it appears in the ONS GeoJSON data. Return only the matching name string in the " +
+                    "location field, nothing else. If the city is not in the UK, return null.\n\n" +
+                    `Valid locations:\n${validLocations.join("\n")}`,
+                schema: {
+                    type: "object",
+                    properties: {
+                        location: { type: ["string", "null"] },
+                    },
+                    required: ["location"],
+                    additionalProperties: false,
+                },
+                temperature: 0,
+                promptVersion: "uk_location_geocode_v1",
+                traceContext: { city },
+            });
+            const location = typeof result.data?.location === "string"
+                ? result.data.location
+                : null;
+            if (location !== null && !validLocations.includes(location)) {
+                console.warn(`[geocode] No exact UK LAD match for city="${city}": "${location}"`);
+                sendJson(res, 200, { location: null });
+                return;
+            }
+            sendJson(res, 200, { location });
+        }
+        catch (err) {
+            sendJson(res, 500, { error: "geocode_failed", message: err?.message ?? "unknown" });
+        }
+        return;
+    }
     if (req.method !== "POST" || req.url !== "/run") {
         sendJson(res, 404, { error: "not_found" });
         return;
@@ -97,6 +161,9 @@ const server = node_http_1.default.createServer(async (req, res) => {
         }
         if (typeof body.city === "string") {
             orchInput.city = body.city;
+        }
+        if (typeof body.memory_id === "string" && body.memory_id.trim()) {
+            orchInput.memory_id = body.memory_id.trim();
         }
         const result = await orchestrator.runWithTrace(orchInput);
         // Build response maintaining backward compatibility with the

@@ -234,7 +234,11 @@ export function createVisionDescribeSkill(
             const sentiment =
                 typeof rawSentiment === "number" && Number.isFinite(rawSentiment)
                     ? Math.max(0, Math.min(1, rawSentiment))
-                    : 0.5;
+                    : undefined;
+            const sentimentSource =
+                typeof payload.sentiment_source === "string" && payload.sentiment_source.trim()
+                    ? payload.sentiment_source.trim()
+                    : undefined;
 
             const trace = buildTrace(
                 true, backend, modelId, device, visionType,
@@ -258,7 +262,11 @@ export function createVisionDescribeSkill(
             if (device !== undefined) output.device = device;
             if (visionType !== undefined) output.vision_type = visionType;
             if (confidence !== undefined) output.confidence = confidence;
-            output.sentiment = sentiment;
+            if (sentiment !== undefined) output.sentiment = sentiment;
+            if (sentimentSource !== undefined) {
+                output.sentiment_source = sentimentSource;
+                trace.sentiment_source = sentimentSource;
+            }
 
             return {
                 output,

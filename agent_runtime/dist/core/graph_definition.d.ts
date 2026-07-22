@@ -31,7 +31,22 @@
  *             │
  *             ▼
  *   ┌─────────────────────┐
+ *   │   vision_describe    │  → semantic image features
+ *   └─────────┬────────────┘
+ *             │
+ *             ▼
+ *   ┌─────────────────────┐
+ *   │ caption_sentiment    │  → signed value + confidence + provenance
+ *   └─────────┬────────────┘
+ *             │
+ *             ▼
+ *   ┌─────────────────────┐
  *   │    tes_builder       │  → tes_vector (512)
+ *   └─────────┬────────────┘
+ *             │
+ *             ▼
+ *   ┌─────────────────────┐
+ *   │   persist_memory     │  → skipped | persisted | failed
  *   └─────────┬────────────┘
  *             │
  *             ▼
@@ -66,13 +81,19 @@
  */
 import { GraphDefinition } from "./types";
 /**
- * The default recommendation pipeline graph (v8.0).
+ * The default recommendation pipeline graph (v14.0).
+ *
+ * v14.0 changes from v13.0:
+ *   - Added caption_sentiment as the canonical signed sentiment source.
+ *   - Added persist_memory as a confirmed, idempotent upload write step.
+ *   - Removed memory persistence and sentiment conversion from tes_builder.
+ *   - Graph version bumped to 14.0.0.
  *
  * v13.0 changes from v12.0:
  *   - Added build_profile_vector node (Node 6) between memory_weight_adjust
- *     and vision_describe.  Single authoritative source for P4 dynamic
- *     weighting: computes final_weight = cosine * w_time * w_sent * w_context
- *     per memory and writes decision_trace.profile_vector_node.
+ *     and vision_describe. It consumes the authoritative weights calculated by
+ *     memory.search/memory_weight_adjust and writes
+ *     decision_trace.profile_vector_node.
  *   - explain_from_trace now reads profile_vector_node from the trace.
  *   - Graph version bumped to 13.0.0.
  *

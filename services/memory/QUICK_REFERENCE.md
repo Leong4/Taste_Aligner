@@ -18,9 +18,15 @@ w_time = exp(-0.03 × Δdays)
 
 ### v1.2 - Sentiment Weight (w_sent)
 ```python
-w_sent = 1 + 0.5 × sentiment
+w_sent = 1 + 0.5 × sentiment × sentiment_confidence
 # Clamped to [0.5, 1.5]
 ```
+Memory persists canonical signed sentiment in `[-1, 1]` with
+`sentiment_scale="signed_v1"`: `-1` is very negative, `0` is neutral, and `1`
+is very positive. Caption analysis writes `sentiment_source`,
+`sentiment_confidence`, and `sentiment_available`. Missing or unavailable
+analysis always uses `w_sent=1.0` and is not represented as measured neutral.
+
 - Positive (+0.8): 1.4
 - Neutral (0.0): 1.0
 - Negative (-0.5): 0.75
@@ -78,9 +84,16 @@ Each search result includes full explainability:
   "timestamp": "2026-01-30T00:00:00Z",
   "city": "tokyo",
   "normalized_tags": ["ramen"],
-  "sentiment": 0.8
+  "sentiment": 0.8,
+  "sentiment_confidence": 0.9,
+  "sentiment_available": true,
+  "sentiment_source": "caption_lexicon_v1"
 }
 ```
+
+`POST /write` is idempotent when the caller supplies `memory_id`: a repeat by
+the same user returns HTTP 200 with `idempotent_replay=true`; a different-user
+collision returns HTTP 409.
 
 ## Files Modified
 

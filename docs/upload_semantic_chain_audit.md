@@ -1,5 +1,9 @@
 # Upload Semantic Chain Audit
 
+> Historical audit note: the fire-and-forget findings below were resolved by
+> Graph v14. `caption_sentiment` now owns signed sentiment provenance and
+> `persist_memory` waits for a confirmed, idempotent Memory Service response.
+
 ## 1 Vision Backend
 
 ### 1.1 当前实际 backend

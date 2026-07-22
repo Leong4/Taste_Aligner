@@ -163,6 +163,8 @@ async function runAll() {
         assert.strictEqual(result.output.model_id, "ViT-B-32/openai");
         assert.strictEqual(result.output.device, "cpu");
         assert.strictEqual(result.output.latency_ms, 42);
+        assert.strictEqual(result.output.sentiment, undefined,
+            "clip_v1 must not fabricate sentiment=0.5 when no score was produced");
 
         const trace = result.output.decision_trace.vision_describe;
         assert.strictEqual(trace.rule_id, "vision_describe_v1");
@@ -171,6 +173,7 @@ async function runAll() {
         assert.strictEqual(trace.fallback_used, false);
         assert.strictEqual(trace.tags_count, 3);
         assert.strictEqual(trace.backend, "clip_v1");
+        assert.strictEqual(trace.sentiment, undefined);
         assert.strictEqual(trace.input_summary.has_url, true);
         assert.strictEqual(trace.input_summary.has_base64, false);
     });

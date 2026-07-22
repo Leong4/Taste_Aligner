@@ -368,6 +368,7 @@ async function runAll() {
         path.join(__dirname, "test_build_profile_vector.js"),
         path.join(__dirname, "test_tes_builder.js"),
         path.join(__dirname, "test_vision_describe.js"),
+        path.join(__dirname, "test_caption_sentiment.js"),
         path.join(__dirname, "test_fetch_recommendation.js"),
         path.join(__dirname, "test_rerank_tes.js"),
         path.join(__dirname, "test_tag_expand.js"),

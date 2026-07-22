@@ -5,14 +5,8 @@
  * Calls embedding service TES endpoint through gateway tool routing and
  * returns a validated 512-dim TES vector with deterministic guards.
  */
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createTesBuilderSkill = createTesBuilderSkill;
-const http_1 = __importDefault(require("http"));
-const https_1 = __importDefault(require("https"));
-const url_1 = require("url");
 const trace_manager_1 = require("../core/trace_manager");
 const RULE_ID = "tes_builder_v1";
 const SCHEMA_VERSION = "1.0";
@@ -62,42 +56,8 @@ function resolveRequestTs(value, context) {
     }
     return context.request_ts;
 }
-function resolveMemoryWriteTimestamp(context) {
-    const input = context.input;
-    if (typeof input.timestamp === "string" && input.timestamp.trim().length > 0) {
-        return { timestamp: input.timestamp.trim(), source: "input_timestamp" };
-    }
-    if (typeof context.request_ts === "number" && Number.isFinite(context.request_ts)) {
-        return {
-            timestamp: new Date(Math.trunc(context.request_ts)).toISOString(),
-            source: "context_request_ts",
-        };
-    }
-    return { timestamp: "1970-01-01T00:00:00Z", source: "fixed_epoch" };
-}
 function createZeroVector() {
     return Array.from({ length: DIM_EXPECTED }, () => 0);
-}
-function resolveVisionSentiment(value) {
-    if (typeof value !== "number" || !Number.isFinite(value)) {
-        return { value: 0.5, source: "neutral_default" };
-    }
-    return {
-        value: Number(Math.max(0, Math.min(1, value)).toFixed(4)),
-        source: "vision",
-    };
-}
-function extractCaptionText(input, context) {
-    if (typeof input.caption_text === "string" && input.caption_text.trim()) {
-        return input.caption_text.trim();
-    }
-    if (typeof context.input.caption === "string" && context.input.caption.trim()) {
-        return context.input.caption.trim();
-    }
-    if (typeof context.input.text === "string" && context.input.text.trim()) {
-        return context.input.text.trim();
-    }
-    return "";
 }
 function computeNorm(vector) {
     if (!Array.isArray(vector) || vector.length === 0) {
@@ -111,29 +71,6 @@ function computeNorm(vector) {
         sum += v * v;
     }
     return Math.sqrt(sum);
-}
-function hasUploadImageSignal(context) {
-    const root = context;
-    const input = context.input;
-    return !!(root.image ||
-        input?.image ||
-        (typeof input?.image_url === "string" && input.image_url.trim()) ||
-        (typeof input?.image_original_base64 === "string" && input.image_original_base64.trim()) ||
-        (typeof input?.image_base64 === "string" && input.image_base64.trim()));
-}
-function normalizeDataUrl(value, defaultMime) {
-    if (typeof value !== "string") {
-        return "";
-    }
-    const trimmed = value.trim();
-    if (!trimmed) {
-        return "";
-    }
-    if (/^data:image\/[a-z0-9.+-]+;base64,/i.test(trimmed)) {
-        return trimmed;
-    }
-    // Accept raw base64 payloads from test or non-UI callers.
-    return `data:${defaultMime};base64,${trimmed}`;
 }
 function buildTrace(requestTs, usedTags, anchorTagCount, normalizedTagCount, visionFeaturesCount, tagSource, latencyMs, vectorChecks, fallbackUsed, fallbackReason, errorMessage, backend, tesVersion, modelId, device) {
     const trace = {
@@ -198,69 +135,15 @@ function buildFallbackOutput(reason, requestTs, inputTags, anchorTagCount, norma
     return { output, trace: traceNode };
 }
 // ---------------------------------------------------------------------------
-// Memory write side effect — fire-and-resolve, never throws
-// ---------------------------------------------------------------------------
-/**
- * POST a memory record to the memory service (upload flow only).
- * Reads MEMORY_SERVICE_URL at call time so tests can override it.
- * Returns "ok" on 2xx, "failed" on any error or non-2xx.
- */
-async function writeMemoryRecord(body) {
-    const baseUrl = (process.env.MEMORY_SERVICE_URL ?? "http://localhost:5001").replace(/\/$/, "");
-    const url = new url_1.URL(`${baseUrl}/write`);
-    const payload = JSON.stringify({ data: body });
-    const mod = url.protocol === "https:" ? https_1.default : http_1.default;
-    return new Promise((resolve) => {
-        try {
-            const req = mod.request({
-                hostname: url.hostname,
-                port: Number(url.port) || (url.protocol === "https:" ? 443 : 80),
-                path: url.pathname,
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Content-Length": Buffer.byteLength(payload),
-                },
-                timeout: 2000,
-            }, (res) => {
-                res.resume(); // drain response body
-                if (res.statusCode !== undefined && res.statusCode >= 200 && res.statusCode < 300) {
-                    resolve("ok");
-                }
-                else {
-                    console.warn(`[tes_builder] memory.write HTTP ${res.statusCode}`);
-                    resolve("failed");
-                }
-            });
-            req.on("timeout", () => {
-                req.destroy();
-                console.warn("[tes_builder] memory.write timed out");
-                resolve("failed");
-            });
-            req.on("error", (err) => {
-                console.warn(`[tes_builder] memory.write error: ${err.message}`);
-                resolve("failed");
-            });
-            req.write(payload);
-            req.end();
-        }
-        catch (err) {
-            const msg = err instanceof Error ? err.message : String(err);
-            console.warn(`[tes_builder] memory.write exception: ${msg}`);
-            resolve("failed");
-        }
-    });
-}
-// ---------------------------------------------------------------------------
 // Skill factory
 // ---------------------------------------------------------------------------
 function createTesBuilderSkill(toolClient) {
     return {
         name: "tes_builder",
         inputSchema: {
-            description: "Build TES vector from memory_signal anchor tags and optional vision features",
+            description: "Build TES vector from memory_weight_adjust anchor tags (or normalized-tag fallback) and optional vision features",
             required: [],
-            optional: ["anchor_tags", "normalized_tags", "vision_features", "vision_tags", "sentiment", "request_ts", "user_city", "decision_trace"],
+            optional: ["anchor_tags", "normalized_tags", "vision_features", "request_ts", "decision_trace"],
         },
         outputSchema: {
             description: "Validated TES vector and trace",
@@ -281,7 +164,6 @@ function createTesBuilderSkill(toolClient) {
             const anchorTags = normalizeAnchorTags(input.anchor_tags);
             const normalizedTags = normalizeAnchorTags(input.normalized_tags);
             const visionFeatures = normalizeAnchorTags(input.vision_features);
-            const visionTags = normalizeAnchorTags(input.vision_tags);
             const tagsForTes = anchorTags.length > 0 ? anchorTags : normalizedTags;
             const tagSource = anchorTags.length > 0
                 ? "anchor_tags"
@@ -351,62 +233,6 @@ function createTesBuilderSkill(toolClient) {
                     finite,
                     norm,
                 }, false, undefined, "", backend, tesVersion, modelId, device);
-                // Upload flow: persist embedding to memory service as a side effect.
-                // Triggered only when the original request carried an image (explicit signal).
-                // Never throws; result only affects trace, not recommendation output.
-                const isUploadFlow = hasUploadImageSignal(context);
-                traceNode.memory_persisted = isUploadFlow;
-                if (isUploadFlow) {
-                    const writeTimestamp = resolveMemoryWriteTimestamp(context);
-                    const captionText = extractCaptionText(input, context);
-                    const sentiment = resolveVisionSentiment(input.sentiment);
-                    const visionSemanticTags = visionTags.length > 0 ? visionTags : visionFeatures;
-                    const writeTags = visionTags.length > 0
-                        ? visionTags
-                        : (tagsForTes.length > 0 ? tagsForTes : visionSemanticTags);
-                    const writeNormalizedTags = visionTags.length > 0
-                        ? visionTags
-                        : (normalizedTags.length > 0 ? normalizedTags : writeTags);
-                    const writeBody = {
-                        user_id: context.input.user_id ?? "demo_user",
-                        timestamp: writeTimestamp.timestamp,
-                        raw_tags: writeTags,
-                        normalized_tags: writeNormalizedTags,
-                        embedding: numericVector,
-                        source: "upload",
-                        sentiment: sentiment.value,
-                    };
-                    if (captionText) {
-                        writeBody.caption_text = captionText;
-                    }
-                    if (typeof input.vision_type === "string" && input.vision_type.length > 0) {
-                        writeBody.vision_type = input.vision_type;
-                    }
-                    const originalImageBase64 = normalizeDataUrl(context.input.image_original_base64 ?? context.input.image_base64, "image/jpeg");
-                    if (originalImageBase64) {
-                        writeBody.image_base64 = originalImageBase64;
-                    }
-                    const visionInputBase64 = normalizeDataUrl(context.input.image_base64, "image/webp");
-                    if (visionInputBase64 && visionInputBase64 !== originalImageBase64) {
-                        writeBody.image_vision_input_base64 = visionInputBase64;
-                    }
-                    if (typeof context.input.image_url === "string" && context.input.image_url.trim()) {
-                        writeBody.image_url = context.input.image_url;
-                    }
-                    if (typeof input.user_city === "string" && input.user_city.length > 0) {
-                        writeBody.city = input.user_city;
-                    }
-                    else if (typeof context.input.city === "string" && context.input.city.trim().length > 0) {
-                        writeBody.city = context.input.city.trim();
-                    }
-                    // Fire-and-forget: do not block the pipeline.
-                    // Status is set to "queued" deterministically; actual result is discarded.
-                    traceNode.timestamp_source = writeTimestamp.source;
-                    traceNode.sentiment_source = sentiment.source;
-                    traceNode.sentiment_value = sentiment.value;
-                    traceNode.memory_write_status = "queued";
-                    writeMemoryRecord(writeBody).catch(() => void 0);
-                }
                 const mergedDecisionTrace = (0, trace_manager_1.deepMergeTrace)(upstreamDecisionTrace, { tes_builder: traceNode });
                 const output = {
                     tes_vector: numericVector,

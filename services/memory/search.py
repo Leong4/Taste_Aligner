@@ -81,22 +81,48 @@ def compute_time_weight(memory_ts: str, now_ts: str) -> float:
         return 1.0
 
 
-def compute_sentiment_weight(sentiment: float) -> float:
+def compute_sentiment_weight(
+    sentiment: float,
+    confidence: float = 1.0,
+    available: bool = True,
+) -> float:
     """
     Memory v1.2 - Sentiment Weight
 
-    w_sent = 1 + α * sentiment
+    w_sent = 1 + α * sentiment * confidence
 
     Args:
         sentiment: Sentiment value in [-1, 1], defaults to 0.0
+        confidence: Analysis confidence in [0, 1]
+        available: False when sentiment was not actually analysed
 
     Returns:
         Sentiment weight in [0.5, 1.5]
     """
+    if not available:
+        return 1.0
+
+    # Legacy rows may contain NULL or otherwise malformed values. Treat those as
+    # signed-neutral rather than failing the entire search request.
+    try:
+        sentiment = float(sentiment)
+    except (TypeError, ValueError):
+        sentiment = 0.0
+    if not math.isfinite(sentiment):
+        sentiment = 0.0
+
     # Clamp sentiment to [-1, 1]
     sentiment = max(-1.0, min(1.0, sentiment))
 
-    w_sent = 1.0 + ALPHA_SENT * sentiment
+    try:
+        confidence = float(confidence)
+    except (TypeError, ValueError):
+        confidence = 0.0
+    if not math.isfinite(confidence):
+        confidence = 0.0
+    confidence = max(0.0, min(1.0, confidence))
+
+    w_sent = 1.0 + ALPHA_SENT * sentiment * confidence
 
     # Clamp to safe range
     w_sent = max(0.5, min(1.5, w_sent))
@@ -162,7 +188,8 @@ def compute_context_weight(
     memory_city: str,
     query_city: Optional[str],
     memory_tags: List[str],
-    query_tags: Optional[List[str]]
+    query_tags: Optional[List[str]],
+    city_boost: Optional[float] = None,
 ) -> tuple[float, float, float]:
     """
     Memory v1.3 - Context Weight
@@ -178,7 +205,8 @@ def compute_context_weight(
     Returns:
         Tuple of (w_context, city_boost, tag_boost) for explainability
     """
-    city_boost = compute_city_boost(memory_city, query_city)
+    if city_boost is None:
+        city_boost = compute_city_boost(memory_city, query_city)
     tag_boost = compute_tag_boost(query_tags, memory_tags)
 
     w_context = city_boost * tag_boost
@@ -223,7 +251,8 @@ def search_memories(
     query_city: Optional[str],
     now_ts: str,
     memory_pool: Optional[str] = None,
-    top_k: int = 10
+    top_k: int = 10,
+    allow_cross_city: bool = True,
 ) -> List[Dict[str, Any]]:
     """
     Memory v1.3 - Search with Unified Weighting
@@ -260,10 +289,17 @@ def search_memories(
         memory_city = memory.get("city", "")
         memory_ts = memory.get("timestamp", "")
         sentiment = memory.get("sentiment", 0.0)
+        sentiment_confidence = memory.get("sentiment_confidence", 1.0)
+        sentiment_available = bool(memory.get("sentiment_available", True))
 
         if query_city:
-            if memory_city.lower().strip() != query_city.lower().strip():
+            same_city = memory_city.lower().strip() == query_city.lower().strip()
+            if not allow_cross_city and not same_city:
                 continue
+            city_boost = CITY_MATCH_BOOST if same_city else 0.5
+        else:
+            same_city = None
+            city_boost = 1.0
 
         # Compute base similarity (cosine or tag overlap fallback)
         if use_embedding and len(memory_embedding) == 512:
@@ -282,9 +318,13 @@ def search_memories(
 
         # Compute weighting factors (v1.1 - v1.3)
         w_time = compute_time_weight(memory_ts, now_ts)
-        w_sent = compute_sentiment_weight(sentiment)
+        w_sent = compute_sentiment_weight(
+            sentiment,
+            confidence=sentiment_confidence,
+            available=sentiment_available,
+        )
         w_context, city_boost, tag_boost = compute_context_weight(
-            memory_city, query_city, memory_tags, query_tags
+            memory_city, query_city, memory_tags, query_tags, city_boost=city_boost
         )
 
         # Final score
@@ -300,11 +340,15 @@ def search_memories(
             "w_context": round(w_context, 6),
             "city_boost": round(city_boost, 6),
             "tag_boost": round(tag_boost, 6),
+            "cross_city": query_city is not None and not same_city,
             "timestamp": memory_ts,
             "city": memory_city,
             "vision_type": memory.get("vision_type"),
             "normalized_tags": memory_tags,
             "sentiment": sentiment,
+            "sentiment_confidence": sentiment_confidence,
+            "sentiment_available": sentiment_available,
+            "sentiment_source": memory.get("sentiment_source", "legacy_unknown"),
             "image_url": f"/files/{memory_id}?variant=thumb",
             "preview_url": f"/files/{memory_id}?variant=preview"
         })

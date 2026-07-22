@@ -315,6 +315,17 @@ function mapResult(raw: Record<string, unknown>): MemoryWeightedResult {
     if (raw.sentiment != null) {
         result.sentiment = round6(Number(raw.sentiment) || 0);
     }
+    if (raw.sentiment_confidence != null) {
+        result.sentiment_confidence = round6(Number(raw.sentiment_confidence) || 0);
+    }
+    if (typeof raw.sentiment_available === "boolean") {
+        result.sentiment_available = raw.sentiment_available;
+    } else if (raw.sentiment_available === 0 || raw.sentiment_available === 1) {
+        result.sentiment_available = raw.sentiment_available === 1;
+    }
+    if (typeof raw.sentiment_source === "string") {
+        result.sentiment_source = raw.sentiment_source;
+    }
     return result;
 }
 
@@ -360,7 +371,7 @@ export function createMemoryWeightAdjustSkill(
             if (tags.length === 0) {
                 const fallback = buildFallback("no_tags", 0, topK, userId, city, nowTsPresent, memoryPool);
                 applyQueryEmbeddingTraceFields(
-                    fallback.trace,
+                    fallback.output.decision_trace.memory_weight_adjust,
                     false,
                     0,
                     "tags_only_fallback",
@@ -447,7 +458,7 @@ export function createMemoryWeightAdjustSkill(
                     message,
                 );
                 applyQueryEmbeddingTraceFields(
-                    fallback.trace,
+                    fallback.output.decision_trace.memory_weight_adjust,
                     queryEmbeddingUsed,
                     tags.length,
                     memorySearchMode,
@@ -466,7 +477,7 @@ export function createMemoryWeightAdjustSkill(
                     observation.error?.message ?? "gateway_call_failed",
                 );
                 applyQueryEmbeddingTraceFields(
-                    fallback.trace,
+                    fallback.output.decision_trace.memory_weight_adjust,
                     queryEmbeddingUsed,
                     tags.length,
                     memorySearchMode,
@@ -490,7 +501,7 @@ export function createMemoryWeightAdjustSkill(
                     "output_not_object",
                 );
                 applyQueryEmbeddingTraceFields(
-                    fallback.trace,
+                    fallback.output.decision_trace.memory_weight_adjust,
                     queryEmbeddingUsed,
                     tags.length,
                     memorySearchMode,
@@ -513,7 +524,7 @@ export function createMemoryWeightAdjustSkill(
                     "results_not_array",
                 );
                 applyQueryEmbeddingTraceFields(
-                    fallback.trace,
+                    fallback.output.decision_trace.memory_weight_adjust,
                     queryEmbeddingUsed,
                     tags.length,
                     memorySearchMode,
@@ -557,7 +568,7 @@ export function createMemoryWeightAdjustSkill(
                     latencyMs,
                 );
                 applyQueryEmbeddingTraceFields(
-                    fallback.trace,
+                    fallback.output.decision_trace.memory_weight_adjust,
                     queryEmbeddingUsed,
                     tags.length,
                     memorySearchMode,

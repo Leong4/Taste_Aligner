@@ -64,7 +64,15 @@ export default function MemoryModal({ memory, loading, onClose }: Props) {
             <DetailRow label="vision_type">{memory.vision_type ?? "—"}</DetailRow>
 
             <DetailRow label="sentiment">
-              {typeof memory.sentiment === "number" ? memory.sentiment.toFixed(3) : "—"}
+              {memory.sentiment_available === false || memory.sentiment_available === 0
+                ? "not analyzed"
+                : typeof memory.sentiment === "number" ? memory.sentiment.toFixed(3) : "—"}
+            </DetailRow>
+            <DetailRow label="sentiment source">{memory.sentiment_source ?? "—"}</DetailRow>
+            <DetailRow label="sentiment confidence">
+              {typeof memory.sentiment_confidence === "number"
+                ? `${Math.round(memory.sentiment_confidence * 100)}%`
+                : "—"}
             </DetailRow>
 
             {memory.caption_text && (

@@ -27,7 +27,9 @@ import {
     createMemoryWeightAdjustSkill,
     createBuildProfileVectorSkill,
     createVisionDescribeSkill,
+    captionSentimentSkill,
     createTesBuilderSkill,
+    createPersistMemorySkill,
     createFetchRecommendationSkill,
     createRerankSkill,
     mixPolicySkill,
@@ -72,11 +74,15 @@ export function createOrchestrator(config: OrchestratorConfig = {}): Orchestrato
     registry.register(decideTagBudgetSkill);
     registry.register(createTagExpandSkill(llmAdapter));
     registry.register(createTagNormalizeSkill(toolClient));
+    // Registered only for callers/tests that still address the legacy skill by
+    // name. RECOMMENDATION_GRAPH v13 does not contain a memory_signal node.
     registry.register(createMemorySignalSkill(toolClient));
     registry.register(createMemoryWeightAdjustSkill(toolClient));
     registry.register(createBuildProfileVectorSkill());  // no tool client needed — pure computation
     registry.register(createVisionDescribeSkill(toolClient));
+    registry.register(captionSentimentSkill);
     registry.register(createTesBuilderSkill(toolClient));
+    registry.register(createPersistMemorySkill());
     registry.register(createFetchRecommendationSkill(toolClient));
     registry.register(createRerankSkill(toolClient));
     registry.register(mixPolicySkill);

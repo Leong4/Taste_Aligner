@@ -47,8 +47,23 @@ export interface DecisionTrace {
     fallback_reason?: string;
   };
   tes_builder?: {
+    fallback_reason?: string;
+  };
+  caption_sentiment?: {
+    sentiment?: number;
+    confidence?: number;
+    available?: boolean;
+    source?: string;
+    fallback_reason?: string;
+  };
+  persist_memory?: {
+    status?: "skipped" | "persisted" | "failed";
     memory_persisted?: boolean;
-    memory_write_status?: string;
+    memory_id?: string;
+    attempts?: number;
+    http_status?: number;
+    error_code?: string;
+    error_message?: string;
     fallback_reason?: string;
   };
   profile_vector_node?: {
@@ -87,6 +102,31 @@ export interface SearchResult {
   vision_type?: string;
   normalized_tags?: string[];
   sentiment?: number;
+  sentiment_source?: string;
+  sentiment_confidence?: number;
+  sentiment_available?: boolean | number;
+}
+
+export interface AtlasMemory extends SearchResult {
+  country_code?: string | null;
+  image_url?: string;
+  preview_url?: string;
+}
+
+export interface AtlasSummaryResponse {
+  user_id: string;
+  total_memories: number;
+  country_count: number;
+  city_count: number;
+  mapped_memories: number;
+  unmapped_cities: string[];
+  taste_profile: Record<string, number>;
+  countries: Array<{
+    country_code: string;
+    memory_count: number;
+    cities: Array<{ city: string; memory_count: number }>;
+  }>;
+  memories: AtlasMemory[];
 }
 
 export interface MemoryDetail {
@@ -98,6 +138,10 @@ export interface MemoryDetail {
   normalized_tags?: string[];
   taxonomy?: Record<string, unknown>;
   sentiment?: number;
+  sentiment_scale?: "signed_v1";
+  sentiment_source?: string;
+  sentiment_confidence?: number;
+  sentiment_available?: boolean | number;
   source?: string;
   image_path?: string;
   thumbnail_path?: string;

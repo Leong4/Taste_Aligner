@@ -1,8 +1,8 @@
 import { useState, useRef, DragEvent, ChangeEvent } from "react";
-import { runPipeline, pollForNewMemory } from "../api";
+import { runPipeline } from "../api";
 import type { RunResponse } from "../types";
 
-type Phase = "idle" | "uploading" | "polling" | "done";
+type Phase = "idle" | "uploading" | "done";
 const VISION_INPUT_MAX_WIDTH = 1024;
 const VISION_INPUT_WEBP_QUALITY = 0.82;
 
@@ -13,6 +13,25 @@ interface UploadResult {
   memoryId: string | null;
   city?: string;
   normalizedTags: string[];
+  sentiment?: number;
+  sentimentConfidence?: number;
+  sentimentAvailable: boolean;
+  sentimentSource?: string;
+  memoryError?: string;
+}
+
+function createMemoryId(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return `upload_${Date.now()}_${Math.random().toString(36).slice(2, 12)}`;
+}
+
+function memoryBadgeClass(status?: string): string {
+  if (status === "persisted") return "badge-green";
+  if (status === "failed") return "badge-red";
+  if (status === "persisting") return "badge-yellow";
+  return "badge-gray";
 }
 
 function buildVisionInputDataUrl(
@@ -59,6 +78,7 @@ export default function ImportPage() {
   const [result, setResult] = useState<UploadResult | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const memoryIdRef = useRef<string | null>(null);
 
   function loadFile(file: File) {
     setImageFile(file);
@@ -67,6 +87,7 @@ export default function ImportPage() {
     reader.readAsDataURL(file);
     setResult(null);
     setError(null);
+    memoryIdRef.current = null;
   }
 
   function onFileChange(e: ChangeEvent<HTMLInputElement>) {
@@ -90,7 +111,8 @@ export default function ImportPage() {
     setResult(null);
     setPhase("uploading");
 
-    const uploadStartMs = Date.now();
+    const memoryId = memoryIdRef.current ?? createMemoryId();
+    memoryIdRef.current = memoryId;
     let runResp: RunResponse;
     try {
       const caption = note.trim();
@@ -105,6 +127,7 @@ export default function ImportPage() {
         image_original_base64: imagePreview,
         caption: caption || undefined,
         city: explicitCity || undefined,
+        memory_id: memoryId,
       });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -122,7 +145,8 @@ export default function ImportPage() {
 
     const dt = runResp.decision_trace ?? {};
     const vd = dt.vision_describe;
-    const tb = dt.tes_builder;
+    const pm = dt.persist_memory;
+    const cs = dt.caption_sentiment;
     const tn = dt.tag_normalize;
 
     const normalizedTags: string[] = Array.isArray(tn?.normalized_tags)
@@ -138,25 +162,25 @@ export default function ImportPage() {
       // for compatibility with historical traces.
       visionType: vd?.vision_type ?? vd?.type,
       cues: Array.isArray(vd?.cues) ? (vd.cues as string[]) : [],
-      memoryStatus: tb?.memory_write_status,
-      memoryId: null,
+      memoryStatus: pm?.status,
+      memoryId: typeof pm?.memory_id === "string" ? pm.memory_id : null,
       city: detectedCity,
       normalizedTags,
+      sentiment: typeof cs?.sentiment === "number" ? cs.sentiment : undefined,
+      sentimentConfidence: typeof cs?.confidence === "number" ? cs.confidence : undefined,
+      sentimentAvailable: cs?.available === true,
+      sentimentSource: typeof cs?.source === "string" ? cs.source : undefined,
+      memoryError: typeof pm?.error_message === "string" ? pm.error_message : undefined,
     };
     setResult(partial);
-
-    // Poll for memory_id
-    if (tb?.memory_persisted) {
-      setPhase("polling");
-      const tags = normalizedTags.length > 0 ? normalizedTags : ["food", "travel"];
-      const memId = await pollForNewMemory(uploadStartMs, tags, detectedCity).catch(() => null);
-      setResult({ ...partial, memoryId: memId });
+    if (pm?.status === "failed") {
+      setError(`Photo analysis completed, but memory saving failed: ${pm.error_message ?? pm.error_code ?? "unknown error"}`);
     }
 
     setPhase("done");
   }
 
-  const busy = phase === "uploading" || phase === "polling";
+  const busy = phase === "uploading";
   const typeEmoji = result?.visionType === "food" ? "🍜" : result?.visionType === "scenery" ? "🏔️" : "📷";
 
   return (
@@ -220,7 +244,9 @@ export default function ImportPage() {
           disabled={busy || !imageFile}
         >
           {busy ? <span className="spinner" /> : null}
-          {phase === "uploading" ? "Uploading..." : phase === "polling" ? "Saving to memory..." : "Upload"}
+          {phase === "uploading"
+            ? "Analyzing and saving..."
+            : result?.memoryStatus === "failed" ? "Retry save" : "Upload"}
         </button>
       </div>
 
@@ -240,7 +266,7 @@ export default function ImportPage() {
           <div className="result-row">
             <span className="label">Memory write</span>
             <span>
-              <span className={`status-badge ${result.memoryStatus === "queued" ? "badge-green" : "badge-gray"}`}>
+              <span className={`status-badge ${memoryBadgeClass(result.memoryStatus)}`}>
                 {result.memoryStatus ?? "—"}
               </span>
             </span>
@@ -249,11 +275,16 @@ export default function ImportPage() {
           <div className="result-row">
             <span className="label">Memory ID</span>
             <span className="value mono" style={{ fontSize: "0.8rem", wordBreak: "break-all" }}>
-              {phase === "polling" ? (
-                <><span className="spinner" style={{ marginRight: "0.4rem" }} />polling...</>
-              ) : result.memoryId ?? (
-                <span style={{ color: "#9ca3af" }}>not detected (check library later)</span>
-              )}
+              {result.memoryId ?? <span style={{ color: "#9ca3af" }}>not persisted</span>}
+            </span>
+          </div>
+
+          <div className="result-row">
+            <span className="label">Caption sentiment</span>
+            <span className="value">
+              {result.sentimentAvailable && typeof result.sentiment === "number"
+                ? `${result.sentiment.toFixed(3)}${typeof result.sentimentConfidence === "number" ? ` (${Math.round(result.sentimentConfidence * 100)}% confidence)` : ""}`
+                : "not analyzed"}
             </span>
           </div>
 
